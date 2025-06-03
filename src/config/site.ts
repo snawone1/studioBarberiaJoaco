@@ -26,6 +26,7 @@ export const siteConfig: SiteConfig = {
     { title: "Gallery", href: "/gallery" },
     { title: "Book Appointment", href: "/book" },
     { title: "Style Advisor", href: "/style-advisor" },
+    { title: "Admin Panel", href: "/admin" },
   ],
   links: {
     // Add social media links here if available
