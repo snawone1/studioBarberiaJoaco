@@ -9,12 +9,12 @@ export default function HomePage() {
       <Card className="w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden">
         <div className="relative aspect-[16/9] md:aspect-[2/1]">
           <Image
-            src="https://placehold.co/1200x600.png"
-            alt="Barber pole pattern background"
+            src="https://www.shutterstock.com/image-vector/barbershop-grunge-seamless-background-mens-600nw-2335839235.jpg"
+            alt="Barbershop pattern background with tools"
             layout="fill"
             objectFit="cover"
             className="opacity-80"
-            data-ai-hint="barber pole pattern distressed red blue white"
+            data-ai-hint="barber tools pattern"
             priority
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center bg-black/50 p-6">
