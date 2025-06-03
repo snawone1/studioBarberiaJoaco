@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-4 md:p-8">
       <Card className="w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden">
-        <div className="relative aspect-[16/9] md:aspect-[2/1]">
+        <div className="relative aspect-[16/9] md:aspect-[16/7]">
           <Image
             src="https://www.shutterstock.com/image-vector/barbershop-grunge-seamless-background-mens-600nw-2335839235.jpg"
             alt="Barbershop pattern background with tools"
@@ -24,7 +24,7 @@ export default function HomePage() {
             <p className="mt-4 text-base sm:text-lg md:text-xl max-w-xl mx-auto text-gray-200">
               Estilo y precisión en cada corte. Experimenta la barbería tradicional con un toque moderno.
             </p>
-            <Button size="lg" className="mt-8 bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+            <Button size="lg" className="mt-8 bg-accent hover:bg-accent/90 text-accent-foreground" asChild>
               <Link href="/book">
                 Reservar Cita
               </Link>
