@@ -4,69 +4,70 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
-    --foreground: 0 0% 10%; /* Dark Gray/Near Black */
+    --background: 220 15% 12%; /* Dark Blue-Gray */
+    --foreground: 0 0% 98%; /* Almost White */
 
-    --card: 0 0% 98%; /* Lighter Gray for cards */
-    --card-foreground: 0 0% 10%;
+    --card: 220 15% 18%; /* Slightly Lighter Dark Blue-Gray for cards */
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 100%; /* White for popovers */
-    --popover-foreground: 0 0% 10%;
+    --popover: 220 15% 15%; 
+    --popover-foreground: 0 0% 95%;
 
     --primary: 45 100% 51%; /* Bright Gold */
-    --primary-foreground: 0 0% 10%; /* Dark Gray/Black for text on gold buttons */
+    --primary-foreground: 20 100% 5%; /* Dark Brown/Black for text on gold buttons */
 
-    --secondary: 0 0% 95%; /* Light Gray */
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 220 15% 25%; /* Medium Dark Blue-Gray */
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 0 0% 95%; /* Light Gray */
-    --muted-foreground: 0 0% 40%; /* Slightly lighter gray for muted text */
+    --muted: 220 15% 25%; 
+    --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
 
     --accent: 45 100% 51%; /* Bright Gold for accents */
-    --accent-foreground: 0 0% 10%; /* Dark Gray/Black for text on gold accents */
+    --accent-foreground: 20 100% 5%; 
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%; /* Border Gray */
-    --input: 0 0% 90%; /* Input field border */
+    --border: 220 15% 30%; /* Border Gray for dark theme */
+    --input: 220 15% 30%; /* Input field border for dark theme */
     --ring: 45 100% 51%; /* Gold for focus rings */
     --radius: 0.5rem;
 
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 45 100% 51%;
+    --chart-2: 210 100% 60%;
+    --chart-3: 0 0% 80%;
+    --chart-4: 30 90% 55%;
+    --chart-5: 150 80% 45%;
   }
 
+  /* Remove .dark specific overrides if the main theme is now dark, or adjust if dual theme is still desired */
+  /* For now, we make the root theme dark as per the image */
   .dark {
-    /* Keeping a basic dark mode for shadcn components, though not primary focus */
-    --background: 0 0% 10%;
+    --background: 220 15% 12%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+    --card: 220 15% 18%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 15% 15%;
+    --popover-foreground: 0 0% 95%;
     --primary: 45 100% 51%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
+    --primary-foreground: 20 100% 5%;
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 220 15% 25%;
     --muted-foreground: 0 0% 60%;
     --accent: 45 100% 51%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 62.8% 30.6%;
+    --accent-foreground: 20 100% 5%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 220 15% 30%;
+    --input: 220 15% 30%;
     --ring: 45 100% 51%;
 
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --chart-1: 45 100% 51%;
+    --chart-2: 210 100% 60%;
+    --chart-3: 0 0% 80%;
+    --chart-4: 30 90% 55%;
+    --chart-5: 150 80% 45%;
   }
 }
 
