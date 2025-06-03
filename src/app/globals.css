@@ -22,7 +22,7 @@
     --muted: 220 15% 25%; 
     --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
 
-    --accent: 40 65% 70%; /* Lighter and brighter Gold for CTAs */
+    --accent: 40 50% 60%; /* Gold from user image (#C2A675) - Same as primary for the button */
     --accent-foreground: 0 0% 10%; /* Darker text for new accent */
 
     --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
@@ -53,7 +53,7 @@
     --secondary-foreground: 0 0% 90%;
     --muted: 220 15% 25%;
     --muted-foreground: 0 0% 60%;
-    --accent: 40 65% 70%; /* Lighter and brighter Gold for CTAs */
+    --accent: 40 50% 60%; /* Gold from user image (#C2A675) - Same as primary for the button */
     --accent-foreground: 0 0% 10%; /* Darker text for new accent */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
