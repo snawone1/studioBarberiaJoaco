@@ -13,7 +13,7 @@
     --popover: 220 15% 15%; 
     --popover-foreground: 0 0% 95%;
 
-    --primary: 40 50% 60%; /* New Gold from user */
+    --primary: 40 50% 60%; /* Gold from user image */
     --primary-foreground: 0 0% 10%; /* Darker text for new primary */
 
     --secondary: 220 15% 25%; /* Medium Dark Blue-Gray */
@@ -22,7 +22,7 @@
     --muted: 220 15% 25%; 
     --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
 
-    --accent: 40 50% 60%; /* New Gold from user */
+    --accent: 40 60% 55%; /* Richer Gold for CTAs from user image */
     --accent-foreground: 0 0% 10%; /* Darker text for new accent */
 
     --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
@@ -30,10 +30,10 @@
 
     --border: 220 15% 30%; /* Border Gray for dark theme */
     --input: 220 15% 30%; /* Input field border for dark theme */
-    --ring: 40 50% 60%; /* New Gold for focus rings */
+    --ring: 40 50% 60%; /* Gold from user image for focus rings */
     --radius: 0.5rem;
 
-    --chart-1: 40 50% 60%; /* New Gold */
+    --chart-1: 40 50% 60%; /* Gold from user image */
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
@@ -47,21 +47,21 @@
     --card-foreground: 0 0% 95%;
     --popover: 220 15% 15%;
     --popover-foreground: 0 0% 95%;
-    --primary: 40 50% 60%; /* New Gold from user */
+    --primary: 40 50% 60%; /* Gold from user image */
     --primary-foreground: 0 0% 10%; /* Darker text for new primary */
     --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 90%;
     --muted: 220 15% 25%;
     --muted-foreground: 0 0% 60%;
-    --accent: 40 50% 60%; /* New Gold from user */
+    --accent: 40 60% 55%; /* Richer Gold for CTAs from user image */
     --accent-foreground: 0 0% 10%; /* Darker text for new accent */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 15% 30%;
     --input: 220 15% 30%;
-    --ring: 40 50% 60%; /* New Gold */
+    --ring: 40 50% 60%; /* Gold from user image */
 
-    --chart-1: 40 50% 60%; /* New Gold */
+    --chart-1: 40 50% 60%; /* Gold from user image */
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
