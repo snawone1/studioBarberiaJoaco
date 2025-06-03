@@ -23,8 +23,11 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
-import { styleAdvisorSchema, type StyleAdvisorFormValues, getAIStyleAdvice } from '@/app/actions';
+import { getAIStyleAdvice } from '@/app/actions';
+import { type StyleAdvisorFormValues, styleAdvisorSchema } from '@/lib/schemas';
 import type { StyleRecommendationWithServicesOutput } from '@/ai/flows/style-recommendation-with-services';
+import Link from 'next/link';
+
 
 const hairTypes = ['Straight', 'Wavy', 'Curly', 'Coily', 'Fine', 'Thick'];
 const faceShapes = ['Oval', 'Round', 'Square', 'Heart', 'Diamond', 'Long'];

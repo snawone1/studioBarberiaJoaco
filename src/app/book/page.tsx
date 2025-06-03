@@ -33,7 +33,8 @@ import { CalendarIcon, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 
 import { PageHeader } from '@/components/page-header';
-import { appointmentSchema, type AppointmentFormValues, submitAppointmentRequest } from '@/app/actions';
+import { submitAppointmentRequest } from '@/app/actions';
+import { type AppointmentFormValues, appointmentSchema } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 
