@@ -13,8 +13,8 @@
     --popover: 220 15% 15%; 
     --popover-foreground: 0 0% 95%;
 
-    --primary: 45 100% 51%; /* Bright Gold */
-    --primary-foreground: 20 100% 5%; /* Dark Brown/Black for text on gold buttons */
+    --primary: 39 23% 38%; /* Muted Gold/Bronze */
+    --primary-foreground: 0 0% 98%; /* Almost White for text on new primary */
 
     --secondary: 220 15% 25%; /* Medium Dark Blue-Gray */
     --secondary-foreground: 0 0% 90%;
@@ -22,26 +22,24 @@
     --muted: 220 15% 25%; 
     --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
 
-    --accent: 45 100% 51%; /* Bright Gold for accents */
-    --accent-foreground: 20 100% 5%; 
+    --accent: 39 23% 38%; /* Muted Gold/Bronze for accents */
+    --accent-foreground: 0 0% 98%; /* Almost White for text on new accent */
 
     --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
     --destructive-foreground: 0 0% 98%;
 
     --border: 220 15% 30%; /* Border Gray for dark theme */
     --input: 220 15% 30%; /* Input field border for dark theme */
-    --ring: 45 100% 51%; /* Gold for focus rings */
+    --ring: 39 23% 38%; /* Muted Gold/Bronze for focus rings */
     --radius: 0.5rem;
 
-    --chart-1: 45 100% 51%;
+    --chart-1: 39 23% 38%;
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
     --chart-5: 150 80% 45%;
   }
 
-  /* Remove .dark specific overrides if the main theme is now dark, or adjust if dual theme is still desired */
-  /* For now, we make the root theme dark as per the image */
   .dark {
     --background: 220 15% 12%;
     --foreground: 0 0% 98%;
@@ -49,21 +47,21 @@
     --card-foreground: 0 0% 95%;
     --popover: 220 15% 15%;
     --popover-foreground: 0 0% 95%;
-    --primary: 45 100% 51%;
-    --primary-foreground: 20 100% 5%;
+    --primary: 39 23% 38%;
+    --primary-foreground: 0 0% 98%;
     --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 90%;
     --muted: 220 15% 25%;
     --muted-foreground: 0 0% 60%;
-    --accent: 45 100% 51%;
-    --accent-foreground: 20 100% 5%;
+    --accent: 39 23% 38%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 15% 30%;
     --input: 220 15% 30%;
-    --ring: 45 100% 51%;
+    --ring: 39 23% 38%;
 
-    --chart-1: 45 100% 51%;
+    --chart-1: 39 23% 38%;
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
@@ -77,7 +75,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* font-family is set by tailwind.config.ts via className on body tag */
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
