@@ -27,19 +27,16 @@ export function MainNav({ items }: MainNavProps) {
         (item, index) => {
           const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
           const isActive = pathname === item.href;
-          const isHomeActive = isActive && item.href === '/';
 
           return item.href && (
             <Link
               key={index}
               href={item.href}
               className={cn(
-                'flex items-center text-sm font-medium transition-colors px-4 py-2 rounded-md', // Added padding and rounded-md
-                isHomeActive 
+                'flex items-center text-sm font-medium transition-colors px-4 py-2 rounded-md', 
+                isActive 
                   ? 'bg-secondary text-primary' 
-                  : isActive 
-                  ? 'text-primary hover:text-primary/90' 
-                  : 'text-foreground/80 hover:text-primary/80',
+                  : 'text-foreground/80 hover:text-primary/80 hover:bg-secondary/50', // Added hover:bg-secondary/50 for consistency
                 item.disabled && 'cursor-not-allowed opacity-80'
               )}
             >

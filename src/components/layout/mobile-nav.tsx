@@ -52,8 +52,8 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
                     href={item.href}
                     onOpenChange={setOpen}
                     className={cn(
-                      "flex items-center py-2 text-lg", // Added py-2
-                      isActive ? "text-primary" : "text-foreground/80 hover:text-primary"
+                      "flex items-center py-2 px-3 rounded-md text-lg", // Added px-3 and rounded-md
+                      isActive ? "bg-secondary text-primary" : "text-foreground/80 hover:text-primary hover:bg-secondary/50"
                     )}
                   >
                     {IconComponent && <IconComponent className={cn(
