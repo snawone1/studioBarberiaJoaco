@@ -38,3 +38,10 @@ export const registerSchema = z.object({
   path: ["confirmPassword"], // path of error
 });
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+// Site Settings Form Schema
+export const siteSettingsSchema = z.object({
+  siteName: z.string().min(1, { message: "El nombre del sitio no puede estar vacío." }),
+  siteDescription: z.string().min(1, { message: "La descripción del sitio no puede estar vacía." }),
+});
+export type SiteSettingsFormValues = z.infer<typeof siteSettingsSchema>;
