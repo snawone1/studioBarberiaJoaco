@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center p-4 md:p-8">
       <Card className="w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden">
-        <div className="relative aspect-[16/9] md:aspect-[16/7]">
+        <div className="relative aspect-[16/9] md:aspect-[2/1]"> {/* Changed aspect ratio for a taller banner */}
           <Image
             src="https://www.shutterstock.com/image-vector/barbershop-grunge-seamless-background-mens-600nw-2335839235.jpg"
             alt="Barbershop pattern background with tools"
