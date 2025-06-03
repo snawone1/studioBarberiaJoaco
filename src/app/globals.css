@@ -13,8 +13,8 @@
     --popover: 220 15% 15%; 
     --popover-foreground: 0 0% 95%;
 
-    --primary: 39 23% 45%; /* Muted Gold/Bronze - Lightened */
-    --primary-foreground: 0 0% 98%; /* Almost White for text on new primary */
+    --primary: 39 31% 57%; /* New Gold from image */
+    --primary-foreground: 0 0% 10%; /* Darker text for new primary */
 
     --secondary: 220 15% 25%; /* Medium Dark Blue-Gray */
     --secondary-foreground: 0 0% 90%;
@@ -22,18 +22,18 @@
     --muted: 220 15% 25%; 
     --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
 
-    --accent: 39 23% 45%; /* Muted Gold/Bronze for accents - Lightened */
-    --accent-foreground: 0 0% 98%; /* Almost White for text on new accent */
+    --accent: 39 31% 57%; /* New Gold from image */
+    --accent-foreground: 0 0% 10%; /* Darker text for new accent */
 
     --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
     --destructive-foreground: 0 0% 98%;
 
     --border: 220 15% 30%; /* Border Gray for dark theme */
     --input: 220 15% 30%; /* Input field border for dark theme */
-    --ring: 39 23% 45%; /* Muted Gold/Bronze for focus rings - Lightened */
+    --ring: 39 31% 57%; /* New Gold for focus rings */
     --radius: 0.5rem;
 
-    --chart-1: 39 23% 45%; /* Lightened */
+    --chart-1: 39 31% 57%; /* New Gold */
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
@@ -47,21 +47,21 @@
     --card-foreground: 0 0% 95%;
     --popover: 220 15% 15%;
     --popover-foreground: 0 0% 95%;
-    --primary: 39 23% 45%; /* Lightened */
-    --primary-foreground: 0 0% 98%;
+    --primary: 39 31% 57%; /* New Gold from image */
+    --primary-foreground: 0 0% 10%; /* Darker text for new primary */
     --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 90%;
     --muted: 220 15% 25%;
     --muted-foreground: 0 0% 60%;
-    --accent: 39 23% 45%; /* Lightened */
-    --accent-foreground: 0 0% 98%;
+    --accent: 39 31% 57%; /* New Gold from image */
+    --accent-foreground: 0 0% 10%; /* Darker text for new accent */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 220 15% 30%;
     --input: 220 15% 30%;
-    --ring: 39 23% 45%; /* Lightened */
+    --ring: 39 31% 57%; /* New Gold */
 
-    --chart-1: 39 23% 45%; /* Lightened */
+    --chart-1: 39 31% 57%; /* New Gold */
     --chart-2: 210 100% 60%;
     --chart-3: 0 0% 80%;
     --chart-4: 30 90% 55%;
