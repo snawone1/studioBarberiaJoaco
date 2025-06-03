@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link, { type LinkProps } from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, Scissors, Home, ShoppingBag, CalendarDays, LayoutDashboard, type LucideProps } from 'lucide-react';
 import { siteConfig, type NavItem } from '@/config/site';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ const iconComponents: { [key: string]: React.FC<LucideProps> } = {
 
 export function MobileNav({ items }: { items?: NavItem[] }) {
   const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -33,25 +34,32 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
       <SheetContent side="left" className="pr-0 bg-background text-foreground">
         <MobileLink
           href="/"
-          className="flex items-center"
+          className="flex items-center mb-4" // Added margin bottom
           onOpenChange={setOpen}
         >
           <Scissors className="mr-2 h-6 w-6 text-primary" />
           <span className="font-bold text-xl font-headline">{siteConfig.name}</span>
         </MobileLink>
         <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col space-y-2"> {/* Adjusted space-y */}
             {items?.map(
               (item) => {
                 const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
+                const isActive = pathname === item.href;
                 return item.href && (
                   <MobileLink
                     key={item.href}
                     href={item.href}
                     onOpenChange={setOpen}
-                    className="flex items-center"
+                    className={cn(
+                      "flex items-center py-2 text-lg", // Added py-2
+                      isActive ? "text-primary" : "text-foreground/80 hover:text-primary"
+                    )}
                   >
-                    {IconComponent && <IconComponent className="mr-2 h-4 w-4 text-primary" />}
+                    {IconComponent && <IconComponent className={cn(
+                      "mr-2 h-5 w-5", // Slightly larger icon
+                       isActive ? "text-primary" : "text-foreground/70"
+                    )} />}
                     {item.title}
                   </MobileLink>
                 )
@@ -85,7 +93,7 @@ function MobileLink({
         router.push(href.toString());
         onOpenChange?.(false);
       }}
-      className={cn('text-lg font-medium text-foreground/80 hover:text-primary', className)}
+      className={cn('font-medium', className)} // Removed text-lg as it's in the map
       {...props}
     >
       {children}

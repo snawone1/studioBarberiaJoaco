@@ -16,7 +16,7 @@ export function Header() {
         <MainNav items={siteConfig.mainNav} />
         <MobileNav items={siteConfig.mainNav} />
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Button variant="outline">
+          <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary">
             <LogOut className="mr-2 h-4 w-4" />
             Cerrar Sesión
           </Button>
