@@ -3,7 +3,44 @@
 
 import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
-import { productsData, type Product } from '@/app/products/page'; // Assuming productsData is exported
+import type { Product } from '@/app/products/page'; // Product type is still fine to import
+
+// Define initial productsData here
+const initialProductsData: Product[] = [
+  {
+    id: 'prod1',
+    name: 'Cera Moldeadora Profesional',
+    description: 'Fijación fuerte y acabado mate para estilos modernos y definidos. Fácil de aplicar y remover.',
+    price: 'ARS$ 2800',
+    imageSrc: 'https://placehold.co/400x400.png',
+    aiHint: 'hair wax men',
+  },
+  {
+    id: 'prod2',
+    name: 'Aceite Premium para Barba',
+    description: 'Hidrata y suaviza la barba, promoviendo un crecimiento saludable y brillo natural. Aroma sutil.',
+    price: 'ARS$ 3200',
+    imageSrc: 'https://placehold.co/400x400.png',
+    aiHint: 'beard oil grooming',
+  },
+  {
+    id: 'prod3',
+    name: 'Shampoo Fortalecedor Anticaída',
+    description: 'Formulado con extractos naturales para fortalecer el cabello desde la raíz y prevenir la caída.',
+    price: 'ARS$ 3500',
+    imageSrc: 'https://placehold.co/400x400.png',
+    aiHint: 'shampoo hair loss',
+  },
+  {
+    id: 'prod4',
+    name: 'Navaja Clásica de Afeitar',
+    description: 'Para un afeitado apurado y tradicional. Hoja intercambiable, mango ergonómico de madera.',
+    price: 'ARS$ 7500',
+    imageSrc: 'https://placehold.co/400x400.png',
+    aiHint: 'straight razor shave',
+  },
+];
+
 
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
   // In a real app, you'd save this to a database or send an email.
@@ -40,7 +77,7 @@ export async function submitSiteSettings(data: SiteSettingsFormValues) {
 }
 
 // Product Management Actions (Simulated)
-let currentProducts: Product[] = [...productsData]; // In-memory store for simulation
+let currentProducts: Product[] = [...initialProductsData]; // In-memory store for simulation
 
 export async function getProducts(): Promise<Product[]> {
   // Simulate API delay
