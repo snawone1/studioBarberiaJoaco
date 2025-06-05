@@ -1,8 +1,9 @@
 
 'use server';
 
-import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues } from '@/lib/schemas';
+import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
+import { productsData, type Product } from '@/app/products/page'; // Assuming productsData is exported
 
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
   // In a real app, you'd save this to a database or send an email.
@@ -33,15 +34,34 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 }
 
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
-  // In a real app, you'd save this to a database (e.g., Firestore).
-  // These changes would then need to be read by your application, possibly
-  // invalidating caches or re-fetching data for siteConfig.
   console.log('Site Settings Update Received:', data);
-
-  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // For this prototype, we always return success.
-  // In a real app, handle potential errors during save.
   return { success: true, message: '¡Configuración del sitio guardada con éxito! (Simulado)' };
+}
+
+// Product Management Actions (Simulated)
+let currentProducts: Product[] = [...productsData]; // In-memory store for simulation
+
+export async function getProducts(): Promise<Product[]> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return currentProducts;
+}
+
+export async function addProduct(data: ProductFormValues) {
+  console.log('Adding Product (Simulated):', data);
+  const newProduct: Product = {
+    ...data,
+    id: data.id || `prod-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, // Generate ID if not present
+  };
+  currentProducts.push(newProduct); // Add to in-memory store
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { success: true, message: 'Producto añadido con éxito (Simulado).', product: newProduct };
+}
+
+export async function deleteProduct(productId: string) {
+  console.log('Deleting Product (Simulated):', productId);
+  currentProducts = currentProducts.filter(p => p.id !== productId); // Remove from in-memory store
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { success: true, message: 'Producto eliminado con éxito (Simulado).' };
 }

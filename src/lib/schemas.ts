@@ -47,3 +47,14 @@ export const siteSettingsSchema = z.object({
   siteDescription: z.string().min(1, { message: "La descripción del sitio no puede estar vacía." }),
 });
 export type SiteSettingsFormValues = z.infer<typeof siteSettingsSchema>;
+
+// Product Form Schema
+export const productSchema = z.object({
+  id: z.string().optional(), // Optional for new products, required for existing
+  name: z.string().min(3, { message: "El nombre del producto debe tener al menos 3 caracteres." }),
+  description: z.string().min(10, { message: "La descripción debe tener al menos 10 caracteres." }),
+  price: z.string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, { message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX" }),
+  imageSrc: z.string().url({ message: "Por favor, introduce una URL de imagen válida." }),
+  aiHint: z.string().min(2, { message: "La pista de IA debe tener al menos 2 caracteres." }),
+});
+export type ProductFormValues = z.infer<typeof productSchema>;

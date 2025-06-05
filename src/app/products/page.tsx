@@ -1,8 +1,18 @@
+
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 
-const products = [
+export type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  imageSrc: string;
+  aiHint: string;
+};
+
+export const productsData: Product[] = [
   {
     id: 'pomade-strong',
     name: 'Pomada Fijación Fuerte',
@@ -45,7 +55,7 @@ export default function ProductsPage() {
         description="Descubre nuestra selección de productos premium para el cuidado del cabello y la barba."
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        {products.map((product) => (
+        {productsData.map((product) => (
           <Card key={product.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
             <div className="relative aspect-square w-full">
               <Image

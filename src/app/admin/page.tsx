@@ -20,6 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Form,
   FormControl,
@@ -28,20 +29,30 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { siteSettingsSchema, type SiteSettingsFormValues } from '@/lib/schemas';
-import { submitSiteSettings } from '@/app/actions';
+import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
+import { submitSiteSettings, getProducts, addProduct, deleteProduct } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Loader2 } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle } from 'lucide-react';
+import type { Product } from '@/app/products/page';
 
 export default function AdminPage() {
   const { currentUser, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+
+  // Site Settings State
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [isSubmittingSettings, setIsSubmittingSettings] = useState(false);
+
+  // Product Management State
+  const [isProductManagerOpen, setIsProductManagerOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -51,37 +62,24 @@ export default function AdminPage() {
     },
   });
 
+  const productForm = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      price: 'ARS$ ',
+      imageSrc: '',
+      aiHint: '',
+    },
+  });
+
   useEffect(() => {
     if (!loading && !currentUser) {
       router.push('/login?redirect=/admin');
     }
   }, [currentUser, loading, router]);
 
-  async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
-    setIsSubmittingSettings(true);
-    const result = await submitSiteSettings(data);
-    if (result.success) {
-      toast({
-        title: '¡Configuración Guardada!',
-        description: result.message,
-      });
-      // In a real app, you might want to update siteConfig or trigger a re-fetch
-      // For now, we can update the form defaults if the dialog is kept open
-      // or simply close the dialog.
-      // settingsForm.reset(data); // Optionally reset form to new values
-      setIsSettingsDialogOpen(false); // Close dialog on success
-    } else {
-      toast({
-        title: 'Error',
-        description: result.message || 'No se pudo guardar la configuración.',
-        variant: 'destructive',
-      });
-    }
-    setIsSubmittingSettings(false);
-  }
-  
   useEffect(() => {
-    // Reset form to current siteConfig values when dialog opens
     if (isSettingsDialogOpen) {
       settingsForm.reset({
         siteName: siteConfig.name,
@@ -89,7 +87,62 @@ export default function AdminPage() {
       });
     }
   }, [isSettingsDialogOpen, settingsForm]);
+  
+  async function fetchProductsAdmin() {
+    if (isProductManagerOpen) {
+      setIsLoadingProducts(true);
+      try {
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        toast({ title: 'Error', description: 'No se pudieron cargar los productos.', variant: 'destructive' });
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    }
+  }
 
+  useEffect(() => {
+    fetchProductsAdmin();
+  }, [isProductManagerOpen]);
+
+
+  async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
+    setIsSubmittingSettings(true);
+    const result = await submitSiteSettings(data);
+    if (result.success) {
+      toast({ title: '¡Configuración Guardada!', description: result.message });
+      setIsSettingsDialogOpen(false);
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
+    }
+    setIsSubmittingSettings(false);
+  }
+
+  async function onAddProductSubmit(data: ProductFormValues) {
+    setIsSubmittingProduct(true);
+    const result = await addProduct(data);
+    if (result.success && result.product) {
+      toast({ title: '¡Producto Añadido!', description: result.message });
+      setProducts(prev => [...prev, result.product!]);
+      productForm.reset();
+      setShowAddProductForm(false);
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo añadir el producto.', variant: 'destructive' });
+    }
+    setIsSubmittingProduct(false);
+  }
+
+  async function handleDeleteProduct(productId: string) {
+    // Optional: Add a confirmation dialog here
+    const result = await deleteProduct(productId);
+    if (result.success) {
+      toast({ title: '¡Producto Eliminado!', description: result.message });
+      setProducts(prev => prev.filter(p => p.id !== productId));
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo eliminar el producto.', variant: 'destructive' });
+    }
+  }
 
   if (loading) {
     return (
@@ -103,6 +156,15 @@ export default function AdminPage() {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <p>Redirigiendo a inicio de sesión...</p>
+      </div>
+    );
+  }
+  
+   if (currentUser.email !== 'joacoadmin@admin.com') {
+    return (
+      <div className="container mx-auto px-4 py-12 text-center">
+        <PageHeader title="Acceso Denegado" description="No tienes permiso para ver esta página." titleClassName="font-sans" />
+        <Button onClick={() => router.push('/')}>Volver al Inicio</Button>
       </div>
     );
   }
@@ -139,7 +201,7 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Visualiza, confirma o reprograma las citas de los clientes.
+              Visualiza, confirma o reprograma las citas de los clientes. (Funcionalidad futura)
             </p>
           </CardContent>
         </Card>
@@ -152,10 +214,12 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Supervisa las cuentas y roles de los usuarios.
+              Supervisa las cuentas y roles de los usuarios. (Funcionalidad futura)
             </p>
           </CardContent>
         </Card>
+        
+        {/* Site Settings Card & Dialog */}
         <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -222,6 +286,131 @@ export default function AdminPage() {
                 </DialogFooter>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Product Management Card & Dialog */}
+        <Dialog open={isProductManagerOpen} onOpenChange={setIsProductManagerOpen}>
+          <DialogTrigger asChild>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-medium font-sans">
+                  Gestionar Productos
+                </CardTitle>
+                <Package className="h-6 w-6 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Añade, edita o elimina productos de tu tienda.
+                </p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="font-sans">Gestionar Productos</DialogTitle>
+              <DialogDescription>
+                Visualiza, añade o elimina productos de tu inventario. Los cambios son simulados.
+              </DialogDescription>
+            </DialogHeader>
+
+            {!showAddProductForm && (
+              <Button onClick={() => { productForm.reset(); setShowAddProductForm(true); }} className="mb-4">
+                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Producto Nuevo
+              </Button>
+            )}
+
+            {showAddProductForm && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="font-sans text-lg">Nuevo Producto</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Form {...productForm}>
+                    <form onSubmit={productForm.handleSubmit(onAddProductSubmit)} className="space-y-4">
+                      <FormField control={productForm.control} name="name" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nombre del Producto</FormLabel>
+                          <FormControl><Input placeholder="Ej: Cera Moldeadora" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={productForm.control} name="description" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción</FormLabel>
+                          <FormControl><Textarea placeholder="Describe el producto..." {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={productForm.control} name="price" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Precio</FormLabel>
+                          <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={productForm.control} name="imageSrc" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL de Imagen</FormLabel>
+                          <FormControl><Input placeholder="https://placehold.co/400x400.png" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={productForm.control} name="aiHint" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pista para IA (Keywords)</FormLabel>
+                          <FormControl><Input placeholder="Ej: cera cabello" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <div className="flex justify-end space-x-2 pt-2">
+                        <Button type="button" variant="outline" onClick={() => setShowAddProductForm(false)}>Cancelar</Button>
+                        <Button type="submit" disabled={isSubmittingProduct}>
+                          {isSubmittingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Añadir Producto
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            )}
+            
+            <h3 className="text-lg font-semibold mb-2 font-sans">Productos Actuales</h3>
+            {isLoadingProducts ? (
+              <div className="flex justify-center py-4"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+            ) : products.length === 0 ? (
+              <p className="text-muted-foreground text-sm">No hay productos para mostrar.</p>
+            ) : (
+              <ScrollArea className="h-[300px] border rounded-md">
+                <div className="p-4 space-y-3">
+                  {products.map(product => (
+                    <Card key={product.id} className="p-3">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold">{product.name}</p>
+                          <p className="text-sm text-muted-foreground">{product.price}</p>
+                        </div>
+                        <div className="space-x-2">
+                           {/* <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600">
+                            <Edit3 className="h-4 w-4" />
+                          </Button>  */}
+                          <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)} className="h-8 w-8 text-destructive hover:text-red-700">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
+
+            <DialogFooter className="mt-6">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
