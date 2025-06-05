@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -8,6 +9,7 @@ import { siteConfig, type NavItem } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useAuth } from '@/context/AuthContext';
 
 const iconComponents: { [key: string]: React.FC<LucideProps> } = {
   Home,
@@ -19,6 +21,14 @@ const iconComponents: { [key: string]: React.FC<LucideProps> } = {
 export function MobileNav({ items }: { items?: NavItem[] }) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
+  const { currentUser } = useAuth();
+
+  const filteredItems = items?.filter(item => {
+    if (item.href === '/admin') {
+      return currentUser?.email === 'joacoadmin@admin.com';
+    }
+    return true;
+  });
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -42,7 +52,7 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
         </MobileLink>
         <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
           <div className="flex flex-col space-y-2"> {/* Adjusted space-y */}
-            {items?.map(
+            {filteredItems?.map(
               (item) => {
                 const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
                 const isActive = pathname === item.href;
@@ -93,7 +103,7 @@ function MobileLink({
         router.push(href.toString());
         onOpenChange?.(false);
       }}
-      className={cn('font-medium', className)} // Removed text-lg as it's in the map
+      className={cn('font-medium', className)}
       {...props}
     >
       {children}
