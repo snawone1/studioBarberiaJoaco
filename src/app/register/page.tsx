@@ -28,7 +28,9 @@ export default function RegisterPage() {
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      fullName: '',
       email: '',
+      phoneNumber: '',
       password: '',
       confirmPassword: '',
     },
@@ -41,7 +43,10 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await signup(data);
+      // Note: 'fullName' and 'phoneNumber' from 'data' are not directly used by 
+      // Firebase's createUserWithEmailAndPassword. They would need to be saved
+      // to a user profile (e.g., in Firestore) in a separate step.
+      const result = await signup(data); 
       if (result && 'code' in result) { // Check if it's an AuthError
         setError(result.message || 'Error al registrarse.');
         toast({ title: 'Error', description: result.message || 'Error al registrarse.', variant: 'destructive' });
@@ -72,6 +77,18 @@ export default function RegisterPage() {
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
+                <Label htmlFor="fullName">Nombre Completo</Label>
+                <Input 
+                  id="fullName" 
+                  type="text" 
+                  placeholder="Juan Pérez" 
+                  {...form.register('fullName')} 
+                />
+                {form.formState.errors.fullName && (
+                  <p className="text-sm text-destructive">{form.formState.errors.fullName.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="email">Correo Electrónico</Label>
                 <Input 
                   id="email" 
@@ -81,6 +98,18 @@ export default function RegisterPage() {
                 />
                 {form.formState.errors.email && (
                   <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">Número de Teléfono</Label>
+                <Input 
+                  id="phoneNumber" 
+                  type="tel" 
+                  placeholder="+54 11 1234 5678" 
+                  {...form.register('phoneNumber')} 
+                />
+                {form.formState.errors.phoneNumber && (
+                  <p className="text-sm text-destructive">{form.formState.errors.phoneNumber.message}</p>
                 )}
               </div>
               <div className="space-y-2">

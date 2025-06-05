@@ -13,10 +13,10 @@
     --popover: 220 15% 12%; /* Darker popover for contrast */
     --popover-foreground: 0 0% 95%;
 
-    --card: 0 0% 100%;          /* White cards */
-    --card-foreground: 220 10% 25%; /* Dark text on cards (not black, but dark grey) */
+    --card: 220 15% 13%;          /* Darker card background */
+    --card-foreground: 0 0% 95%; /* Light text on cards */
 
-    --border: 220 10% 30%;      /* For subtle borders if needed */
+    --border: 220 10% 50% / 0.4;      /* Lighter, semi-transparent borders */
     --input: 220 10% 35%;
 
     --primary: 40 50% 60%;      /* Gold/Tan for icons, highlights #C2A675 */
@@ -25,7 +25,7 @@
     --secondary: 220 15% 25%; /* Darker secondary */
     --secondary-foreground: 0 0% 95%;
 
-    --accent: 40 60% 55%;       /* Slightly richer Gold/Tan for CTA #D9B379 */
+    --accent: 40 50% 60%;       /* Gold/Tan for CTA (matched to primary as per user request) */
     --accent-foreground: 220 15% 10%; /* Dark text for accent buttons */
 
     --destructive: 0 72% 51%; /* Standard Red */
@@ -62,10 +62,10 @@
     --popover: 220 15% 12%;
     --popover-foreground: 0 0% 95%;
 
-    --card: 0 0% 100%; /* White cards for contrast even in dark mode example */
-    --card-foreground: 220 10% 25%;
+    --card: 220 15% 13%; 
+    --card-foreground: 0 0% 95%;
 
-    --border: 220 10% 30%;
+    --border: 220 10% 50% / 0.4;
     --input: 220 10% 35%;
 
     --primary: 40 50% 60%;
@@ -74,7 +74,7 @@
     --secondary: 220 15% 25%;
     --secondary-foreground: 0 0% 95%;
 
-    --accent: 40 60% 55%;
+    --accent: 40 50% 60%;
     --accent-foreground: 220 15% 10%;
 
     --destructive: 0 63% 40%; /* Adjusted destructive for dark theme to be a bit less bright */

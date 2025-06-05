@@ -30,7 +30,9 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 
 // Register Form Schema
 export const registerSchema = z.object({
+  fullName: z.string().min(2, { message: "El nombre completo debe tener al menos 2 caracteres." }),
   email: z.string().email({ message: "Correo electrónico inválido." }),
+  phoneNumber: z.string().min(8, { message: "El número de teléfono debe tener al menos 8 dígitos." }),
   password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
   confirmPassword: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
 }).refine((data) => data.password === data.confirmPassword, {
