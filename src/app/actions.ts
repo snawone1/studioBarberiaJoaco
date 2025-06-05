@@ -58,10 +58,10 @@ export async function getProducts(): Promise<Product[]> {
         name: data.name,
         description: data.description,
         price: data.price,
-        imageSrc: data.imageSrc,
+        imageSrc: typeof data.imageSrc === 'string' ? data.imageSrc : '', // Ensure imageSrc is a string, fallback to empty if not
         aiHint: data.aiHint,
         createdAt: createdAt,
-      } as Product; // Cast to Product type (which will be updated)
+      } as Product; 
     });
     return products;
   } catch (error) {
@@ -116,3 +116,4 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
+
