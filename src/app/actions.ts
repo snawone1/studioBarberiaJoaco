@@ -3,12 +3,10 @@
 
 import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
-import type { Product } from '@/app/products/page'; // Product type is still fine to import
+import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
-
-// Define initial productsData here - now empty
-const initialProductsData: Product[] = [];
-
+import { firestore } from '@/lib/firebase';
+import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
   // In a real app, you'd save this to a database or send an email.
@@ -44,41 +42,62 @@ export async function submitSiteSettings(data: SiteSettingsFormValues) {
   return { success: true, message: '¡Configuración del sitio guardada con éxito! (Simulado)' };
 }
 
-// Product Management Actions (Simulated)
-let currentProducts: Product[] = [...initialProductsData]; // In-memory store for simulation
+// Product Management Actions with Firestore
+const productsCollectionRef = collection(firestore, 'products');
 
 export async function getProducts(): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // console.log('Server: Returning products from getProducts:', currentProducts);
-  return currentProducts;
+  try {
+    const querySnapshot = await getDocs(productsCollectionRef);
+    const products = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    } as Product));
+    return products;
+  } catch (error) {
+    console.error("Error fetching products from Firestore:", error);
+    return []; // Return empty array on error
+  }
 }
 
 export async function addProduct(data: ProductFormValues) {
-  console.log('Adding Product (Simulated):', data);
-  const newProduct: Product = {
-    ...data,
-    id: data.id || `prod-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, // Generate ID if not present
-  };
-  currentProducts.push(newProduct); // Add to in-memory store
-  // console.log('Server: currentProducts after add:', currentProducts);
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  revalidatePath('/products'); // Revalidate the products page
-  revalidatePath('/admin');     // Revalidate the admin page (if it displays product list directly)
-  
-  return { success: true, message: 'Producto añadido con éxito (Simulado).', product: newProduct };
+  try {
+    // Firestore will auto-generate an ID
+    const productDataToAdd = {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      imageSrc: data.imageSrc,
+      aiHint: data.aiHint,
+      createdAt: Timestamp.now() // Optional: add a timestamp
+    };
+    const docRef = await addDoc(productsCollectionRef, productDataToAdd);
+    
+    const newProduct: Product = {
+      id: docRef.id,
+      ...productDataToAdd
+    };
+
+    revalidatePath('/products');
+    revalidatePath('/admin');
+    
+    return { success: true, message: 'Producto añadido con éxito a Firestore.', product: newProduct };
+  } catch (error) {
+    console.error("Error adding product to Firestore:", error);
+    return { success: false, message: 'Error al añadir el producto a Firestore. Inténtalo de nuevo.' };
+  }
 }
 
 export async function deleteProduct(productId: string) {
-  console.log('Deleting Product (Simulated):', productId);
-  currentProducts = currentProducts.filter(p => p.id !== productId); // Remove from in-memory store
-  // console.log('Server: currentProducts after delete:', currentProducts);
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  try {
+    const productDocRef = doc(firestore, 'products', productId);
+    await deleteDoc(productDocRef);
 
-  revalidatePath('/products'); // Revalidate the products page
-  revalidatePath('/admin');     // Revalidate the admin page
-  
-  return { success: true, message: 'Producto eliminado con éxito (Simulado).' };
+    revalidatePath('/products');
+    revalidatePath('/admin');
+    
+    return { success: true, message: 'Producto eliminado con éxito de Firestore.' };
+  } catch (error) {
+    console.error("Error deleting product from Firestore:", error);
+    return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
+  }
 }
-

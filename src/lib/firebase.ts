@@ -1,8 +1,7 @@
 
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-// import { getFirestore, type Firestore } from 'firebase/firestore'; // Example if you need Firestore
-// import { getStorage, type FirebaseStorage } from 'firebase/storage'; // Example if you need Storage
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDrSCyZX-LRSY3N2wbXKN2wS8YNl4rRtdg",
@@ -16,8 +15,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp;
 let auth: Auth;
-// let firestore: Firestore;
-// let storage: FirebaseStorage;
+let firestore: Firestore;
 
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -26,7 +24,6 @@ if (!getApps().length) {
 }
 
 auth = getAuth(app);
-// firestore = getFirestore(app); // Initialize Firestore if needed
-// storage = getStorage(app); // Initialize Storage if needed
+firestore = getFirestore(app); // Initialize Firestore
 
-export { app, auth /*, firestore, storage */ };
+export { app, auth, firestore };
