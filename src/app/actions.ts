@@ -4,6 +4,7 @@
 import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
 import type { Product } from '@/app/products/page'; // Product type is still fine to import
+import { revalidatePath } from 'next/cache';
 
 // Define initial productsData here - now empty
 const initialProductsData: Product[] = [];
@@ -49,6 +50,7 @@ let currentProducts: Product[] = [...initialProductsData]; // In-memory store fo
 export async function getProducts(): Promise<Product[]> {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
+  // console.log('Server: Returning products from getProducts:', currentProducts);
   return currentProducts;
 }
 
@@ -59,14 +61,24 @@ export async function addProduct(data: ProductFormValues) {
     id: data.id || `prod-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, // Generate ID if not present
   };
   currentProducts.push(newProduct); // Add to in-memory store
+  // console.log('Server: currentProducts after add:', currentProducts);
   await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  revalidatePath('/products'); // Revalidate the products page
+  revalidatePath('/admin');     // Revalidate the admin page (if it displays product list directly)
+  
   return { success: true, message: 'Producto añadido con éxito (Simulado).', product: newProduct };
 }
 
 export async function deleteProduct(productId: string) {
   console.log('Deleting Product (Simulated):', productId);
   currentProducts = currentProducts.filter(p => p.id !== productId); // Remove from in-memory store
+  // console.log('Server: currentProducts after delete:', currentProducts);
   await new Promise(resolve => setTimeout(resolve, 1000));
+
+  revalidatePath('/products'); // Revalidate the products page
+  revalidatePath('/admin');     // Revalidate the admin page
+  
   return { success: true, message: 'Producto eliminado con éxito (Simulado).' };
 }
 
