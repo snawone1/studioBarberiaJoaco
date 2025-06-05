@@ -5,41 +5,8 @@ import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormVal
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
 import type { Product } from '@/app/products/page'; // Product type is still fine to import
 
-// Define initial productsData here
-const initialProductsData: Product[] = [
-  {
-    id: 'prod1',
-    name: 'Cera Moldeadora Profesional',
-    description: 'Fijación fuerte y acabado mate para estilos modernos y definidos. Fácil de aplicar y remover.',
-    price: 'ARS$ 2800',
-    imageSrc: 'https://placehold.co/400x400.png',
-    aiHint: 'hair wax men',
-  },
-  {
-    id: 'prod2',
-    name: 'Aceite Premium para Barba',
-    description: 'Hidrata y suaviza la barba, promoviendo un crecimiento saludable y brillo natural. Aroma sutil.',
-    price: 'ARS$ 3200',
-    imageSrc: 'https://placehold.co/400x400.png',
-    aiHint: 'beard oil grooming',
-  },
-  {
-    id: 'prod3',
-    name: 'Shampoo Fortalecedor Anticaída',
-    description: 'Formulado con extractos naturales para fortalecer el cabello desde la raíz y prevenir la caída.',
-    price: 'ARS$ 3500',
-    imageSrc: 'https://placehold.co/400x400.png',
-    aiHint: 'shampoo hair loss',
-  },
-  {
-    id: 'prod4',
-    name: 'Navaja Clásica de Afeitar',
-    description: 'Para un afeitado apurado y tradicional. Hoja intercambiable, mango ergonómico de madera.',
-    price: 'ARS$ 7500',
-    imageSrc: 'https://placehold.co/400x400.png',
-    aiHint: 'straight razor shave',
-  },
-];
+// Define initial productsData here - now empty
+const initialProductsData: Product[] = [];
 
 
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
@@ -102,3 +69,4 @@ export async function deleteProduct(productId: string) {
   await new Promise(resolve => setTimeout(resolve, 1000));
   return { success: true, message: 'Producto eliminado con éxito (Simulado).' };
 }
+
