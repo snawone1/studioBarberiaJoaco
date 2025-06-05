@@ -56,5 +56,7 @@ export const productSchema = z.object({
   price: z.string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, { message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX" }),
   imageSrc: z.string().url({ message: "Por favor, introduce una URL de imagen válida." }),
   aiHint: z.string().min(2, { message: "La pista de IA debe tener al menos 2 caracteres." }),
+  stock: z.coerce.number().min(0, { message: "El stock no puede ser negativo." }).optional().default(0),
 });
 export type ProductFormValues = z.infer<typeof productSchema>;
+

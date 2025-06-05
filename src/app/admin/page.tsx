@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,13 +30,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
-import { submitSiteSettings, getProducts, addProduct, deleteProduct } from '@/app/actions';
+import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 
 export default function AdminPage() {
@@ -43,16 +44,15 @@ export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Site Settings State
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [isSubmittingSettings, setIsSubmittingSettings] = useState(false);
 
-  // Product Management State
   const [isProductManagerOpen, setIsProductManagerOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
-  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [showAddEditProductForm, setShowAddEditProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -70,6 +70,7 @@ export default function AdminPage() {
       price: 'ARS$ ',
       imageSrc: '',
       aiHint: '',
+      stock: 0,
     },
   });
 
@@ -93,7 +94,7 @@ export default function AdminPage() {
       setIsLoadingProducts(true);
       try {
         const fetchedProducts = await getProducts();
-        setProducts(fetchedProducts);
+        setProducts(fetchedProducts.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
       } catch (error) {
         toast({ title: 'Error', description: 'No se pudieron cargar los productos.', variant: 'destructive' });
       } finally {
@@ -104,8 +105,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     fetchProductsAdmin();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProductManagerOpen]);
-
 
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
     setIsSubmittingSettings(true);
@@ -119,22 +120,59 @@ export default function AdminPage() {
     setIsSubmittingSettings(false);
   }
 
-  async function onAddProductSubmit(data: ProductFormValues) {
+  const handleAddNewProductClick = () => {
+    setEditingProduct(null);
+    productForm.reset({
+      name: '',
+      description: '',
+      price: 'ARS$ ',
+      imageSrc: '',
+      aiHint: '',
+      stock: 0,
+    });
+    setShowAddEditProductForm(true);
+  };
+
+  const handleEditProductClick = (product: Product) => {
+    setEditingProduct(product);
+    productForm.reset({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      imageSrc: product.imageSrc,
+      aiHint: product.aiHint,
+      stock: product.stock ?? 0,
+    });
+    setShowAddEditProductForm(true);
+  };
+
+  async function onProductFormSubmit(data: ProductFormValues) {
     setIsSubmittingProduct(true);
-    const result = await addProduct(data);
+    let result;
+    if (editingProduct && data.id) { // Editing existing product
+      result = await updateProduct(data);
+    } else { // Adding new product
+      result = await addProduct(data);
+    }
+
     if (result.success && result.product) {
-      toast({ title: '¡Producto Añadido!', description: result.message });
-      setProducts(prev => [...prev, result.product!]);
+      toast({ title: editingProduct ? '¡Producto Actualizado!' : '¡Producto Añadido!', description: result.message });
+      if (editingProduct) {
+        setProducts(prev => prev.map(p => p.id === result.product!.id ? result.product! : p).sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
+      } else {
+        setProducts(prev => [...prev, result.product!].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
+      }
       productForm.reset();
-      setShowAddProductForm(false);
+      setShowAddEditProductForm(false);
+      setEditingProduct(null);
     } else {
-      toast({ title: 'Error', description: result.message || 'No se pudo añadir el producto.', variant: 'destructive' });
+      toast({ title: 'Error', description: result.message || 'No se pudo guardar el producto.', variant: 'destructive' });
     }
     setIsSubmittingProduct(false);
   }
 
   async function handleDeleteProduct(productId: string) {
-    // Optional: Add a confirmation dialog here
     const result = await deleteProduct(productId);
     if (result.success) {
       toast({ title: '¡Producto Eliminado!', description: result.message });
@@ -219,7 +257,6 @@ export default function AdminPage() {
           </CardContent>
         </Card>
         
-        {/* Site Settings Card & Dialog */}
         <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -245,32 +282,18 @@ export default function AdminPage() {
             </DialogHeader>
             <Form {...settingsForm}>
               <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-4 py-4">
-                <FormField
-                  control={settingsForm.control}
-                  name="siteName"
-                  render={({ field }) => (
+                <FormField control={settingsForm.control} name="siteName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nombre del Sitio</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ej: JoacoBarber" {...field} />
-                      </FormControl>
+                      <FormControl><Input placeholder="Ej: JoacoBarber" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={settingsForm.control}
-                  name="siteDescription"
-                  render={({ field }) => (
+                <FormField control={settingsForm.control} name="siteDescription" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Descripción del Sitio</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Ej: La mejor barbería de la ciudad."
-                          className="resize-none"
-                          {...field}
-                        />
-                      </FormControl>
+                      <FormControl><Textarea placeholder="Ej: La mejor barbería de la ciudad." className="resize-none" {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -289,8 +312,7 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Product Management Card & Dialog */}
-        <Dialog open={isProductManagerOpen} onOpenChange={setIsProductManagerOpen}>
+        <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); }}}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -306,28 +328,30 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-3xl">
             <DialogHeader>
               <DialogTitle className="font-sans">Gestionar Productos</DialogTitle>
               <DialogDescription>
-                Visualiza, añade o elimina productos de tu inventario. Los cambios son simulados.
+                Visualiza, añade, edita o elimina productos de tu inventario.
               </DialogDescription>
             </DialogHeader>
 
-            {!showAddProductForm && (
-              <Button onClick={() => { productForm.reset(); setShowAddProductForm(true); }} className="mb-4">
+            {!showAddEditProductForm && (
+              <Button onClick={handleAddNewProductClick} className="mb-4">
                 <PlusCircle className="mr-2 h-4 w-4" /> Añadir Producto Nuevo
               </Button>
             )}
 
-            {showAddProductForm && (
+            {showAddEditProductForm && (
               <Card className="mb-6">
                 <CardHeader>
-                  <CardTitle className="font-sans text-lg">Nuevo Producto</CardTitle>
+                  <CardTitle className="font-sans text-lg">
+                    {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Form {...productForm}>
-                    <form onSubmit={productForm.handleSubmit(onAddProductSubmit)} className="space-y-4">
+                    <form onSubmit={productForm.handleSubmit(onProductFormSubmit)} className="space-y-4">
                       <FormField control={productForm.control} name="name" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Nombre del Producto</FormLabel>
@@ -342,13 +366,22 @@ export default function AdminPage() {
                           <FormMessage />
                         </FormItem>
                       )} />
-                      <FormField control={productForm.control} name="price" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Precio</FormLabel>
-                          <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField control={productForm.control} name="price" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Precio</FormLabel>
+                            <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={productForm.control} name="stock" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Stock</FormLabel>
+                            <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </div>
                       <FormField control={productForm.control} name="imageSrc" render={({ field }) => (
                         <FormItem>
                           <FormLabel>URL de Imagen</FormLabel>
@@ -364,10 +397,10 @@ export default function AdminPage() {
                         </FormItem>
                       )} />
                       <div className="flex justify-end space-x-2 pt-2">
-                        <Button type="button" variant="outline" onClick={() => setShowAddProductForm(false)}>Cancelar</Button>
+                        <Button type="button" variant="outline" onClick={() => { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset(); }}>Cancelar</Button>
                         <Button type="submit" disabled={isSubmittingProduct}>
                           {isSubmittingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          Añadir Producto
+                          {editingProduct ? 'Actualizar Producto' : 'Añadir Producto'}
                         </Button>
                       </div>
                     </form>
@@ -380,21 +413,38 @@ export default function AdminPage() {
             {isLoadingProducts ? (
               <div className="flex justify-center py-4"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
             ) : products.length === 0 ? (
-              <p className="text-muted-foreground text-sm">No hay productos para mostrar.</p>
+              <div className="text-center py-10 text-muted-foreground">
+                <PackageSearch className="h-12 w-12 mx-auto mb-2" />
+                <p>No hay productos para mostrar.</p>
+                <p className="text-sm">Empieza añadiendo uno nuevo.</p>
+              </div>
             ) : (
               <ScrollArea className="h-[300px] border rounded-md">
                 <div className="p-4 space-y-3">
                   {products.map(product => (
                     <Card key={product.id} className="p-3">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold">{product.name}</p>
-                          <p className="text-sm text-muted-foreground">{product.price}</p>
+                       <div className="flex items-center space-x-4">
+                        <div className="relative w-16 h-16 aspect-square flex-shrink-0">
+                          <Image
+                            src={product.imageSrc}
+                            alt={product.name}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                            data-ai-hint={product.aiHint || 'product image'}
+                          />
                         </div>
-                        <div className="space-x-2">
-                           {/* <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-600">
+                        <div className="flex-grow min-w-0">
+                          <p className="font-semibold truncate" title={product.name}>{product.name}</p>
+                          <p className="text-sm text-muted-foreground">{product.price}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Stock: {typeof product.stock === 'number' ? product.stock : 'N/A'}
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 space-x-1 sm:space-x-2">
+                           <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-700" onClick={() => handleEditProductClick(product)}>
                             <Edit3 className="h-4 w-4" />
-                          </Button>  */}
+                          </Button> 
                           <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)} className="h-8 w-8 text-destructive hover:text-red-700">
                             <Trash2 className="h-4 w-4" />
                           </Button>

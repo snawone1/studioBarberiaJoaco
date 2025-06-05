@@ -3,12 +3,13 @@
 
 import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { getProducts } from '@/app/actions'; 
-import { Loader2 } from 'lucide-react';
+import { Loader2, PackageSearch } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-// Update Product type to expect createdAt as a string (ISO string)
+// Update Product type to expect createdAt as a string (ISO string) and include stock
 export type Product = {
   id: string;
   name: string;
@@ -16,6 +17,7 @@ export type Product = {
   price: string;
   imageSrc: string; // Will always be a valid URL or placeholder from actions.ts
   aiHint: string;
+  stock?: number;
   createdAt?: string; 
 };
 
@@ -30,7 +32,7 @@ export default function ProductsPage() {
         setIsLoading(true);
         setError(null);
         const fetchedProducts = await getProducts();
-        setProducts(fetchedProducts);
+        setProducts(fetchedProducts.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
       } catch (err) {
         setError('Failed to load products. Please try again later.');
         console.error(err);
@@ -59,8 +61,10 @@ export default function ProductsPage() {
         </div>
       )}
       {!isLoading && !error && products.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground text-lg">No hay productos disponibles en este momento.</p>
+        <div className="text-center py-20">
+          <PackageSearch className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground text-xl">No hay productos disponibles en este momento.</p>
+          <p className="text-muted-foreground text-sm">Vuelve a consultar más tarde o añade productos desde el panel de administración.</p>
         </div>
       )}
       {!isLoading && !error && products.length > 0 && (
@@ -69,25 +73,43 @@ export default function ProductsPage() {
             <Card key={product.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <div className="relative aspect-square w-full">
                 <Image
-                  src={product.imageSrc} // product.imageSrc is now guaranteed to be a usable URL
+                  src={product.imageSrc}
                   alt={product.name}
                   layout="fill"
                   objectFit="cover"
                   data-ai-hint={product.aiHint}
                 />
+                 {typeof product.stock === 'number' && product.stock === 0 && (
+                  <Badge variant="destructive" className="absolute top-2 right-2">Agotado</Badge>
+                )}
               </div>
               <CardHeader>
                 <CardTitle className="text-xl font-headline">{product.name}</CardTitle>
-                <CardDescription className="text-sm h-16 overflow-hidden">{product.description}</CardDescription>
+                <CardDescription className="text-sm h-16 overflow-hidden text-ellipsis">{product.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
                 <p className="text-lg font-semibold text-primary">{product.price}</p>
               </CardContent>
-              {/* Future: Add to cart button 
-              <CardFooter>
+              <CardFooter className="flex justify-between items-center">
+                {typeof product.stock === 'number' && product.stock > 0 && (
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    Stock: {product.stock}
+                  </p>
+                )}
+                 {typeof product.stock === 'number' && product.stock === 0 && (
+                  <p className="text-sm text-destructive">
+                    Agotado
+                  </p>
+                )}
+                 {typeof product.stock !== 'number' && (
+                  <p className="text-sm text-muted-foreground">
+                    Stock no disponible
+                  </p>
+                )}
+                {/* Future: Add to cart button 
                 <Button className="w-full">Añadir al Carrito</Button>
+                */}
               </CardFooter>
-              */}
             </Card>
           ))}
         </div>
