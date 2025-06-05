@@ -4,68 +4,89 @@
 
 @layer base {
   :root {
-    --background: 220 15% 12%; /* Dark Blue-Gray */
-    --foreground: 0 0% 98%; /* Almost White */
+    --background: 220 15% 10%; /* Very Dark Blue/Black */
+    --foreground: 0 0% 95%;    /* Light text for general page */
 
-    --card: 220 15% 18%; /* Slightly Lighter Dark Blue-Gray for cards */
-    --card-foreground: 0 0% 95%;
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 60%;
 
-    --popover: 220 15% 15%; 
+    --popover: 220 15% 12%; /* Darker popover for contrast */
     --popover-foreground: 0 0% 95%;
 
-    --primary: 40 50% 60%; /* Gold from user image (#C2A675) */
-    --primary-foreground: 0 0% 10%; /* Darker text for new primary */
+    --card: 0 0% 100%;          /* White cards */
+    --card-foreground: 220 10% 25%; /* Dark text on cards (not black, but dark grey) */
 
-    --secondary: 220 15% 25%; /* Medium Dark Blue-Gray */
-    --secondary-foreground: 0 0% 90%;
+    --border: 220 10% 30%;      /* For subtle borders if needed */
+    --input: 220 10% 35%;
 
-    --muted: 220 15% 25%; 
-    --muted-foreground: 0 0% 60%; /* Lighter gray for muted text on dark bg */
+    --primary: 40 50% 60%;      /* Gold/Tan for icons, highlights #C2A675 */
+    --primary-foreground: 220 15% 10%; /* Dark text for elements with primary background */
 
-    --accent: 40 50% 60%; /* Gold from user image (#C2A675) - Same as primary for the button */
-    --accent-foreground: 0 0% 10%; /* Darker text for new accent */
+    --secondary: 220 15% 25%; /* Darker secondary */
+    --secondary-foreground: 0 0% 95%;
 
-    --destructive: 0 70% 50%; /* Adjusted for dark theme visibility */
+    --accent: 40 60% 55%;       /* Slightly richer Gold/Tan for CTA #D9B379 */
+    --accent-foreground: 220 15% 10%; /* Dark text for accent buttons */
+
+    --destructive: 0 72% 51%; /* Standard Red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 15% 30%; /* Border Gray for dark theme */
-    --input: 220 15% 30%; /* Input field border for dark theme */
-    --ring: 40 50% 60%; /* Gold from user image for focus rings */
+    --ring: 40 50% 65%;         /* Gold/Tan for focus rings */
+
     --radius: 0.5rem;
 
-    --chart-1: 40 50% 60%; /* Gold from user image */
-    --chart-2: 210 100% 60%;
-    --chart-3: 0 0% 80%;
-    --chart-4: 30 90% 55%;
-    --chart-5: 150 80% 45%;
+    --chart-1: 40 50% 60%;
+    --chart-2: 40 60% 55%;
+    --chart-3: 40 40% 70%;
+    --chart-4: 220 15% 50%;
+    --chart-5: 220 10% 40%;
+
+    --sidebar-background: 220 15% 12%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 40 50% 60%;
+    --sidebar-primary-foreground: 220 15% 10%;
+    --sidebar-accent: 220 15% 20%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 10% 25%;
+    --sidebar-ring: 40 50% 65%;
   }
 
   .dark {
-    --background: 220 15% 12%;
-    --foreground: 0 0% 98%;
-    --card: 220 15% 18%;
-    --card-foreground: 0 0% 95%;
-    --popover: 220 15% 15%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 40 50% 60%; /* Gold from user image (#C2A675) */
-    --primary-foreground: 0 0% 10%; /* Darker text for new primary */
-    --secondary: 220 15% 25%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 220 15% 25%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 40 50% 60%; /* Gold from user image (#C2A675) - Same as primary for the button */
-    --accent-foreground: 0 0% 10%; /* Darker text for new accent */
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 30%;
-    --input: 220 15% 30%;
-    --ring: 40 50% 60%; /* Gold from user image */
+    /* For dark mode, we can use the same palette as it's already dark themed */
+    --background: 220 15% 10%;
+    --foreground: 0 0% 95%;
 
-    --chart-1: 40 50% 60%; /* Gold from user image */
-    --chart-2: 210 100% 60%;
-    --chart-3: 0 0% 80%;
-    --chart-4: 30 90% 55%;
-    --chart-5: 150 80% 45%;
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 60%;
+
+    --popover: 220 15% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --card: 0 0% 100%; /* White cards for contrast even in dark mode example */
+    --card-foreground: 220 10% 25%;
+
+    --border: 220 10% 30%;
+    --input: 220 10% 35%;
+
+    --primary: 40 50% 60%;
+    --primary-foreground: 220 15% 10%;
+
+    --secondary: 220 15% 25%;
+    --secondary-foreground: 0 0% 95%;
+
+    --accent: 40 60% 55%;
+    --accent-foreground: 220 15% 10%;
+
+    --destructive: 0 63% 40%; /* Adjusted destructive for dark theme to be a bit less bright */
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 40 50% 65%;
+    
+    --chart-1: 40 50% 60%;
+    --chart-2: 40 60% 55%;
+    --chart-3: 40 40% 70%;
+    --chart-4: 220 15% 50%;
+    --chart-5: 220 10% 40%;
   }
 }
 
@@ -75,8 +96,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans); /* Ensure sans-serif font is applied */
   }
-  h1, h2, h3, h4, h5, h6 {
+   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
   }
 }
