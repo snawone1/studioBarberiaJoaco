@@ -110,8 +110,8 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <PageHeader
-        title="Admin Panel"
-        description="Manage your application settings, content, and operations."
+        title="Panel de Administración"
+        description="Gestiona la configuración, el contenido y las operaciones de tu aplicación."
         titleClassName="font-sans"
       />
       
@@ -133,26 +133,26 @@ export default function AdminPage() {
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xl font-medium font-sans">
-              Manage Appointments
+              Gestionar Citas
             </CardTitle>
             <CalendarCheck className="h-6 w-6 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              View, confirm, or reschedule client appointments.
+              Visualiza, confirma o reprograma las citas de los clientes.
             </p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xl font-medium font-sans">
-              User Management
+              Gestión de Usuarios
             </CardTitle>
             <Users className="h-6 w-6 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Oversee user accounts and roles.
+              Supervisa las cuentas y roles de los usuarios.
             </p>
           </CardContent>
         </Card>
@@ -161,13 +161,13 @@ export default function AdminPage() {
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xl font-medium font-sans">
-                  Site Settings
+                  Configuración del Sitio
                 </CardTitle>
                 <Settings className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Configure global site settings and preferences.
+                  Configura los ajustes y preferencias globales del sitio.
                 </p>
               </CardContent>
             </Card>
