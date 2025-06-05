@@ -35,7 +35,7 @@ export function Header() {
           <span className="font-bold text-2xl font-headline text-primary">{siteConfig.name}</span>
         </Link>
         <MobileNav items={siteConfig.mainNav} />
-        <div className="flex flex-1 items-center justify-end space-x-2"> {/* Reduced space-x from 4 to 2 */}
+        <div className="flex flex-1 items-center justify-end space-x-2">
           <MainNav items={siteConfig.mainNav} />
           {loading ? (
             <Button variant="outline" className="border-primary text-primary" disabled>
@@ -48,7 +48,7 @@ export function Header() {
             </Button>
           ) : (
             <>
-              <Button variant="ghost" className="text-foreground/80 hover:text-primary/80" asChild>
+              <Button variant="ghost" className="text-foreground/80" asChild>
                 <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
                   Iniciar Sesión
