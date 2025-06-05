@@ -48,10 +48,21 @@ const productsCollectionRef = collection(firestore, 'products');
 export async function getProducts(): Promise<Product[]> {
   try {
     const querySnapshot = await getDocs(productsCollectionRef);
-    const products = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    } as Product));
+    const products = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      // Convert Timestamp to ISO string for client-side compatibility
+      const createdAt = data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined;
+      
+      return {
+        id: doc.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        imageSrc: data.imageSrc,
+        aiHint: data.aiHint,
+        createdAt: createdAt,
+      } as Product; // Cast to Product type (which will be updated)
+    });
     return products;
   } catch (error) {
     console.error("Error fetching products from Firestore:", error);
@@ -61,20 +72,24 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function addProduct(data: ProductFormValues) {
   try {
-    // Firestore will auto-generate an ID
     const productDataToAdd = {
       name: data.name,
       description: data.description,
       price: data.price,
       imageSrc: data.imageSrc,
       aiHint: data.aiHint,
-      createdAt: Timestamp.now() // Optional: add a timestamp
+      createdAt: Timestamp.now()
     };
     const docRef = await addDoc(productsCollectionRef, productDataToAdd);
     
     const newProduct: Product = {
       id: docRef.id,
-      ...productDataToAdd
+      name: productDataToAdd.name,
+      description: productDataToAdd.description,
+      price: productDataToAdd.price,
+      imageSrc: productDataToAdd.imageSrc,
+      aiHint: productDataToAdd.aiHint,
+      createdAt: productDataToAdd.createdAt.toDate().toISOString(), // Convert to ISO string
     };
 
     revalidatePath('/products');

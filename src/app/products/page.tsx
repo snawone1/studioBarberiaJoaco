@@ -8,9 +8,7 @@ import Image from 'next/image';
 import { getProducts } from '@/app/actions'; // Importar la acción
 import { Loader2 } from 'lucide-react';
 
-// El tipo Product ya está definido en actions.ts y en el product schema.
-// Para mantener consistencia, idealmente lo importaríamos de un lugar centralizado,
-// pero por ahora, podemos redefinirlo o asumir que la estructura de getProducts() es compatible.
+// Update Product type to expect createdAt as a string (ISO string)
 export type Product = {
   id: string;
   name: string;
@@ -18,10 +16,8 @@ export type Product = {
   price: string;
   imageSrc: string;
   aiHint: string;
+  createdAt?: string; // Changed from Timestamp to string, optional if not always present
 };
-
-// productsData ya no se usará directamente, se obtendrán de getProducts
-// export const productsData: Product[] = [ ... ];
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
