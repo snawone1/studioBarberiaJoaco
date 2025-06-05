@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
-import { getProducts } from '@/app/actions'; // Importar la acción
+import { getProducts } from '@/app/actions'; 
 import { Loader2 } from 'lucide-react';
 
 // Update Product type to expect createdAt as a string (ISO string)
@@ -14,9 +14,9 @@ export type Product = {
   name: string;
   description: string;
   price: string;
-  imageSrc: string;
+  imageSrc: string; // Will always be a valid URL or placeholder from actions.ts
   aiHint: string;
-  createdAt?: string; // Changed from Timestamp to string, optional if not always present
+  createdAt?: string; 
 };
 
 export default function ProductsPage() {
@@ -69,7 +69,7 @@ export default function ProductsPage() {
             <Card key={product.id} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow">
               <div className="relative aspect-square w-full">
                 <Image
-                  src={product.imageSrc || 'https://placehold.co/400x400.png'} // Fallback si imageSrc está vacío
+                  src={product.imageSrc} // product.imageSrc is now guaranteed to be a usable URL
                   alt={product.name}
                   layout="fill"
                   objectFit="cover"

@@ -50,16 +50,27 @@ export async function getProducts(): Promise<Product[]> {
     const querySnapshot = await getDocs(productsCollectionRef);
     const products = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      // Convert Timestamp to ISO string for client-side compatibility
       const createdAt = data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined;
       
+      let imageSrcVal = 'https://placehold.co/400x400.png'; // Default to placeholder
+      if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
+        imageSrcVal = data.imageSrc;
+      } else if (typeof data.imageSrc === 'string' && data.imageSrc.trim() !== '') {
+        // If it's a string but not a full URL, maybe it's a relative path or a malformed one.
+        // For now, we still default to placeholder. Could be refined if specific relative paths are expected.
+        console.warn(`Product ID ${doc.id} has an imageSrc that is a string but not a valid http/https URL: "${data.imageSrc}". Defaulting to placeholder.`);
+      } else if (data.imageSrc && typeof data.imageSrc !== 'string') {
+        console.warn(`Product ID ${doc.id} has a non-string imageSrc. Type: ${typeof data.imageSrc}. Value:`, data.imageSrc, ". Defaulting to placeholder.");
+      }
+
+
       return {
         id: doc.id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        imageSrc: typeof data.imageSrc === 'string' ? data.imageSrc : '', // Ensure imageSrc is a string, fallback to empty if not
-        aiHint: data.aiHint,
+        name: data.name || 'Unnamed Product',
+        description: data.description || '',
+        price: data.price || 'ARS$ 0',
+        imageSrc: imageSrcVal,
+        aiHint: data.aiHint || '',
         createdAt: createdAt,
       } as Product; 
     });
@@ -76,7 +87,7 @@ export async function addProduct(data: ProductFormValues) {
       name: data.name,
       description: data.description,
       price: data.price,
-      imageSrc: data.imageSrc,
+      imageSrc: data.imageSrc, // This comes from a Zod validated URL string
       aiHint: data.aiHint,
       createdAt: Timestamp.now()
     };
@@ -89,7 +100,7 @@ export async function addProduct(data: ProductFormValues) {
       price: productDataToAdd.price,
       imageSrc: productDataToAdd.imageSrc,
       aiHint: productDataToAdd.aiHint,
-      createdAt: productDataToAdd.createdAt.toDate().toISOString(), // Convert to ISO string
+      createdAt: productDataToAdd.createdAt.toDate().toISOString(), 
     };
 
     revalidatePath('/products');
@@ -116,4 +127,3 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
-
