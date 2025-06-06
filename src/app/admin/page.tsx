@@ -126,7 +126,7 @@ export default function AdminPage() {
       name: '',
       description: '',
       price: 'ARS$ ',
-      imageSrc: '',
+      imageSrc: 'https://placehold.co/400x400.png', // Default placeholder
       aiHint: '',
       stock: 0,
     });
@@ -140,7 +140,7 @@ export default function AdminPage() {
       name: product.name,
       description: product.description,
       price: product.price,
-      imageSrc: product.imageSrc,
+      imageSrc: product.imageSrc || 'https://placehold.co/400x400.png',
       aiHint: product.aiHint,
       stock: product.stock ?? 0,
     });
@@ -163,7 +163,7 @@ export default function AdminPage() {
       } else {
         setProducts(prev => [...prev, result.product!].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
       }
-      productForm.reset();
+      productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,});
       setShowAddEditProductForm(false);
       setEditingProduct(null);
     } else {
@@ -312,8 +312,170 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); }}}>
-          <DialogTrigger asChild>
+        <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,}); }}}>
+          <DialogContent className="sm:max-w-3xl max-h-[calc(100vh-8rem)] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="font-sans">Gestionar Productos</DialogTitle>
+              <DialogDescription>
+                Visualiza, añade, edita o elimina productos de tu inventario.
+              </DialogDescription>
+            </DialogHeader>
+
+            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1"> {/* Added pr-2 and -mr-1 for scrollbar spacing if needed */}
+              {!showAddEditProductForm && (
+                <Button onClick={handleAddNewProductClick} className="mb-4">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Añadir Producto Nuevo
+                </Button>
+              )}
+
+              {showAddEditProductForm && (
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="font-sans text-lg">
+                      {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...productForm}>
+                      <form onSubmit={productForm.handleSubmit(onProductFormSubmit)} className="space-y-4">
+                        <FormField control={productForm.control} name="name" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre del Producto</FormLabel>
+                            <FormControl><Input placeholder="Ej: Cera Moldeadora" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={productForm.control} name="description" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descripción</FormLabel>
+                            <FormControl><Textarea placeholder="Describe el producto..." {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField control={productForm.control} name="price" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Precio</FormLabel>
+                              <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <FormField control={productForm.control} name="stock" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Stock</FormLabel>
+                              <FormControl><Input type="number" placeholder="0" {...field} 
+                                onChange={event => field.onChange(+event.target.value)} // Ensure value is number
+                              /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        </div>
+                        <FormField control={productForm.control} name="imageSrc" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>URL de Imagen</FormLabel>
+                            <FormControl><Input placeholder="https://placehold.co/400x400.png" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={productForm.control} name="aiHint" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pista para IA (Keywords)</FormLabel>
+                            <FormControl><Input placeholder="Ej: cera cabello" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <div className="flex justify-end space-x-2 pt-2">
+                          <Button type="button" variant="outline" onClick={() => { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,}); }}>Cancelar</Button>
+                          <Button type="submit" disabled={isSubmittingProduct}>
+                            {isSubmittingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {editingProduct ? 'Actualizar Producto' : 'Añadir Producto'}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              )}
+              
+              <h3 className="text-lg font-semibold mb-2 font-sans mt-4">Productos Actuales</h3>
+              {isLoadingProducts ? (
+                <div className="flex justify-center py-4"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : products.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground">
+                  <PackageSearch className="h-12 w-12 mx-auto mb-2" />
+                  <p>No hay productos para mostrar.</p>
+                  <p className="text-sm">Empieza añadiendo uno nuevo.</p>
+                </div>
+              ) : (
+                <div className={showAddEditProductForm ? "max-h-[200px] overflow-y-auto border rounded-md" : "max-h-[400px] overflow-y-auto border rounded-md"}>
+                  <div className="p-4 space-y-3">
+                    {products.map(product => (
+                      <Card key={product.id} className="p-3">
+                         <div className="flex items-center space-x-4">
+                          <div className="relative w-16 h-16 aspect-square flex-shrink-0">
+                            <Image
+                              src={product.imageSrc || 'https://placehold.co/400x400.png'}
+                              alt={product.name}
+                              fill
+                              className="rounded-md object-cover"
+                              data-ai-hint={product.aiHint || 'product image'}
+                              unoptimized={product.imageSrc && product.imageSrc.startsWith('data:')} // Add this if you expect data URIs
+                            />
+                          </div>
+                          <div className="flex-grow min-w-0">
+                            <p className="font-semibold truncate" title={product.name}>{product.name}</p>
+                            <p className="text-sm text-muted-foreground">{product.price}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Stock: {typeof product.stock === 'number' ? product.stock : 'N/A'}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0 space-x-1 sm:space-x-2">
+                             <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-700" onClick={() => handleEditProductClick(product)}>
+                              <Edit3 className="h-4 w-4" />
+                            </Button> 
+                            <Dialog> {/* Nested Dialog for Delete Confirmation */}
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-red-700">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                  <DialogTitle>Confirmar Eliminación</DialogTitle>
+                                  <DialogDescription>
+                                    ¿Estás seguro de que quieres eliminar el producto "{product.name}"? Esta acción no se puede deshacer.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter className="sm:justify-end">
+                                  <DialogClose asChild>
+                                    <Button type="button" variant="outline">
+                                      Cancelar
+                                    </Button>
+                                  </DialogClose>
+                                  <DialogClose asChild>
+                                    <Button type="button" variant="destructive" onClick={() => handleDeleteProduct(product.id)}>
+                                      Eliminar
+                                    </Button>
+                                  </DialogClose>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </ScrollArea>
+
+            <DialogFooter className="mt-auto pt-4 border-t">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xl font-medium font-sans">
@@ -328,140 +490,6 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-3xl">
-            <DialogHeader>
-              <DialogTitle className="font-sans">Gestionar Productos</DialogTitle>
-              <DialogDescription>
-                Visualiza, añade, edita o elimina productos de tu inventario.
-              </DialogDescription>
-            </DialogHeader>
-
-            {!showAddEditProductForm && (
-              <Button onClick={handleAddNewProductClick} className="mb-4">
-                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Producto Nuevo
-              </Button>
-            )}
-
-            {showAddEditProductForm && (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="font-sans text-lg">
-                    {editingProduct ? 'Editar Producto' : 'Nuevo Producto'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...productForm}>
-                    <form onSubmit={productForm.handleSubmit(onProductFormSubmit)} className="space-y-4">
-                      <FormField control={productForm.control} name="name" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre del Producto</FormLabel>
-                          <FormControl><Input placeholder="Ej: Cera Moldeadora" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={productForm.control} name="description" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descripción</FormLabel>
-                          <FormControl><Textarea placeholder="Describe el producto..." {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField control={productForm.control} name="price" render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Precio</FormLabel>
-                            <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                        <FormField control={productForm.control} name="stock" render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Stock</FormLabel>
-                            <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-                      </div>
-                      <FormField control={productForm.control} name="imageSrc" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>URL de Imagen</FormLabel>
-                          <FormControl><Input placeholder="https://placehold.co/400x400.png" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={productForm.control} name="aiHint" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pista para IA (Keywords)</FormLabel>
-                          <FormControl><Input placeholder="Ej: cera cabello" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <div className="flex justify-end space-x-2 pt-2">
-                        <Button type="button" variant="outline" onClick={() => { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset(); }}>Cancelar</Button>
-                        <Button type="submit" disabled={isSubmittingProduct}>
-                          {isSubmittingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          {editingProduct ? 'Actualizar Producto' : 'Añadir Producto'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            )}
-            
-            <h3 className="text-lg font-semibold mb-2 font-sans">Productos Actuales</h3>
-            {isLoadingProducts ? (
-              <div className="flex justify-center py-4"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : products.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                <PackageSearch className="h-12 w-12 mx-auto mb-2" />
-                <p>No hay productos para mostrar.</p>
-                <p className="text-sm">Empieza añadiendo uno nuevo.</p>
-              </div>
-            ) : (
-              <ScrollArea className="h-[300px] border rounded-md">
-                <div className="p-4 space-y-3">
-                  {products.map(product => (
-                    <Card key={product.id} className="p-3">
-                       <div className="flex items-center space-x-4">
-                        <div className="relative w-16 h-16 aspect-square flex-shrink-0">
-                          <Image
-                            src={product.imageSrc}
-                            alt={product.name}
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-md"
-                            data-ai-hint={product.aiHint || 'product image'}
-                          />
-                        </div>
-                        <div className="flex-grow min-w-0">
-                          <p className="font-semibold truncate" title={product.name}>{product.name}</p>
-                          <p className="text-sm text-muted-foreground">{product.price}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Stock: {typeof product.stock === 'number' ? product.stock : 'N/A'}
-                          </p>
-                        </div>
-                        <div className="flex-shrink-0 space-x-1 sm:space-x-2">
-                           <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-700" onClick={() => handleEditProductClick(product)}>
-                            <Edit3 className="h-4 w-4" />
-                          </Button> 
-                          <Button variant="ghost" size="icon" onClick={() => handleDeleteProduct(product.id)} className="h-8 w-8 text-destructive hover:text-red-700">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            )}
-
-            <DialogFooter className="mt-6">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">Cerrar</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
         </Dialog>
       </div>
     </div>
