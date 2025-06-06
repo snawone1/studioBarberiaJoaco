@@ -75,34 +75,49 @@ export default function BookAppointmentPage() {
     : "Selecciona una fecha primero";
 
   useEffect(() => {
+    let isActive = true; // Flag to manage async operation lifecycle
+
     if (watchedDate) {
       const fetchBookedSlots = async () => {
+        if (!isActive) return; 
         setIsLoadingBookedSlots(true);
         setBookedSlots([]); 
-        setSelectedTimeSlot(undefined); // Deselect time when date changes
-        form.setValue('preferredTime', ''); // Clear time in form when date changes
+        setSelectedTimeSlot(undefined); 
+        form.setValue('preferredTime', ''); 
+
         try {
           const slots = await getBookedSlotsForDate(watchedDate);
-          setBookedSlots(slots);
+          if (isActive) { 
+            setBookedSlots(slots);
+          }
         } catch (error) {
-          console.error("Error fetching booked slots:", error);
-          toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
+          if (isActive) { 
+            console.error("Error fetching booked slots:", error);
+            toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
+          }
         } finally {
-          setIsLoadingBookedSlots(false);
+          if (isActive) { 
+            setIsLoadingBookedSlots(false);
+          }
         }
       };
       fetchBookedSlots();
     } else {
-      setBookedSlots([]); 
+      // Reset states if no date is selected
+      setBookedSlots([]);
       setSelectedTimeSlot(undefined);
       form.setValue('preferredTime', '');
       setIsLoadingBookedSlots(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedDate, toast]);
+
+    return () => {
+      isActive = false; // Cleanup function to set flag to false
+    };
+  }, [watchedDate]); // Only re-run if watchedDate changes. form.setValue and toast are stable.
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
+    console.log("Submitting appointment with payload:", data);
     if (!currentUser) {
       toast({
         title: 'Error de Autenticación',
@@ -113,13 +128,25 @@ export default function BookAppointmentPage() {
     }
 
     setIsLoading(true);
+    let result;
     
-    const payloadForServer: AppointmentFormValues = {
-      ...data,
-      userId: currentUser.uid,
-    };
-
-    const result = await submitAppointmentRequest(payloadForServer);
+    try {
+      const payloadForServer: AppointmentFormValues = {
+        ...data,
+        userId: currentUser.uid,
+      };
+      result = await submitAppointmentRequest(payloadForServer);
+    } catch (error) {
+      console.error("Unexpected error submitting appointment:", error);
+      toast({
+        title: 'Error Inesperado',
+        description: 'Ocurrió un error al procesar tu solicitud. Inténtalo de nuevo.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(false);
 
     if (result.success) {
@@ -129,19 +156,24 @@ export default function BookAppointmentPage() {
       });
       form.reset({ 
         services: [], 
-        preferredDate: undefined, 
+        preferredDate: watchedDate, // Keep the date, or undefined if you prefer to clear it
         preferredTime: '', 
         message: '' 
       });
       setSelectedTimeSlot(undefined);
-      if (watchedDate) { // Re-fetch booked slots for the current date to update UI
+      if (watchedDate) { 
         setIsLoadingBookedSlots(true);
         getBookedSlotsForDate(watchedDate)
-          .then(slots => {
-            setBookedSlots(slots);
+          .then(newSlots => {
+            setBookedSlots(newSlots);
           })
-          .catch(console.error)
-          .finally(() => setIsLoadingBookedSlots(false));
+          .catch(fetchError => {
+            console.error("Error re-fetching booked slots after submission:", fetchError);
+            // Optionally show a non-critical toast here if needed
+          })
+          .finally(() => {
+            setIsLoadingBookedSlots(false);
+          });
       }
     } else {
       toast({
@@ -149,14 +181,19 @@ export default function BookAppointmentPage() {
         description: result.message,
         variant: 'destructive',
       });
-       // If booking failed due to slot taken, refresh booked slots
        if (result.message && result.message.includes('Este horario ya no está disponible')) {
           if (watchedDate) {
             setIsLoadingBookedSlots(true);
             getBookedSlotsForDate(watchedDate)
-              .then(setBookedSlots)
-              .catch(console.error)
-              .finally(() => setIsLoadingBookedSlots(false));
+              .then(newSlots => {
+                setBookedSlots(newSlots);
+              })
+              .catch(fetchError => {
+                console.error("Error re-fetching booked slots after failed booking:", fetchError);
+              })
+              .finally(() => {
+                setIsLoadingBookedSlots(false);
+              });
           }
        }
     }
@@ -204,8 +241,6 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          // setSelectedTimeSlot(undefined); // Moved to useEffect
-                          // form.setValue('preferredTime', ''); // Moved to useEffect
                         }}
                         disabled={(date) =>
                           date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
@@ -314,12 +349,12 @@ export default function BookAppointmentPage() {
                   <div className="space-y-2">
                     {availableServices.map((service) => (
                       <FormField
-                        key={service.id} // Key is on the FormField - Correct
+                        key={service.id}
                         control={form.control}
                         name="services"
                         render={({ field }) => {
                           return (
-                            <FormItem // Removed redundant key here
+                            <FormItem
                               className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-muted transition-colors"
                             >
                               <FormControl>
@@ -383,4 +418,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
