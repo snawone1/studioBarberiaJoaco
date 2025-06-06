@@ -526,6 +526,10 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 100;
 }
 
+.col-span-full {
+  grid-column: 1 / -1;
+}
+
 .-mx-1 {
   margin-left: -.25rem;
   margin-right: -.25rem;

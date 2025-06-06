@@ -50,6 +50,7 @@ const timeSlots = [
 ];
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
+const now = new Date(); // Define now once at the component level
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
@@ -79,38 +80,36 @@ export default function BookAppointmentPage() {
 
     const fetchBookedSlots = async () => {
       if (!watchedDate) {
-        // Si no hay fecha seleccionada (ej. el usuario borra la fecha del calendario)
         if (isActive) {
-          setBookedSlots([]); // Limpia los horarios reservados
-          setSelectedTimeSlot(undefined); // Limpia el horario seleccionado
-          form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
-          setIsLoadingBookedSlots(false); // Asegura que no esté en estado de carga
+          setBookedSlots([]);
+          setSelectedTimeSlot(undefined);
+          form.setValue('preferredTime', '');
+          setIsLoadingBookedSlots(false); 
         }
         return;
       }
 
-      // Si hay una fecha seleccionada, procedemos a cargar los horarios
       if (isActive) {
-        setSelectedTimeSlot(undefined); // Limpia cualquier horario previamente seleccionado
-        form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
-        // No llamamos a setBookedSlots([]) aquí; el loader se encargará de ocultar la cuadrícula.
-        setIsLoadingBookedSlots(true); // Activa el estado de carga
+        setSelectedTimeSlot(undefined); 
+        form.setValue('preferredTime', ''); 
+        setIsLoadingBookedSlots(true); 
+        // No es necesario setBookedSlots([]) aquí, el loader se encargará
       }
 
       try {
         const slots = await getBookedSlotsForDate(watchedDate);
         if (isActive) {
-          setBookedSlots(slots); // Establece los nuevos horarios reservados
+          setBookedSlots(slots); 
         }
       } catch (error) {
         if (isActive) {
           console.error("Error fetching booked slots:", error);
           toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
-          setBookedSlots([]); // En caso de error, limpia los horarios reservados
+          setBookedSlots([]); 
         }
       } finally {
         if (isActive) {
-          setIsLoadingBookedSlots(false); // Desactiva el estado de carga
+          setIsLoadingBookedSlots(false);
         }
       }
     };
@@ -118,9 +117,9 @@ export default function BookAppointmentPage() {
     fetchBookedSlots();
 
     return () => {
-      isActive = false; // Función de limpieza para el efecto
+      isActive = false; 
     };
-  }, [watchedDate]); // Dependencia única: watchedDate
+  }, [watchedDate]);
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
@@ -163,15 +162,14 @@ export default function BookAppointmentPage() {
       });
       form.reset({ 
         services: [], 
-        preferredDate: watchedDate, // Mantén la fecha seleccionada si es una reserva exitosa
+        preferredDate: watchedDate,
         preferredTime: '', 
         message: '' 
       });
       setSelectedTimeSlot(undefined);
-      // Vuelve a cargar los horarios para la fecha actual para reflejar el nuevo bloqueo
       if (watchedDate) { 
         setIsLoadingBookedSlots(true);
-        // No es necesario setBookedSlots([]) aquí, el loader se encargará
+        // No es necesario setBookedSlots([]) aquí
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
@@ -189,7 +187,6 @@ export default function BookAppointmentPage() {
         description: result.message,
         variant: 'destructive',
       });
-       // Si el error es porque el horario ya no está disponible, refresca los slots
        if (result.message && result.message.includes('Este horario ya no está disponible')) {
           if (watchedDate) {
             setIsLoadingBookedSlots(true);
@@ -209,7 +206,39 @@ export default function BookAppointmentPage() {
     }
   }
 
-  const now = new Date(); 
+  const availableSlotsToDisplay = React.useMemo(() => {
+    if (!watchedDate) return [];
+
+    return timeSlots.filter(slot => {
+        const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+        let slotIsTooSoonOrPast = false;
+
+        if (isToday) {
+            const timeParts = slot.split(' ');
+            const timeDigits = timeParts[0].split(':');
+            let slotHours = parseInt(timeDigits[0]);
+            const slotMinutes = parseInt(timeDigits[1]);
+            const period = timeParts[1].toUpperCase();
+
+            if (period === 'PM' && slotHours !== 12) slotHours += 12;
+            else if (period === 'AM' && slotHours === 12) slotHours = 0; 
+
+            const slotStartDateTime = new Date(watchedDate); // Use a new date object for each slot
+            slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+            
+            // Calculate cutoff time relative to the *current* `now`
+            const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+
+            if (slotStartDateTime <= cutoffTime) {
+                slotIsTooSoonOrPast = true;
+            }
+        }
+        
+        const isSlotBooked = bookedSlots.includes(slot);
+        
+        return !isSlotBooked && !slotIsTooSoonOrPast;
+    });
+  }, [watchedDate, bookedSlots]); // isLoadingBookedSlots removed as filter runs when data is ready
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -276,7 +305,7 @@ export default function BookAppointmentPage() {
                   </FormLabel>
                   <p className="text-sm text-muted-foreground mb-3">{formattedSelectedDate}</p>
                   
-                  <div className="min-h-[70px] py-2"> {/* Container with min-height and keys for conditional blocks */}
+                  <div className="min-h-[70px] py-2">
                     {!watchedDate ? (
                       <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
                     ) : isLoadingBookedSlots ? (
@@ -286,58 +315,31 @@ export default function BookAppointmentPage() {
                       </div>
                     ) : (
                       <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {timeSlots.map((slot) => {
-                          const isToday = watchedDate && format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
-                          let isDisabledByTime = false;
-
-                          if (isToday && watchedDate) {
-                            const timeParts = slot.split(' ');
-                            const timeDigits = timeParts[0].split(':');
-                            let slotHours = parseInt(timeDigits[0]);
-                            const slotMinutes = parseInt(timeDigits[1]);
-                            const period = timeParts[1].toUpperCase();
-
-                            if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                            else if (period === 'AM' && slotHours === 12) slotHours = 0; 
-
-                            const slotStartDateTime = new Date(watchedDate);
-                            slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                            
-                            const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-
-                            if (slotStartDateTime <= cutoffTime) {
-                              isDisabledByTime = true;
-                            }
-                          }
-                          
-                          const isBooked = bookedSlots.includes(slot);
-                          const isDisabled = isDisabledByTime || isBooked;
-                          
-                          return (
+                        {availableSlotsToDisplay.length === 0 ? (
+                           <p className="text-sm text-muted-foreground text-center col-span-full">
+                             No hay horarios disponibles para esta fecha.
+                           </p>
+                        ) : (
+                          availableSlotsToDisplay.map((slot) => (
                             <Button
                               key={slot}
                               type="button"
-                              variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
+                              variant={selectedTimeSlot === slot ? "default" : "outline"}
                               className={cn(
                                 "w-full py-3 text-sm",
-                                selectedTimeSlot === slot && !isDisabled
+                                selectedTimeSlot === slot
                                   ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                  : "text-foreground hover:bg-muted",
-                                isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground line-through"
+                                  : "text-foreground hover:bg-muted"
                               )}
                               onClick={() => {
-                                if (!isDisabled) {
-                                  setSelectedTimeSlot(slot);
-                                  field.onChange(slot);
-                                }
+                                setSelectedTimeSlot(slot);
+                                field.onChange(slot);
                               }}
-                              disabled={isDisabled}
-                              title={isBooked ? "Horario no disponible" : isDisabledByTime ? "Horario no disponible (muy pronto)" : ""}
                             >
                               {slot}
                             </Button>
-                          );
-                        })}
+                          ))
+                        )}
                       </div>
                     )}
                   </div>
@@ -414,11 +416,11 @@ export default function BookAppointmentPage() {
                 </FormItem>
               )}
             />
-            <Button 
-              type="submit" 
-              className="w-full py-6 text-lg" 
-              disabled={isLoading || !currentUser || isLoadingBookedSlots}
-            >
+             <Button 
+                type="submit" 
+                className="w-full py-6 text-lg" 
+                disabled={isLoading || !currentUser || isLoadingBookedSlots}
+              >
               <Loader2 
                 className={cn(
                   "mr-2 h-5 w-5 animate-spin",
