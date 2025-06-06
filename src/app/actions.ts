@@ -53,13 +53,18 @@ export async function getProducts(): Promise<Product[]> {
       const createdAt = data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined;
       
       let imageSrcVal = 'https://placehold.co/400x400.png'; 
-      if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
+      // If imageSrc is a non-empty string from Firestore and starts with http, use it.
+      // This relies on Zod validation on write ensuring it's a valid http/https URL.
+      if (typeof data.imageSrc === 'string' && data.imageSrc.trim().startsWith('http')) {
         imageSrcVal = data.imageSrc;
-      } else if (typeof data.imageSrc === 'string' && data.imageSrc.trim() !== '') {
-        console.warn(`Product ID ${doc.id} has an imageSrc that is a string but not a valid http/https URL: "${data.imageSrc}". Defaulting to placeholder.`);
-      } else if (data.imageSrc && typeof data.imageSrc !== 'string') {
-        console.warn(`Product ID ${doc.id} has a non-string imageSrc. Type: ${typeof data.imageSrc}. Value:`, data.imageSrc, ". Defaulting to placeholder.");
+      } else if (data.imageSrc && data.imageSrc.trim() !== '') { 
+        // If imageSrc exists but wasn't a valid http string (e.g. old data, different format)
+        console.warn(`Product ID ${doc.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
+      } else if (!data.imageSrc) {
+        // If imageSrc is missing or null/undefined
+        console.warn(`Product ID ${doc.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
       }
+
 
       return {
         id: doc.id,
@@ -81,6 +86,7 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function addProduct(data: ProductFormValues) {
   try {
+    // data.imageSrc is already validated by Zod to be a http/https URL string
     const productDataToAdd = {
       name: data.name,
       description: data.description,
@@ -114,6 +120,7 @@ export async function updateProduct(data: ProductFormValues) {
   }
   try {
     const productDocRef = doc(firestore, 'products', data.id);
+    // data.imageSrc is already validated by Zod to be a http/https URL string
     const productDataToUpdate = {
       name: data.name,
       description: data.description,
@@ -121,25 +128,27 @@ export async function updateProduct(data: ProductFormValues) {
       imageSrc: data.imageSrc,
       aiHint: data.aiHint,
       stock: data.stock ?? 0,
-      // Note: We are not updating createdAt here. 
-      // If an 'updatedAt' field is desired, it should be added here:
-      // updatedAt: Timestamp.now() 
     };
     await updateDoc(productDocRef, productDataToUpdate);
     
-    // Fetch the full updated document to return consistent data including existing createdAt
     const updatedDocSnap = await getDoc(productDocRef);
     if (!updatedDocSnap.exists()) {
         return { success: false, message: 'Failed to retrieve updated product.' };
     }
     const updatedData = updatedDocSnap.data();
 
+    // When reading back, use the same logic as getProducts for imageSrcVal
+    let imageSrcVal = 'https://placehold.co/400x400.png';
+    if (typeof updatedData.imageSrc === 'string' && updatedData.imageSrc.trim().startsWith('http')) {
+        imageSrcVal = updatedData.imageSrc;
+    }
+
     const updatedProduct: Product = {
       id: updatedDocSnap.id,
       name: updatedData.name,
       description: updatedData.description,
       price: updatedData.price,
-      imageSrc: updatedData.imageSrc, // Already validated or placeholder by getProducts or schema
+      imageSrc: imageSrcVal, 
       aiHint: updatedData.aiHint,
       stock: updatedData.stock,
       createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
@@ -170,3 +179,4 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
+

@@ -54,7 +54,12 @@ export const productSchema = z.object({
   name: z.string().min(3, { message: "El nombre del producto debe tener al menos 3 caracteres." }),
   description: z.string().min(10, { message: "La descripción debe tener al menos 10 caracteres." }),
   price: z.string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, { message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX" }),
-  imageSrc: z.string().url({ message: "Por favor, introduce una URL de imagen válida." }),
+  imageSrc: z.string()
+    .min(1, { message: "La URL de la imagen no puede estar vacía." })
+    .url({ message: "Por favor, introduce una URL de imagen válida." })
+    .refine(val => val.startsWith('http://') || val.startsWith('https://'), {
+      message: "La URL debe empezar con http:// o https://",
+    }),
   aiHint: z.string().min(2, { message: "La pista de IA debe tener al menos 2 caracteres." }),
   stock: z.coerce.number().min(0, { message: "El stock no puede ser negativo." }).optional().default(0),
 });
