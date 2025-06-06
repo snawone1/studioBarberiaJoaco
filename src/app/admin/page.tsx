@@ -68,7 +68,7 @@ export default function AdminPage() {
       name: '',
       description: '',
       price: 'ARS$ ',
-      imageSrc: '',
+      imageSrc: 'https://placehold.co/400x400.png',
       aiHint: '',
       stock: 0,
     },
@@ -94,7 +94,11 @@ export default function AdminPage() {
       setIsLoadingProducts(true);
       try {
         const fetchedProducts = await getProducts();
-        setProducts(fetchedProducts.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
+        setProducts(fetchedProducts.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+        }));
       } catch (error) {
         toast({ title: 'Error', description: 'No se pudieron cargar los productos.', variant: 'destructive' });
       } finally {
@@ -126,7 +130,7 @@ export default function AdminPage() {
       name: '',
       description: '',
       price: 'ARS$ ',
-      imageSrc: 'https://placehold.co/400x400.png', // Default placeholder
+      imageSrc: 'https://placehold.co/400x400.png',
       aiHint: '',
       stock: 0,
     });
@@ -140,7 +144,7 @@ export default function AdminPage() {
       name: product.name,
       description: product.description,
       price: product.price,
-      imageSrc: product.imageSrc || 'https://placehold.co/400x400.png',
+      imageSrc: product.imageSrc, // Relies on imageSrc being a valid URL from getProducts
       aiHint: product.aiHint,
       stock: product.stock ?? 0,
     });
@@ -150,18 +154,26 @@ export default function AdminPage() {
   async function onProductFormSubmit(data: ProductFormValues) {
     setIsSubmittingProduct(true);
     let result;
-    if (editingProduct && data.id) { // Editing existing product
+    if (editingProduct && data.id) {
       result = await updateProduct(data);
-    } else { // Adding new product
+    } else {
       result = await addProduct(data);
     }
 
     if (result.success && result.product) {
       toast({ title: editingProduct ? '¡Producto Actualizado!' : '¡Producto Añadido!', description: result.message });
       if (editingProduct) {
-        setProducts(prev => prev.map(p => p.id === result.product!.id ? result.product! : p).sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
+        setProducts(prev => prev.map(p => p.id === result.product!.id ? result.product! : p).sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+        }));
       } else {
-        setProducts(prev => [...prev, result.product!].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()));
+        setProducts(prev => [...prev, result.product!].sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+        }));
       }
       productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,});
       setShowAddEditProductForm(false);
@@ -321,7 +333,7 @@ export default function AdminPage() {
               </DialogDescription>
             </DialogHeader>
 
-            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1"> {/* Added pr-2 and -mr-1 for scrollbar spacing if needed */}
+            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1">
               {!showAddEditProductForm && (
                 <Button onClick={handleAddNewProductClick} className="mb-4">
                   <PlusCircle className="mr-2 h-4 w-4" /> Añadir Producto Nuevo
@@ -364,7 +376,7 @@ export default function AdminPage() {
                             <FormItem>
                               <FormLabel>Stock</FormLabel>
                               <FormControl><Input type="number" placeholder="0" {...field} 
-                                onChange={event => field.onChange(+event.target.value)} // Ensure value is number
+                                onChange={event => field.onChange(+event.target.value)}
                               /></FormControl>
                               <FormMessage />
                             </FormItem>
@@ -414,12 +426,12 @@ export default function AdminPage() {
                          <div className="flex items-center space-x-4">
                           <div className="relative w-16 h-16 aspect-square flex-shrink-0">
                             <Image
-                              src={product.imageSrc || 'https://placehold.co/400x400.png'}
+                              src={product.imageSrc} 
                               alt={product.name}
                               fill
                               className="rounded-md object-cover"
                               data-ai-hint={product.aiHint || 'product image'}
-                              unoptimized={product.imageSrc && product.imageSrc.startsWith('data:')} // Add this if you expect data URIs
+                              unoptimized={!!(product.imageSrc && product.imageSrc.startsWith('data:'))}
                             />
                           </div>
                           <div className="flex-grow min-w-0">
@@ -433,7 +445,7 @@ export default function AdminPage() {
                              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-700" onClick={() => handleEditProductClick(product)}>
                               <Edit3 className="h-4 w-4" />
                             </Button> 
-                            <Dialog> {/* Nested Dialog for Delete Confirmation */}
+                            <Dialog>
                               <DialogTrigger asChild>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-red-700">
                                   <Trash2 className="h-4 w-4" />
@@ -495,3 +507,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
