@@ -762,6 +762,7 @@ const timeSlots = [
     "07:00 PM"
 ];
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
+const now = new Date(); // Define now once at the component level
 function BookAppointmentPage() {
     _s();
     const { toast } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"])();
@@ -789,26 +790,24 @@ function BookAppointmentPage() {
             const fetchBookedSlots = {
                 "BookAppointmentPage.useEffect.fetchBookedSlots": async ()=>{
                     if (!watchedDate) {
-                        // Si no hay fecha seleccionada (ej. el usuario borra la fecha del calendario)
                         if (isActive) {
-                            setBookedSlots([]); // Limpia los horarios reservados
-                            setSelectedTimeSlot(undefined); // Limpia el horario seleccionado
-                            form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
-                            setIsLoadingBookedSlots(false); // Asegura que no esté en estado de carga
+                            setBookedSlots([]);
+                            setSelectedTimeSlot(undefined);
+                            form.setValue('preferredTime', '');
+                            setIsLoadingBookedSlots(false);
                         }
                         return;
                     }
-                    // Si hay una fecha seleccionada, procedemos a cargar los horarios
                     if (isActive) {
-                        setSelectedTimeSlot(undefined); // Limpia cualquier horario previamente seleccionado
-                        form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
-                        // No llamamos a setBookedSlots([]) aquí; el loader se encargará de ocultar la cuadrícula.
-                        setIsLoadingBookedSlots(true); // Activa el estado de carga
+                        setSelectedTimeSlot(undefined);
+                        form.setValue('preferredTime', '');
+                        setIsLoadingBookedSlots(true);
+                    // No es necesario setBookedSlots([]) aquí, el loader se encargará
                     }
                     try {
                         const slots = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getBookedSlotsForDate"])(watchedDate);
                         if (isActive) {
-                            setBookedSlots(slots); // Establece los nuevos horarios reservados
+                            setBookedSlots(slots);
                         }
                     } catch (error) {
                         if (isActive) {
@@ -818,11 +817,11 @@ function BookAppointmentPage() {
                                 description: 'No se pudieron cargar los horarios ocupados.',
                                 variant: 'destructive'
                             });
-                            setBookedSlots([]); // En caso de error, limpia los horarios reservados
+                            setBookedSlots([]);
                         }
                     } finally{
                         if (isActive) {
-                            setIsLoadingBookedSlots(false); // Desactiva el estado de carga
+                            setIsLoadingBookedSlots(false);
                         }
                     }
                 }
@@ -830,13 +829,13 @@ function BookAppointmentPage() {
             fetchBookedSlots();
             return ({
                 "BookAppointmentPage.useEffect": ()=>{
-                    isActive = false; // Función de limpieza para el efecto
+                    isActive = false;
                 }
             })["BookAppointmentPage.useEffect"];
         }
     }["BookAppointmentPage.useEffect"], [
         watchedDate
-    ]); // Dependencia única: watchedDate
+    ]);
     async function onSubmit(data) {
         console.log("Submitting appointment with payload:", data);
         if (!currentUser) {
@@ -878,10 +877,9 @@ function BookAppointmentPage() {
                 message: ''
             });
             setSelectedTimeSlot(undefined);
-            // Vuelve a cargar los horarios para la fecha actual para reflejar el nuevo bloqueo
             if (watchedDate) {
                 setIsLoadingBookedSlots(true);
-                // No es necesario setBookedSlots([]) aquí, el loader se encargará
+                // No es necesario setBookedSlots([]) aquí
                 (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getBookedSlotsForDate"])(watchedDate).then((newSlots)=>{
                     setBookedSlots(newSlots);
                 }).catch((fetchError)=>{
@@ -896,7 +894,6 @@ function BookAppointmentPage() {
                 description: result.message,
                 variant: 'destructive'
             });
-            // Si el error es porque el horario ya no está disponible, refresca los slots
             if (result.message && result.message.includes('Este horario ya no está disponible')) {
                 if (watchedDate) {
                     setIsLoadingBookedSlots(true);
@@ -912,7 +909,38 @@ function BookAppointmentPage() {
             }
         }
     }
-    const now = new Date();
+    const availableSlotsToDisplay = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].useMemo({
+        "BookAppointmentPage.useMemo[availableSlotsToDisplay]": ()=>{
+            if (!watchedDate) return [];
+            return timeSlots.filter({
+                "BookAppointmentPage.useMemo[availableSlotsToDisplay]": (slot)=>{
+                    const isToday = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(watchedDate, 'yyyy-MM-dd') === (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(now, 'yyyy-MM-dd');
+                    let slotIsTooSoonOrPast = false;
+                    if (isToday) {
+                        const timeParts = slot.split(' ');
+                        const timeDigits = timeParts[0].split(':');
+                        let slotHours = parseInt(timeDigits[0]);
+                        const slotMinutes = parseInt(timeDigits[1]);
+                        const period = timeParts[1].toUpperCase();
+                        if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                        else if (period === 'AM' && slotHours === 12) slotHours = 0;
+                        const slotStartDateTime = new Date(watchedDate); // Use a new date object for each slot
+                        slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                        // Calculate cutoff time relative to the *current* `now`
+                        const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+                        if (slotStartDateTime <= cutoffTime) {
+                            slotIsTooSoonOrPast = true;
+                        }
+                    }
+                    const isSlotBooked = bookedSlots.includes(slot);
+                    return !isSlotBooked && !slotIsTooSoonOrPast;
+                }
+            }["BookAppointmentPage.useMemo[availableSlotsToDisplay]"]);
+        }
+    }["BookAppointmentPage.useMemo[availableSlotsToDisplay]"], [
+        watchedDate,
+        bookedSlots
+    ]); // isLoadingBookedSlots removed as filter runs when data is ready
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "container mx-auto px-4 py-12",
         children: [
@@ -921,7 +949,7 @@ function BookAppointmentPage() {
                 description: "Completa el siguiente formulario para solicitar una cita. Nos pondremos en contacto contigo pronto para confirmar."
             }, void 0, false, {
                 fileName: "[project]/src/app/book/page.tsx",
-                lineNumber: 216,
+                lineNumber: 245,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -943,7 +971,7 @@ function BookAppointmentPage() {
                                                 children: "Fecha Preferida"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 228,
+                                                lineNumber: 257,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$popover$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Popover"], {
@@ -961,30 +989,30 @@ function BookAppointmentPage() {
                                                                         children: "Selecciona una fecha"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                                        lineNumber: 242,
+                                                                        lineNumber: 271,
                                                                         columnNumber: 29
                                                                     }, void 0),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CalendarIcon$3e$__["CalendarIcon"], {
                                                                         className: "ml-auto h-5 w-5 opacity-50"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                                        lineNumber: 244,
+                                                                        lineNumber: 273,
                                                                         columnNumber: 27
                                                                     }, void 0)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                                lineNumber: 232,
+                                                                lineNumber: 261,
                                                                 columnNumber: 25
                                                             }, void 0)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/book/page.tsx",
-                                                            lineNumber: 231,
+                                                            lineNumber: 260,
                                                             columnNumber: 23
                                                         }, void 0)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 230,
+                                                        lineNumber: 259,
                                                         columnNumber: 21
                                                     }, void 0),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$popover$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PopoverContent"], {
@@ -1001,34 +1029,34 @@ function BookAppointmentPage() {
                                                             locale: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$locale$2f$es$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["es"]
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/book/page.tsx",
-                                                            lineNumber: 249,
+                                                            lineNumber: 278,
                                                             columnNumber: 23
                                                         }, void 0)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 248,
+                                                        lineNumber: 277,
                                                         columnNumber: 21
                                                     }, void 0)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 229,
+                                                lineNumber: 258,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 263,
+                                                lineNumber: 292,
                                                 columnNumber: 19
                                             }, void 0)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 256,
                                         columnNumber: 17
                                     }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 223,
+                                lineNumber: 252,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1043,14 +1071,14 @@ function BookAppointmentPage() {
                                                         className: "mr-2 h-5 w-5 text-primary"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 274,
+                                                        lineNumber: 303,
                                                         columnNumber: 21
                                                     }, void 0),
                                                     "Horarios Disponibles"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 273,
+                                                lineNumber: 302,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1058,111 +1086,90 @@ function BookAppointmentPage() {
                                                 children: formattedSelectedDate
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 277,
+                                                lineNumber: 306,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "min-h-[70px] py-2",
-                                                children: [
-                                                    " ",
-                                                    !watchedDate ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        className: "text-sm text-muted-foreground text-center",
-                                                        children: "Por favor, selecciona una fecha para ver los horarios."
-                                                    }, "no-date", false, {
+                                                children: !watchedDate ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    className: "text-sm text-muted-foreground text-center",
+                                                    children: "Por favor, selecciona una fecha para ver los horarios."
+                                                }, "no-date", false, {
+                                                    fileName: "[project]/src/app/book/page.tsx",
+                                                    lineNumber: 310,
+                                                    columnNumber: 23
+                                                }, void 0) : isLoadingBookedSlots ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "flex justify-center items-center h-full",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                            className: "h-6 w-6 animate-spin text-primary"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/book/page.tsx",
+                                                            lineNumber: 313,
+                                                            columnNumber: 25
+                                                        }, void 0),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "ml-2",
+                                                            children: "Cargando horarios..."
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/book/page.tsx",
+                                                            lineNumber: 314,
+                                                            columnNumber: 25
+                                                        }, void 0)
+                                                    ]
+                                                }, "loading-slots", true, {
+                                                    fileName: "[project]/src/app/book/page.tsx",
+                                                    lineNumber: 312,
+                                                    columnNumber: 23
+                                                }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3",
+                                                    children: availableSlotsToDisplay.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "text-sm text-muted-foreground text-center col-span-full",
+                                                        children: "No hay horarios disponibles para esta fecha."
+                                                    }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 281,
-                                                        columnNumber: 23
-                                                    }, void 0) : isLoadingBookedSlots ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex justify-center items-center h-full",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
-                                                                className: "h-6 w-6 animate-spin text-primary"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/book/page.tsx",
-                                                                lineNumber: 284,
-                                                                columnNumber: 25
-                                                            }, void 0),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "ml-2",
-                                                                children: "Cargando horarios..."
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/app/book/page.tsx",
-                                                                lineNumber: 285,
-                                                                columnNumber: 25
-                                                            }, void 0)
-                                                        ]
-                                                    }, "loading-slots", true, {
-                                                        fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 283,
-                                                        columnNumber: 23
-                                                    }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3",
-                                                        children: timeSlots.map((slot)=>{
-                                                            const isToday = watchedDate && (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(watchedDate, 'yyyy-MM-dd') === (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$date$2d$fns$2f$format$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$locals$3e$__["format"])(now, 'yyyy-MM-dd');
-                                                            let isDisabledByTime = false;
-                                                            if (isToday && watchedDate) {
-                                                                const timeParts = slot.split(' ');
-                                                                const timeDigits = timeParts[0].split(':');
-                                                                let slotHours = parseInt(timeDigits[0]);
-                                                                const slotMinutes = parseInt(timeDigits[1]);
-                                                                const period = timeParts[1].toUpperCase();
-                                                                if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                                                                else if (period === 'AM' && slotHours === 12) slotHours = 0;
-                                                                const slotStartDateTime = new Date(watchedDate);
-                                                                slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                                                                const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-                                                                if (slotStartDateTime <= cutoffTime) {
-                                                                    isDisabledByTime = true;
-                                                                }
-                                                            }
-                                                            const isBooked = bookedSlots.includes(slot);
-                                                            const isDisabled = isDisabledByTime || isBooked;
-                                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
-                                                                type: "button",
-                                                                variant: selectedTimeSlot === slot && !isDisabled ? "default" : "outline",
-                                                                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-full py-3 text-sm", selectedTimeSlot === slot && !isDisabled ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-foreground hover:bg-muted", isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground line-through"),
-                                                                onClick: ()=>{
-                                                                    if (!isDisabled) {
-                                                                        setSelectedTimeSlot(slot);
-                                                                        field.onChange(slot);
-                                                                    }
-                                                                },
-                                                                disabled: isDisabled,
-                                                                title: isBooked ? "Horario no disponible" : isDisabledByTime ? "Horario no disponible (muy pronto)" : "",
-                                                                children: slot
-                                                            }, slot, false, {
-                                                                fileName: "[project]/src/app/book/page.tsx",
-                                                                lineNumber: 317,
-                                                                columnNumber: 29
-                                                            }, void 0);
-                                                        })
-                                                    }, "slots-grid", false, {
-                                                        fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 288,
-                                                        columnNumber: 23
-                                                    }, void 0)
-                                                ]
-                                            }, void 0, true, {
+                                                        lineNumber: 319,
+                                                        columnNumber: 28
+                                                    }, void 0) : availableSlotsToDisplay.map((slot)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
+                                                            type: "button",
+                                                            variant: selectedTimeSlot === slot ? "default" : "outline",
+                                                            className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("w-full py-3 text-sm", selectedTimeSlot === slot ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-foreground hover:bg-muted"),
+                                                            onClick: ()=>{
+                                                                setSelectedTimeSlot(slot);
+                                                                field.onChange(slot);
+                                                            },
+                                                            children: slot
+                                                        }, slot, false, {
+                                                            fileName: "[project]/src/app/book/page.tsx",
+                                                            lineNumber: 324,
+                                                            columnNumber: 29
+                                                        }, void 0))
+                                                }, "slots-grid", false, {
+                                                    fileName: "[project]/src/app/book/page.tsx",
+                                                    lineNumber: 317,
+                                                    columnNumber: 23
+                                                }, void 0)
+                                            }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 279,
+                                                lineNumber: 308,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormMessage"], {
                                                 className: "mt-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 344,
+                                                lineNumber: 346,
                                                 columnNumber: 19
                                             }, void 0)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 272,
+                                        lineNumber: 301,
                                         columnNumber: 17
                                     }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 268,
+                                lineNumber: 297,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1178,7 +1185,7 @@ function BookAppointmentPage() {
                                                         children: "Servicios"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 355,
+                                                        lineNumber: 357,
                                                         columnNumber: 21
                                                     }, void 0),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormDescription"], {
@@ -1186,13 +1193,13 @@ function BookAppointmentPage() {
                                                         children: "Selecciona el/los servicio(s) que te interesan."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 356,
+                                                        lineNumber: 358,
                                                         columnNumber: 21
                                                     }, void 0)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 354,
+                                                lineNumber: 356,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1216,12 +1223,12 @@ function BookAppointmentPage() {
                                                                             className: "h-5 w-5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/book/page.tsx",
-                                                                            lineNumber: 372,
+                                                                            lineNumber: 374,
                                                                             columnNumber: 33
                                                                         }, void 0)
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                                        lineNumber: 371,
+                                                                        lineNumber: 373,
                                                                         columnNumber: 31
                                                                     }, void 0),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormLabel"], {
@@ -1229,40 +1236,40 @@ function BookAppointmentPage() {
                                                                         children: service.label
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                                        lineNumber: 386,
+                                                                        lineNumber: 388,
                                                                         columnNumber: 31
                                                                     }, void 0)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                                lineNumber: 368,
+                                                                lineNumber: 370,
                                                                 columnNumber: 29
                                                             }, void 0);
                                                         }
                                                     }, service.id, false, {
                                                         fileName: "[project]/src/app/book/page.tsx",
-                                                        lineNumber: 362,
+                                                        lineNumber: 364,
                                                         columnNumber: 23
                                                     }, void 0))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 360,
+                                                lineNumber: 362,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 395,
+                                                lineNumber: 397,
                                                 columnNumber: 19
                                             }, void 0)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 353,
+                                        lineNumber: 355,
                                         columnNumber: 17
                                     }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 349,
+                                lineNumber: 351,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1275,7 +1282,7 @@ function BookAppointmentPage() {
                                                 children: "Mensaje Adicional (Opcional)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 404,
+                                                lineNumber: 406,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1286,28 +1293,28 @@ function BookAppointmentPage() {
                                                     ...field
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/book/page.tsx",
-                                                    lineNumber: 406,
+                                                    lineNumber: 408,
                                                     columnNumber: 21
                                                 }, void 0)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 405,
+                                                lineNumber: 407,
                                                 columnNumber: 19
                                             }, void 0),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                 fileName: "[project]/src/app/book/page.tsx",
-                                                lineNumber: 413,
+                                                lineNumber: 415,
                                                 columnNumber: 19
                                             }, void 0)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 403,
+                                        lineNumber: 405,
                                         columnNumber: 17
                                     }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 399,
+                                lineNumber: 401,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1319,15 +1326,15 @@ function BookAppointmentPage() {
                                         className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("mr-2 h-5 w-5 animate-spin", isLoading || isLoadingBookedSlots ? "inline-block" : "hidden")
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 422,
+                                        lineNumber: 424,
                                         columnNumber: 15
                                     }, this),
                                     isLoading || isLoadingBookedSlots ? 'Procesando...' : currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 417,
-                                columnNumber: 13
+                                lineNumber: 419,
+                                columnNumber: 14
                             }, this),
                             !currentUser && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-sm text-center text-muted-foreground",
@@ -1339,7 +1346,7 @@ function BookAppointmentPage() {
                                         children: "iniciar sesión"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 436,
+                                        lineNumber: 438,
                                         columnNumber: 27
                                     }, this),
                                     " o ",
@@ -1349,40 +1356,40 @@ function BookAppointmentPage() {
                                         children: "registrarte"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/book/page.tsx",
-                                        lineNumber: 436,
+                                        lineNumber: 438,
                                         columnNumber: 128
                                     }, this),
                                     " para solicitar una cita."
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/book/page.tsx",
-                                lineNumber: 435,
+                                lineNumber: 437,
                                 columnNumber: 18
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/book/page.tsx",
-                        lineNumber: 222,
+                        lineNumber: 251,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/book/page.tsx",
-                    lineNumber: 221,
+                    lineNumber: 250,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/book/page.tsx",
-                lineNumber: 220,
+                lineNumber: 249,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/book/page.tsx",
-        lineNumber: 215,
+        lineNumber: 244,
         columnNumber: 5
     }, this);
 }
-_s(BookAppointmentPage, "8yEBQia0F9bZDY2oVgn2p1LqvJ8=", false, function() {
+_s(BookAppointmentPage, "CccSiKJAQ1T1PifEIxAkXkJ1z0c=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$hooks$2f$use$2d$toast$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useToast"],
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"],

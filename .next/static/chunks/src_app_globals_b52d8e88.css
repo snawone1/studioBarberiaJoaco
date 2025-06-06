@@ -601,6 +601,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 2rem;
 }
 
+.ml-2 {
+  margin-left: .5rem;
+}
+
 .ml-4 {
   margin-left: 1rem;
 }
@@ -647,10 +651,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.ml-2 {
-  margin-left: .5rem;
 }
 
 .block {
@@ -810,6 +810,10 @@ h1, h2, h3, h4, h5, h6 {
   min-height: 350px;
 }
 
+.min-h-\[70px\] {
+  min-height: 70px;
+}
+
 .min-h-\[80px\] {
   min-height: 80px;
 }
@@ -824,10 +828,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .min-h-svh {
   min-height: 100svh;
-}
-
-.min-h-\[70px\] {
-  min-height: 70px;
 }
 
 .w-0 {
@@ -1157,6 +1157,10 @@ h1, h2, h3, h4, h5, h6 {
   gap: .5rem;
 }
 
+.gap-3 {
+  gap: .75rem;
+}
+
 .gap-4 {
   gap: 1rem;
 }
@@ -1167,10 +1171,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .gap-8 {
   gap: 2rem;
-}
-
-.gap-3 {
-  gap: .75rem;
 }
 
 .space-x-1 > :not([hidden]) ~ :not([hidden]) {
@@ -1574,6 +1574,11 @@ h1, h2, h3, h4, h5, h6 {
   padding-bottom: 5rem;
 }
 
+.py-3 {
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -1587,11 +1592,6 @@ h1, h2, h3, h4, h5, h6 {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
-}
-
-.py-3 {
-  padding-top: .75rem;
-  padding-bottom: .75rem;
 }
 
 .pb-10 {
@@ -1867,10 +1867,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .underline {
   text-decoration-line: underline;
-}
-
-.line-through {
-  text-decoration-line: line-through;
 }
 
 .underline-offset-4 {
@@ -2201,6 +2197,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: hsl(var(--destructive) / .9);
 }
 
+.hover\:bg-muted:hover {
+  background-color: hsl(var(--muted));
+}
+
 .hover\:bg-muted\/50:hover {
   background-color: hsl(var(--muted) / .5);
 }
@@ -2239,10 +2239,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .hover\:bg-transparent:hover {
   background-color: #0000;
-}
-
-.hover\:bg-muted:hover {
-  background-color: hsl(var(--muted));
 }
 
 .hover\:text-accent-foreground:hover {
@@ -2994,6 +2990,10 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
   }
 
+  .sm\:max-w-2xl {
+    max-width: 42rem;
+  }
+
   .sm\:max-w-3xl {
     max-width: 48rem;
   }
@@ -3008,10 +3008,6 @@ h1, h2, h3, h4, h5, h6 {
 
   .sm\:max-w-sm {
     max-width: 24rem;
-  }
-
-  .sm\:max-w-2xl {
-    max-width: 42rem;
   }
 
   .sm\:grid-cols-2 {
