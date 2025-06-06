@@ -653,6 +653,10 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 .flex {
   display: flex;
 }
@@ -816,6 +820,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .min-h-svh {
   min-height: 100svh;
+}
+
+.min-h-\[70px\] {
+  min-height: 70px;
 }
 
 .w-0 {

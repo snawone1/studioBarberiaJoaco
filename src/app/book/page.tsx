@@ -75,45 +75,51 @@ export default function BookAppointmentPage() {
     : "Selecciona una fecha primero";
 
   useEffect(() => {
-    let isActive = true; // Flag to manage async operation lifecycle
+    let isActive = true;
 
-    if (watchedDate) {
-      const fetchBookedSlots = async () => {
-        if (!isActive) return; 
-        setIsLoadingBookedSlots(true);
-        setBookedSlots([]); 
-        setSelectedTimeSlot(undefined); 
-        form.setValue('preferredTime', ''); 
-
-        try {
-          const slots = await getBookedSlotsForDate(watchedDate);
-          if (isActive) { 
-            setBookedSlots(slots);
-          }
-        } catch (error) {
-          if (isActive) { 
-            console.error("Error fetching booked slots:", error);
-            toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
-          }
-        } finally {
-          if (isActive) { 
-            setIsLoadingBookedSlots(false);
-          }
+    const fetchBookedSlots = async () => {
+      if (!watchedDate) {
+        if (isActive) {
+          setBookedSlots([]);
+          setSelectedTimeSlot(undefined);
+          form.setValue('preferredTime', '');
+          setIsLoadingBookedSlots(false);
         }
-      };
-      fetchBookedSlots();
-    } else {
-      // Reset states if no date is selected
-      setBookedSlots([]);
-      setSelectedTimeSlot(undefined);
-      form.setValue('preferredTime', '');
-      setIsLoadingBookedSlots(false);
-    }
+        return;
+      }
+
+      // Date is selected, proceed to fetch
+      if (isActive) {
+        setSelectedTimeSlot(undefined); 
+        form.setValue('preferredTime', '');
+        setIsLoadingBookedSlots(true); 
+        setBookedSlots([]); // Clear old slots immediately while loading new ones
+      }
+
+      try {
+        const slots = await getBookedSlotsForDate(watchedDate);
+        if (isActive) {
+          setBookedSlots(slots);
+        }
+      } catch (error) {
+        if (isActive) {
+          console.error("Error fetching booked slots:", error);
+          toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
+          setBookedSlots([]); 
+        }
+      } finally {
+        if (isActive) {
+          setIsLoadingBookedSlots(false);
+        }
+      }
+    };
+
+    fetchBookedSlots();
 
     return () => {
-      isActive = false; // Cleanup function to set flag to false
+      isActive = false;
     };
-  }, [watchedDate]); // Only re-run if watchedDate changes. form.setValue and toast are stable.
+  }, [watchedDate]);
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
@@ -156,20 +162,20 @@ export default function BookAppointmentPage() {
       });
       form.reset({ 
         services: [], 
-        preferredDate: watchedDate, // Keep the date, or undefined if you prefer to clear it
+        preferredDate: watchedDate, 
         preferredTime: '', 
         message: '' 
       });
       setSelectedTimeSlot(undefined);
       if (watchedDate) { 
         setIsLoadingBookedSlots(true);
+        setBookedSlots([]); // Clear current slots before re-fetching
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
           })
           .catch(fetchError => {
             console.error("Error re-fetching booked slots after submission:", fetchError);
-            // Optionally show a non-critical toast here if needed
           })
           .finally(() => {
             setIsLoadingBookedSlots(false);
@@ -184,6 +190,7 @@ export default function BookAppointmentPage() {
        if (result.message && result.message.includes('Este horario ya no está disponible')) {
           if (watchedDate) {
             setIsLoadingBookedSlots(true);
+            setBookedSlots([]); // Clear current slots before re-fetching
             getBookedSlotsForDate(watchedDate)
               .then(newSlots => {
                 setBookedSlots(newSlots);
@@ -265,71 +272,72 @@ export default function BookAppointmentPage() {
                     Horarios Disponibles
                   </FormLabel>
                   <p className="text-sm text-muted-foreground mb-3">{formattedSelectedDate}</p>
-                  {!watchedDate && (
-                    <p className="text-sm text-muted-foreground py-4 text-center">Por favor, selecciona una fecha para ver los horarios.</p>
-                  )}
-                  {watchedDate && isLoadingBookedSlots && (
-                    <div className="flex justify-center py-4">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      <span className="ml-2">Cargando horarios...</span>
-                    </div>
-                  )}
-                  {watchedDate && !isLoadingBookedSlots && (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                      {timeSlots.map((slot) => {
-                        const isToday = watchedDate && format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
-                        let isDisabledByTime = false;
+                  
+                  <div className="min-h-[70px] py-2"> {/* Container with min-height and keys for conditional blocks */}
+                    {!watchedDate ? (
+                      <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
+                    ) : isLoadingBookedSlots ? (
+                      <div key="loading-slots" className="flex justify-center items-center h-full">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2">Cargando horarios...</span>
+                      </div>
+                    ) : (
+                      <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                        {timeSlots.map((slot) => {
+                          const isToday = watchedDate && format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                          let isDisabledByTime = false;
 
-                        if (isToday && watchedDate) {
-                          const timeParts = slot.split(' ');
-                          const timeDigits = timeParts[0].split(':');
-                          let slotHours = parseInt(timeDigits[0]);
-                          const slotMinutes = parseInt(timeDigits[1]);
-                          const period = timeParts[1].toUpperCase();
+                          if (isToday && watchedDate) {
+                            const timeParts = slot.split(' ');
+                            const timeDigits = timeParts[0].split(':');
+                            let slotHours = parseInt(timeDigits[0]);
+                            const slotMinutes = parseInt(timeDigits[1]);
+                            const period = timeParts[1].toUpperCase();
 
-                          if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                          else if (period === 'AM' && slotHours === 12) slotHours = 0; 
+                            if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                            else if (period === 'AM' && slotHours === 12) slotHours = 0; 
 
-                          const slotStartDateTime = new Date(watchedDate);
-                          slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                          
-                          const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+                            const slotStartDateTime = new Date(watchedDate);
+                            slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                            
+                            const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
 
-                          if (slotStartDateTime <= cutoffTime) {
-                            isDisabledByTime = true;
+                            if (slotStartDateTime <= cutoffTime) {
+                              isDisabledByTime = true;
+                            }
                           }
-                        }
-                        
-                        const isBooked = bookedSlots.includes(slot);
-                        const isDisabled = isDisabledByTime || isBooked;
-                        
-                        return (
-                          <Button
-                            key={slot}
-                            type="button"
-                            variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
-                            className={cn(
-                              "w-full py-3 text-sm",
-                              selectedTimeSlot === slot && !isDisabled
-                                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                : "text-foreground hover:bg-muted",
-                              isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground line-through"
-                            )}
-                            onClick={() => {
-                              if (!isDisabled) {
-                                setSelectedTimeSlot(slot);
-                                field.onChange(slot);
-                              }
-                            }}
-                            disabled={isDisabled}
-                            title={isBooked ? "Horario no disponible" : isDisabledByTime ? "Horario no disponible (muy pronto)" : ""}
-                          >
-                            {slot}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  )}
+                          
+                          const isBooked = bookedSlots.includes(slot);
+                          const isDisabled = isDisabledByTime || isBooked;
+                          
+                          return (
+                            <Button
+                              key={slot}
+                              type="button"
+                              variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
+                              className={cn(
+                                "w-full py-3 text-sm",
+                                selectedTimeSlot === slot && !isDisabled
+                                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                  : "text-foreground hover:bg-muted",
+                                isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground line-through"
+                              )}
+                              onClick={() => {
+                                if (!isDisabled) {
+                                  setSelectedTimeSlot(slot);
+                                  field.onChange(slot);
+                                }
+                              }}
+                              disabled={isDisabled}
+                              title={isBooked ? "Horario no disponible" : isDisabledByTime ? "Horario no disponible (muy pronto)" : ""}
+                            >
+                              {slot}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                   <FormMessage className="mt-2" />
                 </FormItem>
               )}
@@ -403,9 +411,24 @@ export default function BookAppointmentPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full py-6 text-lg" disabled={isLoading || !currentUser || isLoadingBookedSlots}>
-              {(isLoading || isLoadingBookedSlots) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-              {currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'}
+            <Button 
+              type="submit" 
+              className="w-full py-6 text-lg" 
+              disabled={isLoading || !currentUser || isLoadingBookedSlots}
+            >
+              {isLoading || isLoadingBookedSlots ? (
+                <>
+                  <Loader2 
+                    className={cn(
+                      "mr-2 h-5 w-5 animate-spin",
+                      (isLoading || isLoadingBookedSlots) ? "inline-block" : "hidden"
+                    )} 
+                  />
+                  Procesando...
+                </>
+              ) : (
+                currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
+              )}
             </Button>
             {!currentUser && (
                  <p className="text-sm text-center text-muted-foreground">
@@ -418,3 +441,4 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+

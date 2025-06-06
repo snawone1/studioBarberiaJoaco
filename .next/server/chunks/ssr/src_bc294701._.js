@@ -190,33 +190,31 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "appointmentSchema": (()=>appointmentSchema),
+    "clientAppointmentSchema": (()=>clientAppointmentSchema),
     "loginSchema": (()=>loginSchema),
+    "productSchema": (()=>productSchema),
     "registerSchema": (()=>registerSchema),
     "siteSettingsSchema": (()=>siteSettingsSchema),
     "styleAdvisorSchema": (()=>styleAdvisorSchema)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/zod/lib/index.mjs [app-ssr] (ecmascript)");
 ;
-const appointmentSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].object({
-    name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(2, {
-        message: "Name must be at least 2 characters."
-    }),
-    email: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().email({
-        message: "Invalid email address."
-    }),
-    phone: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(8, {
-        message: "Phone number seems too short."
-    }),
+const clientAppointmentSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].object({
     preferredDate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].date({
-        required_error: "Please select a date."
+        required_error: "Por favor, selecciona una fecha."
     }),
     preferredTime: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(1, {
-        message: "Please select a time slot."
+        message: "Por favor, selecciona un horario."
     }),
     services: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string()).min(1, {
-        message: "Please select at least one service."
+        message: "Por favor, selecciona al menos un servicio."
     }),
     message: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().optional()
+});
+const appointmentSchema = clientAppointmentSchema.extend({
+    userId: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(1, {
+        message: "User ID is required."
+    })
 });
 const styleAdvisorSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].object({
     hairType: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(1, {
@@ -266,6 +264,31 @@ const siteSettingsSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_
     siteDescription: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(1, {
         message: "La descripción del sitio no puede estar vacía."
     })
+});
+const productSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].object({
+    id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().optional(),
+    name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(3, {
+        message: "El nombre del producto debe tener al menos 3 caracteres."
+    }),
+    description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(10, {
+        message: "La descripción debe tener al menos 10 caracteres."
+    }),
+    price: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, {
+        message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX"
+    }),
+    imageSrc: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(1, {
+        message: "La URL de la imagen no puede estar vacía."
+    }).url({
+        message: "Por favor, introduce una URL de imagen válida."
+    }).refine((val)=>val.startsWith('http://') || val.startsWith('https://'), {
+        message: "La URL debe empezar con http:// o https://"
+    }),
+    aiHint: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(2, {
+        message: "La pista de IA debe tener al menos 2 caracteres."
+    }),
+    stock: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].coerce.number().min(0, {
+        message: "El stock no puede ser negativo."
+    }).optional().default(0)
 });
 }}),
 "[project]/src/app/register/page.tsx [app-ssr] (ecmascript)": ((__turbopack_context__) => {
