@@ -29,7 +29,7 @@ import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
 import { submitAppointmentRequest, getBookedSlotsForDate } from '@/app/actions';
-import { type AppointmentFormValues, appointmentSchema } from '@/lib/schemas';
+import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -59,10 +59,9 @@ export default function BookAppointmentPage() {
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
   const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
 
-  const form = useForm<AppointmentFormValues>({
-    resolver: zodResolver(appointmentSchema),
+  const form = useForm<ClientAppointmentFormValues>({
+    resolver: zodResolver(clientAppointmentSchema),
     defaultValues: {
-      userId: '', 
       services: [],
       preferredDate: undefined,
       preferredTime: '',
@@ -79,7 +78,7 @@ export default function BookAppointmentPage() {
     if (watchedDate) {
       const fetchBookedSlots = async () => {
         setIsLoadingBookedSlots(true);
-        setBookedSlots([]); // Clear previous booked slots
+        setBookedSlots([]); 
         try {
           const slots = await getBookedSlotsForDate(watchedDate);
           setBookedSlots(slots);
@@ -92,30 +91,30 @@ export default function BookAppointmentPage() {
       };
       fetchBookedSlots();
     } else {
-      setBookedSlots([]); // Clear if no date is selected
+      setBookedSlots([]); 
+      setIsLoadingBookedSlots(false);
     }
   }, [watchedDate, toast]);
 
 
-  async function onSubmit(data: AppointmentFormValues) {
+  async function onSubmit(data: ClientAppointmentFormValues) {
     if (!currentUser) {
       toast({
         title: 'Error de Autenticación',
         description: 'Debes iniciar sesión para solicitar una cita.',
         variant: 'destructive',
       });
-      setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     
-    const dataWithUser: AppointmentFormValues = {
+    const payloadForServer: AppointmentFormValues = {
       ...data,
       userId: currentUser.uid,
     };
 
-    const result = await submitAppointmentRequest(dataWithUser);
+    const result = await submitAppointmentRequest(payloadForServer);
     setIsLoading(false);
 
     if (result.success) {
@@ -124,14 +123,12 @@ export default function BookAppointmentPage() {
         description: result.message,
       });
       form.reset({ 
-        userId: '', 
         services: [], 
         preferredDate: undefined, 
         preferredTime: '', 
         message: '' 
       });
       setSelectedTimeSlot(undefined);
-      // Re-fetch booked slots for the current date if it's still selected
       if (watchedDate) {
         setIsLoadingBookedSlots(true);
         getBookedSlotsForDate(watchedDate)
@@ -190,7 +187,7 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          form.setValue('preferredTime', ''); // Reset time when date changes
+                          form.setValue('preferredTime', ''); 
                           setSelectedTimeSlot(undefined);
                           
                           if (selectedTimeSlot && date) {

@@ -1,15 +1,22 @@
 
 import { z } from 'zod';
 
-// Appointment Form Schema
-export const appointmentSchema = z.object({
-  userId: z.string().min(1, { message: "User ID is required." }), // Added userId
+// Client-side Appointment Form Schema (used by react-hook-form)
+export const clientAppointmentSchema = z.object({
   preferredDate: z.date({ required_error: "Por favor, selecciona una fecha."}),
   preferredTime: z.string().min(1, { message: "Por favor, selecciona un horario."}),
   services: z.array(z.string()).min(1, { message: "Por favor, selecciona al menos un servicio."}),
   message: z.string().optional(),
 });
+export type ClientAppointmentFormValues = z.infer<typeof clientAppointmentSchema>;
+
+// Server-side/Full Appointment Schema (used by server action)
+// This now explicitly includes userId, which is added by the client before sending to the server.
+export const appointmentSchema = clientAppointmentSchema.extend({
+  userId: z.string().min(1, { message: "User ID is required." }),
+});
 export type AppointmentFormValues = z.infer<typeof appointmentSchema>;
+
 
 // Style Advisor Form Schema
 export const styleAdvisorSchema = z.object({
@@ -62,4 +69,3 @@ export const productSchema = z.object({
   stock: z.coerce.number().min(0, { message: "El stock no puede ser negativo." }).optional().default(0),
 });
 export type ProductFormValues = z.infer<typeof productSchema>;
-
