@@ -79,37 +79,38 @@ export default function BookAppointmentPage() {
 
     const fetchBookedSlots = async () => {
       if (!watchedDate) {
+        // Si no hay fecha seleccionada (ej. el usuario borra la fecha del calendario)
         if (isActive) {
-          setBookedSlots([]);
-          setSelectedTimeSlot(undefined);
-          form.setValue('preferredTime', '');
-          setIsLoadingBookedSlots(false);
+          setBookedSlots([]); // Limpia los horarios reservados
+          setSelectedTimeSlot(undefined); // Limpia el horario seleccionado
+          form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
+          setIsLoadingBookedSlots(false); // Asegura que no esté en estado de carga
         }
         return;
       }
 
-      // Date is selected, proceed to fetch
+      // Si hay una fecha seleccionada, procedemos a cargar los horarios
       if (isActive) {
-        setSelectedTimeSlot(undefined); 
-        form.setValue('preferredTime', '');
-        setIsLoadingBookedSlots(true); 
-        setBookedSlots([]); // Clear old slots immediately while loading new ones
+        setSelectedTimeSlot(undefined); // Limpia cualquier horario previamente seleccionado
+        form.setValue('preferredTime', ''); // Limpia el valor del formulario para la hora
+        // No llamamos a setBookedSlots([]) aquí; el loader se encargará de ocultar la cuadrícula.
+        setIsLoadingBookedSlots(true); // Activa el estado de carga
       }
 
       try {
         const slots = await getBookedSlotsForDate(watchedDate);
         if (isActive) {
-          setBookedSlots(slots);
+          setBookedSlots(slots); // Establece los nuevos horarios reservados
         }
       } catch (error) {
         if (isActive) {
           console.error("Error fetching booked slots:", error);
           toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
-          setBookedSlots([]); 
+          setBookedSlots([]); // En caso de error, limpia los horarios reservados
         }
       } finally {
         if (isActive) {
-          setIsLoadingBookedSlots(false);
+          setIsLoadingBookedSlots(false); // Desactiva el estado de carga
         }
       }
     };
@@ -117,9 +118,9 @@ export default function BookAppointmentPage() {
     fetchBookedSlots();
 
     return () => {
-      isActive = false;
+      isActive = false; // Función de limpieza para el efecto
     };
-  }, [watchedDate]);
+  }, [watchedDate]); // Dependencia única: watchedDate
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
@@ -162,14 +163,15 @@ export default function BookAppointmentPage() {
       });
       form.reset({ 
         services: [], 
-        preferredDate: watchedDate, 
+        preferredDate: watchedDate, // Mantén la fecha seleccionada si es una reserva exitosa
         preferredTime: '', 
         message: '' 
       });
       setSelectedTimeSlot(undefined);
+      // Vuelve a cargar los horarios para la fecha actual para reflejar el nuevo bloqueo
       if (watchedDate) { 
         setIsLoadingBookedSlots(true);
-        setBookedSlots([]); // Clear current slots before re-fetching
+        // No es necesario setBookedSlots([]) aquí, el loader se encargará
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
@@ -187,10 +189,11 @@ export default function BookAppointmentPage() {
         description: result.message,
         variant: 'destructive',
       });
+       // Si el error es porque el horario ya no está disponible, refresca los slots
        if (result.message && result.message.includes('Este horario ya no está disponible')) {
           if (watchedDate) {
             setIsLoadingBookedSlots(true);
-            setBookedSlots([]); // Clear current slots before re-fetching
+            // No es necesario setBookedSlots([]) aquí
             getBookedSlotsForDate(watchedDate)
               .then(newSlots => {
                 setBookedSlots(newSlots);
@@ -416,16 +419,14 @@ export default function BookAppointmentPage() {
               className="w-full py-6 text-lg" 
               disabled={isLoading || !currentUser || isLoadingBookedSlots}
             >
+              <Loader2 
+                className={cn(
+                  "mr-2 h-5 w-5 animate-spin",
+                  (isLoading || isLoadingBookedSlots) ? "inline-block" : "hidden"
+                )} 
+              />
               {isLoading || isLoadingBookedSlots ? (
-                <>
-                  <Loader2 
-                    className={cn(
-                      "mr-2 h-5 w-5 animate-spin",
-                      (isLoading || isLoadingBookedSlots) ? "inline-block" : "hidden"
-                    )} 
-                  />
-                  Procesando...
-                </>
+                'Procesando...'
               ) : (
                 currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
               )}
@@ -441,4 +442,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
