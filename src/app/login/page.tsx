@@ -15,6 +15,7 @@ import { useAuth } from '@/context/AuthContext';
 import { type LoginFormData, loginSchema } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,12 +40,12 @@ export default function LoginPage() {
     setError(null);
     try {
       const result = await login(data);
-      if (result && 'code' in result) { // Check if it's an AuthError
+      if (result && 'code' in result) { 
         setError(result.message || 'Error al iniciar sesión.');
         toast({ title: 'Error', description: result.message || 'Error al iniciar sesión.', variant: 'destructive' });
-      } else if (result) { // User object
+      } else if (result) { 
         toast({ title: '¡Éxito!', description: 'Has iniciado sesión correctamente.' });
-        router.push('/'); // Redirect to home or dashboard
+        router.push('/'); 
       } else {
         setError('Error desconocido al iniciar sesión.');
         toast({ title: 'Error', description: 'Error desconocido al iniciar sesión.', variant: 'destructive' });
@@ -107,8 +108,8 @@ export default function LoginPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Iniciar Sesión
+                <Loader2 className={cn("mr-2 h-4 w-4 animate-spin", isLoading ? "inline-block" : "hidden")} />
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">

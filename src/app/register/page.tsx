@@ -15,6 +15,7 @@ import { useAuth } from '@/context/AuthContext';
 import { type RegisterFormData, registerSchema } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -43,16 +44,13 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError(null);
     try {
-      // Note: 'fullName' and 'phoneNumber' from 'data' are not directly used by 
-      // Firebase's createUserWithEmailAndPassword. They would need to be saved
-      // to a user profile (e.g., in Firestore) in a separate step.
       const result = await signup(data); 
-      if (result && 'code' in result) { // Check if it's an AuthError
+      if (result && 'code' in result) { 
         setError(result.message || 'Error al registrarse.');
         toast({ title: 'Error', description: result.message || 'Error al registrarse.', variant: 'destructive' });
-      } else if (result) { // User object
+      } else if (result) { 
         toast({ title: '¡Éxito!', description: 'Cuenta creada correctamente. Serás redirigido.' });
-        router.push('/'); // Redirect to home or login
+        router.push('/'); 
       } else {
         setError('Error desconocido al registrarse.');
         toast({ title: 'Error', description: 'Error desconocido al registrarse.', variant: 'destructive' });
@@ -164,8 +162,8 @@ export default function RegisterPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Crear Cuenta
+                <Loader2 className={cn("mr-2 h-4 w-4 animate-spin", isLoading ? "inline-block" : "hidden")} />
+                {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
               </Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
