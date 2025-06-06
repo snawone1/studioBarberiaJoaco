@@ -79,6 +79,8 @@ export default function BookAppointmentPage() {
       const fetchBookedSlots = async () => {
         setIsLoadingBookedSlots(true);
         setBookedSlots([]); 
+        setSelectedTimeSlot(undefined); // Deselect time when date changes
+        form.setValue('preferredTime', ''); // Clear time in form when date changes
         try {
           const slots = await getBookedSlotsForDate(watchedDate);
           setBookedSlots(slots);
@@ -92,8 +94,11 @@ export default function BookAppointmentPage() {
       fetchBookedSlots();
     } else {
       setBookedSlots([]); 
+      setSelectedTimeSlot(undefined);
+      form.setValue('preferredTime', '');
       setIsLoadingBookedSlots(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedDate, toast]);
 
 
@@ -129,10 +134,12 @@ export default function BookAppointmentPage() {
         message: '' 
       });
       setSelectedTimeSlot(undefined);
-      if (watchedDate) {
+      if (watchedDate) { // Re-fetch booked slots for the current date to update UI
         setIsLoadingBookedSlots(true);
         getBookedSlotsForDate(watchedDate)
-          .then(setBookedSlots)
+          .then(slots => {
+            setBookedSlots(slots);
+          })
           .catch(console.error)
           .finally(() => setIsLoadingBookedSlots(false));
       }
@@ -142,6 +149,16 @@ export default function BookAppointmentPage() {
         description: result.message,
         variant: 'destructive',
       });
+       // If booking failed due to slot taken, refresh booked slots
+       if (result.message && result.message.includes('Este horario ya no está disponible')) {
+          if (watchedDate) {
+            setIsLoadingBookedSlots(true);
+            getBookedSlotsForDate(watchedDate)
+              .then(setBookedSlots)
+              .catch(console.error)
+              .finally(() => setIsLoadingBookedSlots(false));
+          }
+       }
     }
   }
 
@@ -187,35 +204,8 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          form.setValue('preferredTime', ''); 
-                          setSelectedTimeSlot(undefined);
-                          
-                          if (selectedTimeSlot && date) {
-                            const isSelectedDateToday = format(date, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
-                            if (isSelectedDateToday) {
-                                const timeParts = selectedTimeSlot.split(' ');
-                                const timeDigits = timeParts[0].split(':');
-                                let hours = parseInt(timeDigits[0]);
-                                const minutes = parseInt(timeDigits[1]);
-                                const period = timeParts[1].toUpperCase();
-
-                                if (period === 'PM' && hours !== 12) hours += 12;
-                                else if (period === 'AM' && hours === 12) hours = 0; 
-                                
-                                const slotStartDateTime = new Date(date);
-                                slotStartDateTime.setHours(hours, minutes, 0, 0);
-                                
-                                const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-
-                                if (slotStartDateTime <= cutoffTime) {
-                                  // This part is handled by the general bookedSlots and time validation logic
-                                }
-                            }
-                          } else if (!date) {
-                             form.setValue('preferredTime', '');
-                             setSelectedTimeSlot(undefined);
-                             setBookedSlots([]);
-                          }
+                          // setSelectedTimeSlot(undefined); // Moved to useEffect
+                          // form.setValue('preferredTime', ''); // Moved to useEffect
                         }}
                         disabled={(date) =>
                           date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
@@ -324,13 +314,12 @@ export default function BookAppointmentPage() {
                   <div className="space-y-2">
                     {availableServices.map((service) => (
                       <FormField
-                        key={service.id}
+                        key={service.id} // Key is on the FormField - Correct
                         control={form.control}
                         name="services"
                         render={({ field }) => {
                           return (
-                            <FormItem
-                              key={service.id}
+                            <FormItem // Removed redundant key here
                               className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-muted transition-colors"
                             >
                               <FormControl>
@@ -394,3 +383,4 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
