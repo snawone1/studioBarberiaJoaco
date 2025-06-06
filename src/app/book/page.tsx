@@ -28,10 +28,10 @@ import { es } from 'date-fns/locale';
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
-import { submitAppointmentRequest } from '@/app/actions';
+import { submitAppointmentRequest, getBookedSlotsForDate } from '@/app/actions';
 import { type AppointmentFormValues, appointmentSchema } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 const availableServices = [
@@ -49,13 +49,15 @@ const timeSlots = [
   "06:00 PM", "06:30 PM", "07:00 PM"
 ];
 
-const MIN_ADVANCE_BOOKING_MINUTES = 15; // No se puede reservar un turno que empiece en los próximos 15 mins.
+const MIN_ADVANCE_BOOKING_MINUTES = 15;
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
   const { currentUser } = useAuth(); 
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string | undefined>(undefined);
+  const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
+  const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
 
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
@@ -72,6 +74,28 @@ export default function BookAppointmentPage() {
   const formattedSelectedDate = watchedDate 
     ? format(watchedDate, "'Para el' EEEE, d 'de' MMMM 'de' yyyy", { locale: es }) 
     : "Selecciona una fecha primero";
+
+  useEffect(() => {
+    if (watchedDate) {
+      const fetchBookedSlots = async () => {
+        setIsLoadingBookedSlots(true);
+        setBookedSlots([]); // Clear previous booked slots
+        try {
+          const slots = await getBookedSlotsForDate(watchedDate);
+          setBookedSlots(slots);
+        } catch (error) {
+          console.error("Error fetching booked slots:", error);
+          toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
+        } finally {
+          setIsLoadingBookedSlots(false);
+        }
+      };
+      fetchBookedSlots();
+    } else {
+      setBookedSlots([]); // Clear if no date is selected
+    }
+  }, [watchedDate, toast]);
+
 
   async function onSubmit(data: AppointmentFormValues) {
     if (!currentUser) {
@@ -107,6 +131,14 @@ export default function BookAppointmentPage() {
         message: '' 
       });
       setSelectedTimeSlot(undefined);
+      // Re-fetch booked slots for the current date if it's still selected
+      if (watchedDate) {
+        setIsLoadingBookedSlots(true);
+        getBookedSlotsForDate(watchedDate)
+          .then(setBookedSlots)
+          .catch(console.error)
+          .finally(() => setIsLoadingBookedSlots(false));
+      }
     } else {
       toast({
         title: 'Error',
@@ -158,7 +190,9 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          // Si la fecha cambia y el horario seleccionado se vuelve inválido para la nueva fecha (hoy), lo deseleccionamos.
+                          form.setValue('preferredTime', ''); // Reset time when date changes
+                          setSelectedTimeSlot(undefined);
+                          
                           if (selectedTimeSlot && date) {
                             const isSelectedDateToday = format(date, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
                             if (isSelectedDateToday) {
@@ -169,21 +203,21 @@ export default function BookAppointmentPage() {
                                 const period = timeParts[1].toUpperCase();
 
                                 if (period === 'PM' && hours !== 12) hours += 12;
-                                else if (period === 'AM' && hours === 12) hours = 0;
+                                else if (period === 'AM' && hours === 12) hours = 0; 
                                 
-                                const slotStartDateTime = new Date(date); // date here is the new date
+                                const slotStartDateTime = new Date(date);
                                 slotStartDateTime.setHours(hours, minutes, 0, 0);
                                 
                                 const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
 
                                 if (slotStartDateTime <= cutoffTime) {
-                                  form.setValue('preferredTime', '');
-                                  setSelectedTimeSlot(undefined);
+                                  // This part is handled by the general bookedSlots and time validation logic
                                 }
                             }
-                          } else if (!date) { // Si se deselecciona la fecha, limpiar el horario.
+                          } else if (!date) {
                              form.setValue('preferredTime', '');
                              setSelectedTimeSlot(undefined);
+                             setBookedSlots([]);
                           }
                         }}
                         disabled={(date) =>
@@ -212,11 +246,17 @@ export default function BookAppointmentPage() {
                   {!watchedDate && (
                     <p className="text-sm text-muted-foreground py-4 text-center">Por favor, selecciona una fecha para ver los horarios.</p>
                   )}
-                  {watchedDate && (
+                  {watchedDate && isLoadingBookedSlots && (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2">Cargando horarios...</span>
+                    </div>
+                  )}
+                  {watchedDate && !isLoadingBookedSlots && (
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                       {timeSlots.map((slot) => {
                         const isToday = watchedDate && format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
-                        let isDisabled = false;
+                        let isDisabledByTime = false;
 
                         if (isToday && watchedDate) {
                           const timeParts = slot.split(' ');
@@ -225,22 +265,21 @@ export default function BookAppointmentPage() {
                           const slotMinutes = parseInt(timeDigits[1]);
                           const period = timeParts[1].toUpperCase();
 
-                          if (period === 'PM' && slotHours !== 12) {
-                            slotHours += 12;
-                          } else if (period === 'AM' && slotHours === 12) { 
-                            slotHours = 0; // 12 AM es medianoche (00 horas)
-                          }
+                          if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                          else if (period === 'AM' && slotHours === 12) slotHours = 0; 
 
-                          const slotStartDateTime = new Date(watchedDate); // Crea una fecha con la parte de fecha de watchedDate
-                          slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0); // Establece la hora del slot
+                          const slotStartDateTime = new Date(watchedDate);
+                          slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
                           
-                          // Horario de corte: hora actual + el mínimo de antelación
                           const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
 
                           if (slotStartDateTime <= cutoffTime) {
-                            isDisabled = true;
+                            isDisabledByTime = true;
                           }
                         }
+                        
+                        const isBooked = bookedSlots.includes(slot);
+                        const isDisabled = isDisabledByTime || isBooked;
                         
                         return (
                           <Button
@@ -252,7 +291,7 @@ export default function BookAppointmentPage() {
                               selectedTimeSlot === slot && !isDisabled
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                 : "text-foreground hover:bg-muted",
-                              isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground" // Estilo para deshabilitado
+                              isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground line-through"
                             )}
                             onClick={() => {
                               if (!isDisabled) {
@@ -261,6 +300,7 @@ export default function BookAppointmentPage() {
                               }
                             }}
                             disabled={isDisabled}
+                            title={isBooked ? "Horario no disponible" : isDisabledByTime ? "Horario no disponible (muy pronto)" : ""}
                           >
                             {slot}
                           </Button>
@@ -342,8 +382,8 @@ export default function BookAppointmentPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full py-6 text-lg" disabled={isLoading || !currentUser}>
-              {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+            <Button type="submit" className="w-full py-6 text-lg" disabled={isLoading || !currentUser || isLoadingBookedSlots}>
+              {(isLoading || isLoadingBookedSlots) && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               {currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'}
             </Button>
             {!currentUser && (
@@ -357,5 +397,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

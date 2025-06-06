@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { PageHeader } from '@/components/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -33,11 +33,14 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
-import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct } from '@/app/actions';
+import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct, getAppointments, type Appointment } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays } from 'lucide-react';
 import type { Product } from '@/app/products/page';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default function AdminPage() {
   const { currentUser, loading } = useAuth();
@@ -53,6 +56,10 @@ export default function AdminPage() {
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false);
   const [showAddEditProductForm, setShowAddEditProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const [isAppointmentManagerOpen, setIsAppointmentManagerOpen] = useState(false);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -112,6 +119,26 @@ export default function AdminPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProductManagerOpen]);
 
+  async function fetchAppointmentsAdmin() {
+    if (isAppointmentManagerOpen) {
+      setIsLoadingAppointments(true);
+      try {
+        const fetchedAppointments = await getAppointments();
+        setAppointments(fetchedAppointments); // Already sorted by action
+      } catch (error) {
+        toast({ title: 'Error', description: 'No se pudieron cargar las citas.', variant: 'destructive' });
+      } finally {
+        setIsLoadingAppointments(false);
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchAppointmentsAdmin();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAppointmentManagerOpen]);
+
+
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
     setIsSubmittingSettings(true);
     const result = await submitSiteSettings(data);
@@ -144,7 +171,7 @@ export default function AdminPage() {
       name: product.name,
       description: product.description,
       price: product.price,
-      imageSrc: product.imageSrc, // Relies on imageSrc being a valid URL from getProducts
+      imageSrc: product.imageSrc,
       aiHint: product.aiHint,
       stock: product.stock ?? 0,
     });
@@ -219,6 +246,20 @@ export default function AdminPage() {
     );
   }
 
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'default'; // Primary color for pending
+      case 'confirmed':
+        return 'secondary'; // Or another distinct color like a green, if you add one
+      case 'cancelled':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
+
+
   return (
     <div className="container mx-auto px-4 py-12">
       <PageHeader
@@ -242,19 +283,87 @@ export default function AdminPage() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xl font-medium font-sans">
-              Gestionar Citas
-            </CardTitle>
-            <CalendarCheck className="h-6 w-6 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Visualiza, confirma o reprograma las citas de los clientes. (Funcionalidad futura)
-            </p>
-          </CardContent>
-        </Card>
+        {/* Appointment Manager Dialog & Trigger */}
+        <Dialog open={isAppointmentManagerOpen} onOpenChange={setIsAppointmentManagerOpen}>
+          <DialogTrigger asChild>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-medium font-sans">
+                  Gestionar Citas
+                </CardTitle>
+                <CalendarDays className="h-6 w-6 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Visualiza y gestiona las citas de los clientes.
+                </p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl max-h-[calc(100vh-8rem)] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="font-sans">Gestionar Citas</DialogTitle>
+              <DialogDescription>
+                Visualiza las citas solicitadas. Próximamente: confirmar, cancelar.
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1">
+              {isLoadingAppointments ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+              ) : appointments.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground">
+                  <CalendarCheck className="h-12 w-12 mx-auto mb-2" />
+                  <p>No hay citas para mostrar.</p>
+                </div>
+              ) : (
+                <div className="space-y-4 p-2">
+                  {appointments.map((appt) => (
+                    <Card key={appt.id} className="shadow-md">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg font-sans">
+                              {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
+                            </CardTitle>
+                            <CardDescription className="text-xs">ID Usuario: {appt.userId}</CardDescription>
+                          </div>
+                          <Badge variant={getStatusVariant(appt.status)} className="capitalize">{appt.status}</Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-3 space-y-1 text-sm">
+                        <div>
+                          <span className="font-semibold">Servicios: </span>
+                          {appt.services.join(', ')}
+                        </div>
+                        {appt.message && (
+                          <div>
+                            <span className="font-semibold">Mensaje: </span>
+                            {appt.message}
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground pt-1">
+                          Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
+                        </div>
+                      </CardContent>
+                      {/* Future: Add actions like confirm/cancel here */}
+                      {/* <CardFooter className="pt-3">
+                        <Button size="sm" variant="outline" className="mr-2">Confirmar</Button>
+                        <Button size="sm" variant="destructive">Cancelar Cita</Button>
+                      </CardFooter> */}
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+            <DialogFooter className="mt-auto pt-4 border-t">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+
         <Card className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xl font-medium font-sans">
@@ -324,7 +433,23 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
 
+        {/* Product Manager Dialog & Trigger */}
         <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,}); }}}>
+          <DialogTrigger asChild>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-medium font-sans">
+                  Gestionar Productos
+                </CardTitle>
+                <Package className="h-6 w-6 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Añade, edita o elimina productos de tu tienda.
+                </p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
           <DialogContent className="sm:max-w-3xl max-h-[calc(100vh-8rem)] flex flex-col">
             <DialogHeader>
               <DialogTitle className="font-sans">Gestionar Productos</DialogTitle>
@@ -487,25 +612,8 @@ export default function AdminPage() {
               </DialogClose>
             </DialogFooter>
           </DialogContent>
-           <DialogTrigger asChild>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xl font-medium font-sans">
-                  Gestionar Productos
-                </CardTitle>
-                <Package className="h-6 w-6 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Añade, edita o elimina productos de tu tienda.
-                </p>
-              </CardContent>
-            </Card>
-          </DialogTrigger>
         </Dialog>
       </div>
     </div>
   );
 }
-
-    
