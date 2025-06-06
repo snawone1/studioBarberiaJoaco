@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +13,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from "@/components/ui/calendar"
@@ -31,12 +31,14 @@ import {
 import { cn } from "@/lib/utils"
 import { CalendarIcon, Loader2 } from "lucide-react"
 import { format } from "date-fns"
+import { es } from 'date-fns/locale'; // Import Spanish locale for date-fns
 
 import { PageHeader } from '@/components/page-header';
 import { submitAppointmentRequest } from '@/app/actions';
 import { type AppointmentFormValues, appointmentSchema } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import { useAuth } from '@/context/AuthContext'; // Import useAuth
 
 const availableServices = [
   { id: 'classic-cut', label: 'Corte de Pelo Clásico' },
@@ -54,30 +56,53 @@ const timeSlots = [
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
+  const { currentUser } = useAuth(); // Get current user
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
+      userId: '', // Will be set before submitting
       services: [],
+      preferredDate: undefined,
+      preferredTime: '',
       message: '',
     },
   });
 
   async function onSubmit(data: AppointmentFormValues) {
+    if (!currentUser) {
+      toast({
+        title: 'Error de Autenticación',
+        description: 'Debes iniciar sesión para solicitar una cita.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
-    const result = await submitAppointmentRequest(data);
+    
+    const dataWithUser: AppointmentFormValues = {
+      ...data,
+      userId: currentUser.uid,
+    };
+
+    const result = await submitAppointmentRequest(dataWithUser);
     setIsLoading(false);
 
     if (result.success) {
       toast({
-        title: 'Success!',
+        title: '¡Éxito!',
         description: result.message,
       });
-      form.reset();
+      form.reset({ 
+        userId: '', // Reset userId as well
+        services: [], 
+        preferredDate: undefined, 
+        preferredTime: '', 
+        message: '' 
+      });
     } else {
       toast({
         title: 'Error',
@@ -90,58 +115,19 @@ export default function BookAppointmentPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <PageHeader
-        title="Book Your Appointment"
-        description="Fill out the form below to request an appointment. We'll get back to you soon to confirm."
+        title="Reservar Tu Cita"
+        description="Completa el siguiente formulario para solicitar una cita. Nos pondremos en contacto contigo pronto para confirmar."
       />
       <div className="max-w-2xl mx-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Juan Pérez" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="juan.perez@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input type="tel" placeholder="+54 11 1234 5678" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="preferredDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Preferred Date</FormLabel>
+                    <FormLabel>Fecha Preferida</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -153,9 +139,9 @@ export default function BookAppointmentPage() {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: es })
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Selecciona una fecha</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -170,6 +156,7 @@ export default function BookAppointmentPage() {
                             date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
                           }
                           initialFocus
+                          locale={es} // Add locale to calendar
                         />
                       </PopoverContent>
                     </Popover>
@@ -182,11 +169,11 @@ export default function BookAppointmentPage() {
                 name="preferredTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preferred Time</FormLabel>
+                    <FormLabel>Hora Preferida</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a time slot" />
+                          <SelectValue placeholder="Selecciona un horario" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -207,9 +194,9 @@ export default function BookAppointmentPage() {
               render={() => (
                 <FormItem>
                   <div className="mb-4">
-                    <FormLabel className="text-base">Services</FormLabel>
+                    <FormLabel className="text-base">Servicios</FormLabel>
                     <FormDescription>
-                      Select the service(s) you are interested in.
+                      Selecciona el/los servicio(s) que te interesan.
                     </FormDescription>
                   </div>
                   {availableServices.map((service) => (
@@ -254,10 +241,10 @@ export default function BookAppointmentPage() {
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Additional Message (Optional)</FormLabel>
+                  <FormLabel>Mensaje Adicional (Opcional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Any specific requests or notes?"
+                      placeholder="¿Alguna petición específica o nota?"
                       className="resize-none"
                       {...field}
                     />
@@ -266,10 +253,15 @@ export default function BookAppointmentPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading || !currentUser}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Request Appointment
+              {currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'}
             </Button>
+            {!currentUser && (
+                 <p className="text-sm text-center text-muted-foreground">
+                    Debes <a href="/login" className="underline text-primary">iniciar sesión</a> o <a href="/register" className="underline text-primary">registrarte</a> para solicitar una cita.
+                 </p>
+            )}
           </form>
         </Form>
       </div>

@@ -9,17 +9,23 @@ import { firestore } from '@/lib/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getDoc } from 'firebase/firestore';
 
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
-  // In a real app, you'd save this to a database or send an email.
-  console.log('Appointment Request Received:', data);
-
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Simulate success/failure
-  if (data.name.toLowerCase() === "error") {
-    return { success: false, message: 'Failed to submit appointment. Please try again.' };
+  const appointmentsCollectionRef = collection(firestore, 'appointments');
+  try {
+    const appointmentData = {
+      userId: data.userId, // Save userId
+      preferredDate: Timestamp.fromDate(data.preferredDate), // Convert JS Date to Firestore Timestamp
+      preferredTime: data.preferredTime,
+      services: data.services,
+      message: data.message || '',
+      status: 'pending', // Default status
+      createdAt: Timestamp.now(),
+    };
+    await addDoc(appointmentsCollectionRef, appointmentData);
+    return { success: true, message: 'Solicitud de cita enviada con éxito. Nos pondremos en contacto contigo pronto para confirmar.' };
+  } catch (error) {
+    console.error("Error submitting appointment to Firestore:", error);
+    return { success: false, message: 'Error al enviar la solicitud de cita. Por favor, inténtalo de nuevo.' };
   }
-  return { success: true, message: 'Appointment request sent successfully! We will contact you shortly to confirm.' };
 }
 
 export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
@@ -53,18 +59,13 @@ export async function getProducts(): Promise<Product[]> {
       const createdAt = data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined;
       
       let imageSrcVal = 'https://placehold.co/400x400.png'; 
-      // If imageSrc is a non-empty string from Firestore and starts with http, use it.
-      // This relies on Zod validation on write ensuring it's a valid http/https URL.
       if (typeof data.imageSrc === 'string' && data.imageSrc.trim().startsWith('http')) {
         imageSrcVal = data.imageSrc;
       } else if (data.imageSrc && data.imageSrc.trim() !== '') { 
-        // If imageSrc exists but wasn't a valid http string (e.g. old data, different format)
         console.warn(`Product ID ${doc.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
       } else if (!data.imageSrc) {
-        // If imageSrc is missing or null/undefined
         console.warn(`Product ID ${doc.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
       }
-
 
       return {
         id: doc.id,
@@ -86,7 +87,6 @@ export async function getProducts(): Promise<Product[]> {
 
 export async function addProduct(data: ProductFormValues) {
   try {
-    // data.imageSrc is already validated by Zod to be a http/https URL string
     const productDataToAdd = {
       name: data.name,
       description: data.description,
@@ -120,7 +120,6 @@ export async function updateProduct(data: ProductFormValues) {
   }
   try {
     const productDocRef = doc(firestore, 'products', data.id);
-    // data.imageSrc is already validated by Zod to be a http/https URL string
     const productDataToUpdate = {
       name: data.name,
       description: data.description,
@@ -137,7 +136,6 @@ export async function updateProduct(data: ProductFormValues) {
     }
     const updatedData = updatedDocSnap.data();
 
-    // When reading back, use the same logic as getProducts for imageSrcVal
     let imageSrcVal = 'https://placehold.co/400x400.png';
     if (typeof updatedData.imageSrc === 'string' && updatedData.imageSrc.trim().startsWith('http')) {
         imageSrcVal = updatedData.imageSrc;
@@ -164,7 +162,6 @@ export async function updateProduct(data: ProductFormValues) {
   }
 }
 
-
 export async function deleteProduct(productId: string) {
   try {
     const productDocRef = doc(firestore, 'products', productId);
@@ -179,4 +176,3 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
-

@@ -3,12 +3,10 @@ import { z } from 'zod';
 
 // Appointment Form Schema
 export const appointmentSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  phone: z.string().min(8, { message: "Phone number seems too short." }),
-  preferredDate: z.date({ required_error: "Please select a date."}),
-  preferredTime: z.string().min(1, { message: "Please select a time slot."}),
-  services: z.array(z.string()).min(1, { message: "Please select at least one service."}),
+  userId: z.string().min(1, { message: "User ID is required." }), // Added userId
+  preferredDate: z.date({ required_error: "Por favor, selecciona una fecha."}),
+  preferredTime: z.string().min(1, { message: "Por favor, selecciona un horario."}),
+  services: z.array(z.string()).min(1, { message: "Por favor, selecciona al menos un servicio."}),
   message: z.string().optional(),
 });
 export type AppointmentFormValues = z.infer<typeof appointmentSchema>;
