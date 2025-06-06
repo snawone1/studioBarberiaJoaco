@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { CalendarIcon, Loader2, Clock } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'; 
+import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
 import { submitAppointmentRequest } from '@/app/actions';
@@ -41,13 +42,14 @@ const availableServices = [
   { id: 'coloring', label: 'Coloración' },
 ];
 
-// Updated time slots based on the image (30-minute intervals)
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", 
   "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", 
   "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
   "06:00 PM", "06:30 PM", "07:00 PM"
 ];
+
+const MIN_ADVANCE_BOOKING_MINUTES = 15; // No se puede reservar un turno que empiece en los próximos 15 mins.
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
@@ -104,7 +106,7 @@ export default function BookAppointmentPage() {
         preferredTime: '', 
         message: '' 
       });
-      setSelectedTimeSlot(undefined); // Reset selected time slot
+      setSelectedTimeSlot(undefined);
     } else {
       toast({
         title: 'Error',
@@ -113,6 +115,8 @@ export default function BookAppointmentPage() {
       });
     }
   }
+
+  const now = new Date(); 
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -154,9 +158,33 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          // Optionally reset time when date changes
-                          // form.setValue('preferredTime', '');
-                          // setSelectedTimeSlot(undefined);
+                          // Si la fecha cambia y el horario seleccionado se vuelve inválido para la nueva fecha (hoy), lo deseleccionamos.
+                          if (selectedTimeSlot && date) {
+                            const isSelectedDateToday = format(date, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                            if (isSelectedDateToday) {
+                                const timeParts = selectedTimeSlot.split(' ');
+                                const timeDigits = timeParts[0].split(':');
+                                let hours = parseInt(timeDigits[0]);
+                                const minutes = parseInt(timeDigits[1]);
+                                const period = timeParts[1].toUpperCase();
+
+                                if (period === 'PM' && hours !== 12) hours += 12;
+                                else if (period === 'AM' && hours === 12) hours = 0;
+                                
+                                const slotStartDateTime = new Date(date); // date here is the new date
+                                slotStartDateTime.setHours(hours, minutes, 0, 0);
+                                
+                                const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+
+                                if (slotStartDateTime <= cutoffTime) {
+                                  form.setValue('preferredTime', '');
+                                  setSelectedTimeSlot(undefined);
+                                }
+                            }
+                          } else if (!date) { // Si se deselecciona la fecha, limpiar el horario.
+                             form.setValue('preferredTime', '');
+                             setSelectedTimeSlot(undefined);
+                          }
                         }}
                         disabled={(date) =>
                           date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
@@ -186,25 +214,58 @@ export default function BookAppointmentPage() {
                   )}
                   {watchedDate && (
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                      {timeSlots.map((slot) => (
-                        <Button
-                          key={slot}
-                          type="button"
-                          variant={selectedTimeSlot === slot ? "default" : "outline"}
-                          className={cn(
-                            "w-full py-3 text-sm",
-                            selectedTimeSlot === slot 
-                              ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                              : "text-foreground hover:bg-muted"
-                          )}
-                          onClick={() => {
-                            setSelectedTimeSlot(slot);
-                            field.onChange(slot); // Update form value
-                          }}
-                        >
-                          {slot}
-                        </Button>
-                      ))}
+                      {timeSlots.map((slot) => {
+                        const isToday = watchedDate && format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                        let isDisabled = false;
+
+                        if (isToday && watchedDate) {
+                          const timeParts = slot.split(' ');
+                          const timeDigits = timeParts[0].split(':');
+                          let slotHours = parseInt(timeDigits[0]);
+                          const slotMinutes = parseInt(timeDigits[1]);
+                          const period = timeParts[1].toUpperCase();
+
+                          if (period === 'PM' && slotHours !== 12) {
+                            slotHours += 12;
+                          } else if (period === 'AM' && slotHours === 12) { 
+                            slotHours = 0; // 12 AM es medianoche (00 horas)
+                          }
+
+                          const slotStartDateTime = new Date(watchedDate); // Crea una fecha con la parte de fecha de watchedDate
+                          slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0); // Establece la hora del slot
+                          
+                          // Horario de corte: hora actual + el mínimo de antelación
+                          const cutoffTime = new Date(now.getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+
+                          if (slotStartDateTime <= cutoffTime) {
+                            isDisabled = true;
+                          }
+                        }
+                        
+                        return (
+                          <Button
+                            key={slot}
+                            type="button"
+                            variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
+                            className={cn(
+                              "w-full py-3 text-sm",
+                              selectedTimeSlot === slot && !isDisabled
+                                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                : "text-foreground hover:bg-muted",
+                              isDisabled && "opacity-50 cursor-not-allowed hover:bg-muted text-muted-foreground" // Estilo para deshabilitado
+                            )}
+                            onClick={() => {
+                              if (!isDisabled) {
+                                setSelectedTimeSlot(slot);
+                                field.onChange(slot);
+                              }
+                            }}
+                            disabled={isDisabled}
+                          >
+                            {slot}
+                          </Button>
+                        );
+                      })}
                     </div>
                   )}
                   <FormMessage className="mt-2" />
@@ -296,3 +357,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    
