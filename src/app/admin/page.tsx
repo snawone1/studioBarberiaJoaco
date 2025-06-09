@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -64,6 +64,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from '@/lib/utils';
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
@@ -95,6 +96,10 @@ export default function AdminPage() {
   const [isConfirmAppointmentDialogOpen, setIsConfirmAppointmentDialogOpen] = useState(false);
   const [appointmentToConfirm, setAppointmentToConfirm] = useState<Appointment | null>(null);
   const [sendWhatsAppNotification, setSendWhatsAppNotification] = useState(true);
+
+  const [isCancelAppointmentDialogOpen, setIsCancelAppointmentDialogOpen] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
+  const [sendCancelWhatsAppNotification, setSendCancelWhatsAppNotification] = useState(true);
 
 
   const settingsForm = useForm<SiteSettingsFormValues>({
@@ -273,7 +278,7 @@ export default function AdminPage() {
   
   const openConfirmAppointmentDialog = (appointment: Appointment) => {
     setAppointmentToConfirm(appointment);
-    setSendWhatsAppNotification(true); // Default to checked
+    setSendWhatsAppNotification(true); 
     setIsConfirmAppointmentDialogOpen(true);
   };
 
@@ -281,7 +286,7 @@ export default function AdminPage() {
     if (!appointmentToConfirm) return;
 
     setIsUpdatingStatus(appointmentToConfirm.id);
-    setIsConfirmAppointmentDialogOpen(false); // Close dialog immediately
+    setIsConfirmAppointmentDialogOpen(false); 
 
     const result = await updateAppointmentStatus(appointmentToConfirm.id, 'confirmed');
     
@@ -308,26 +313,67 @@ export default function AdminPage() {
     setIsUpdatingStatus(null);
     setAppointmentToConfirm(null);
   };
-  
-  const handleUpdateAppointmentStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
-    // If confirming, go through dialog, otherwise update directly
-    if (newStatus === 'confirmed') {
-       const apptToConfirm = appointments.find(a => a.id === appointmentId);
-       if (apptToConfirm) {
-         openConfirmAppointmentDialog(apptToConfirm);
-       }
-       return;
-    }
 
-    setIsUpdatingStatus(appointmentId);
-    const result = await updateAppointmentStatus(appointmentId, newStatus);
+  const openCancelAppointmentDialog = (appointment: Appointment) => {
+    setAppointmentToCancel(appointment);
+    setSendCancelWhatsAppNotification(true); 
+    setIsCancelAppointmentDialogOpen(true);
+  };
+
+  const handleActualCancelAppointment = async () => {
+    if (!appointmentToCancel) return;
+
+    setIsUpdatingStatus(appointmentToCancel.id);
+    setIsCancelAppointmentDialogOpen(false); 
+
+    const result = await updateAppointmentStatus(appointmentToCancel.id, 'cancelled');
+
     if (result.success) {
-      toast({ title: 'Éxito', description: result.message });
-      fetchAppointmentsAdmin(); 
+      toast({ title: 'Éxito', description: 'Cita cancelada con éxito.'});
+      fetchAppointmentsAdmin();
+
+      if (sendCancelWhatsAppNotification && appointmentToCancel.userPhone && appointmentToCancel.userName) {
+        const clientName = appointmentToCancel.userName;
+        const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
+        const apptTime = appointmentToCancel.preferredTime;
+        
+        const message = encodeURIComponent(
+          `Hola ${clientName}, lamentamos informarte que tu cita en ${siteConfig.name} para el ${apptDate} a las ${apptTime} ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`
+        );
+        const cleanedPhoneNumber = appointmentToCancel.userPhone.replace(/\D/g, '');
+        const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+      }
     } else {
       toast({ title: 'Error', description: result.message, variant: 'destructive' });
     }
     setIsUpdatingStatus(null);
+    setAppointmentToCancel(null);
+  };
+  
+  const handleUpdateAppointmentStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
+    const appointment = appointments.find(a => a.id === appointmentId);
+
+    if (!appointment) {
+      toast({ title: 'Error', description: 'No se encontró la cita.', variant: 'destructive' });
+      return;
+    }
+
+    if (newStatus === 'confirmed') {
+      openConfirmAppointmentDialog(appointment);
+    } else if (newStatus === 'cancelled') {
+      openCancelAppointmentDialog(appointment);
+    } else { // For 'completed' or any other direct status changes
+      setIsUpdatingStatus(appointmentId);
+      const result = await updateAppointmentStatus(appointmentId, newStatus);
+      if (result.success) {
+        toast({ title: 'Éxito', description: result.message });
+        fetchAppointmentsAdmin(); 
+      } else {
+        toast({ title: 'Error', description: result.message, variant: 'destructive' });
+      }
+      setIsUpdatingStatus(null);
+    }
   };
 
   const handleWhatsAppRedirect = (user: UserDetail) => {
@@ -504,7 +550,7 @@ export default function AdminPage() {
                             <>
                               {appt.status === 'pending' && (
                                 <>
-                                  <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => openConfirmAppointmentDialog(appt)}>
+                                  <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => handleUpdateAppointmentStatus(appt.id, 'confirmed')}>
                                     <CheckCircle className="mr-2 h-4 w-4"/> Confirmar
                                   </Button>
                                   <Button size="sm" variant="destructive" onClick={() => handleUpdateAppointmentStatus(appt.id, 'cancelled')}>
@@ -858,7 +904,10 @@ export default function AdminPage() {
 
       {/* Appointment Confirmation Dialog */}
       {appointmentToConfirm && (
-        <AlertDialog open={isConfirmAppointmentDialogOpen} onOpenChange={setIsConfirmAppointmentDialogOpen}>
+        <AlertDialog open={isConfirmAppointmentDialogOpen} onOpenChange={(isOpen) => {
+          setIsConfirmAppointmentDialogOpen(isOpen);
+          if (!isOpen) setAppointmentToConfirm(null);
+        }}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Confirmar Cita</AlertDialogTitle>
@@ -889,7 +938,10 @@ export default function AdminPage() {
                 </p>
             )}
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setAppointmentToConfirm(null)}>Cancelar</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => {
+                setAppointmentToConfirm(null);
+                setIsConfirmAppointmentDialogOpen(false);
+              }}>Cancelar</AlertDialogCancel>
               <AlertDialogAction onClick={handleActualConfirmAppointment} disabled={isUpdatingStatus === appointmentToConfirm.id}>
                 {isUpdatingStatus === appointmentToConfirm.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Confirmar Cita
@@ -898,9 +950,64 @@ export default function AdminPage() {
           </AlertDialogContent>
         </AlertDialog>
       )}
+
+      {/* Appointment Cancellation Dialog */}
+      {appointmentToCancel && (
+        <AlertDialog 
+          open={isCancelAppointmentDialogOpen} 
+          onOpenChange={(isOpen) => {
+            setIsCancelAppointmentDialogOpen(isOpen);
+            if (!isOpen) setAppointmentToCancel(null);
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Cancelación</AlertDialogTitle>
+              <AlertDialogDescription>
+                Estás a punto de cancelar la siguiente cita:
+                <div className="mt-2 text-sm text-foreground">
+                  <p><strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}</p>
+                  <p><strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}</p>
+                  <p><strong>Hora:</strong> {appointmentToCancel.preferredTime}</p>
+                  <p><strong>Servicios:</strong> {appointmentToCancel.services.join(', ')}</p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex items-center space-x-2 my-4">
+              <Checkbox
+                id="sendCancelWhatsApp"
+                checked={sendCancelWhatsAppNotification}
+                onCheckedChange={(checked) => setSendCancelWhatsAppNotification(checked as boolean)}
+                disabled={!appointmentToCancel.userPhone || !appointmentToCancel.userName}
+              />
+              <Label htmlFor="sendCancelWhatsApp" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Enviar notificación de cancelación por WhatsApp al cliente
+              </Label>
+            </div>
+             {(!appointmentToCancel.userPhone || !appointmentToCancel.userName) && sendCancelWhatsAppNotification && (
+                <p className="text-xs text-destructive -mt-2 mb-2">
+                    No se puede enviar WhatsApp: falta el número de teléfono o el nombre del cliente.
+                </p>
+            )}
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                setAppointmentToCancel(null);
+                setIsCancelAppointmentDialogOpen(false);
+              }}>
+                Cerrar
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleActualCancelAppointment} 
+                disabled={isUpdatingStatus === appointmentToCancel.id}
+                className={cn(buttonVariants({variant: "destructive"}))}
+              >
+                {isUpdatingStatus === appointmentToCancel.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirmar Cancelación
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
-
-
-      

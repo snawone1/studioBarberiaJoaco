@@ -36,7 +36,7 @@ export default function GalleryPage() {
     <div className="container mx-auto px-4 py-12">
       <PageHeader
         title="Gallery"
-        description="A glimpse into the JoacoBarber experience and the styles we create."
+        description="JoacoBarber."
       />
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-8">
@@ -68,7 +68,7 @@ export default function GalleryPage() {
               ))}
             </div>
             {galleryImages.filter(img => cat.value === 'all' || img.category === cat.value).length === 0 && (
-              <p className="text-center text-muted-foreground py-8">No images in this category yet.</p>
+              <p className="text-center text-muted-foreground py-8">No hay imagenes en esta categoria SST001.</p>
             )}
           </TabsContent>
         ))}
