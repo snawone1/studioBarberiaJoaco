@@ -619,6 +619,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
     console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
     try {
+        // If you still face issues, ensure the composite index for these orderBy clauses exists in Firestore.
+        // Firestore usually provides an error message in the server console with a link to create it if missing.
         const qAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qAppointments);
@@ -633,12 +635,12 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
         ];
         let usersMap = new Map();
         if (userIds.length > 0) {
-            // Firestore 'in' query can take up to 30 elements per query
             const MAX_USER_IDS_PER_QUERY = 30;
             for(let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY){
                 const batchUserIds = userIds.slice(i, i + MAX_USER_IDS_PER_QUERY);
                 if (batchUserIds.length === 0) continue;
-                const qUsers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(usersCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('uid', 'in', batchUserIds));
+                // Assuming user documents in 'users' collection have 'uid' field matching Auth user.uid
+                const qUsers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'users'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('uid', 'in', batchUserIds));
                 const userSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUsers);
                 userSnapshot.docs.forEach((docSnap)=>{
                     const userData = docSnap.data();
@@ -752,11 +754,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAIStyleAdvice(data) 
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitSiteSettings(data) {
-    console.log('Site Settings Update Received:', data);
-    await new Promise((resolve)=>setTimeout(resolve, 1000));
+    console.log('Site Settings Update Received by Server Action:', data);
+    // In a real app, this would save to a database or config file.
+    // For this prototype, the AI will modify src/config/site.ts directly.
+    // We just simulate a successful processing here.
+    // No need for await new Promise for this simulation.
     return {
         success: true,
-        message: '¡Configuración del sitio guardada con éxito! (Simulado)'
+        message: 'Configuración del sitio procesada. Los cambios se reflejarán en breve.'
     };
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getProducts() {

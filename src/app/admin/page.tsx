@@ -31,21 +31,22 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+// import { Textarea } from '@/components/ui/textarea'; // No longer used here
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
+// import {
+//   Form, // No longer used here
+//   FormControl, // No longer used here
+//   FormField, // No longer used here
+//   FormItem, // No longer used here
+//   FormLabel, // No longer used here
+//   FormMessage, // No longer used here
+// } from '@/components/ui/form'; // No longer used here
+// import { useForm } from 'react-hook-form'; // No longer used here
+// import { zodResolver } from '@hookform/resolvers/zod'; // No longer used here
+// import { siteSettingsSchema, type SiteSettingsFormValues } from '@/lib/schemas'; // No longer used here
+import { productSchema, type ProductFormValues } from '@/lib/schemas';
 import { 
-  submitSiteSettings, 
+  // submitSiteSettings, // No longer used here for dialog
   getProducts, 
   addProduct, 
   deleteProduct, 
@@ -65,6 +66,9 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form'; // Still needed for product form
+import { zodResolver } from '@hookform/resolvers/zod'; // Still needed for product form
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
@@ -73,8 +77,8 @@ export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
-  const [isSubmittingSettings, setIsSubmittingSettings] = useState(false);
+  // const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false); // Replaced by navigation
+  // const [isSubmittingSettings, setIsSubmittingSettings] = useState(false); // Replaced by navigation
 
   const [isProductManagerOpen, setIsProductManagerOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -102,13 +106,13 @@ export default function AdminPage() {
   const [sendCancelWhatsAppNotification, setSendCancelWhatsAppNotification] = useState(true);
 
 
-  const settingsForm = useForm<SiteSettingsFormValues>({
-    resolver: zodResolver(siteSettingsSchema),
-    defaultValues: {
-      siteName: siteConfig.name,
-      siteDescription: siteConfig.description,
-    },
-  });
+  // const settingsForm = useForm<SiteSettingsFormValues>({ // Moved to settings page
+  //   resolver: zodResolver(siteSettingsSchema),
+  //   defaultValues: {
+  //     siteName: siteConfig.name,
+  //     siteDescription: siteConfig.description,
+  //   },
+  // });
 
   const productForm = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -128,14 +132,14 @@ export default function AdminPage() {
     }
   }, [currentUser, loading, router]);
 
-  useEffect(() => {
-    if (isSettingsDialogOpen) {
-      settingsForm.reset({
-        siteName: siteConfig.name,
-        siteDescription: siteConfig.description,
-      });
-    }
-  }, [isSettingsDialogOpen, settingsForm]);
+  // useEffect(() => { // Moved to settings page
+  //   if (isSettingsDialogOpen) {
+  //     settingsForm.reset({
+  //       siteName: siteConfig.name,
+  //       siteDescription: siteConfig.description,
+  //     });
+  //   }
+  // }, [isSettingsDialogOpen, settingsForm]);
   
   async function fetchProductsAdmin() {
     if (isProductManagerOpen) {
@@ -206,17 +210,17 @@ export default function AdminPage() {
   }, [isUserManagerOpen, currentUser]);
 
 
-  async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
-    setIsSubmittingSettings(true);
-    const result = await submitSiteSettings(data);
-    if (result.success) {
-      toast({ title: '¡Configuración Guardada!', description: result.message });
-      setIsSettingsDialogOpen(false);
-    } else {
-      toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
-    }
-    setIsSubmittingSettings(false);
-  }
+  // async function onSiteSettingsSubmit(data: SiteSettingsFormValues) { // Moved to settings page
+  //   setIsSubmittingSettings(true);
+  //   const result = await submitSiteSettings(data);
+  //   if (result.success) {
+  //     toast({ title: '¡Configuración Guardada!', description: result.message });
+  //     setIsSettingsDialogOpen(false);
+  //   } else {
+  //     toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
+  //   }
+  //   setIsSubmittingSettings(false);
+  // }
 
   const handleAddNewProductClick = () => {
     setEditingProduct(null);
@@ -363,7 +367,7 @@ export default function AdminPage() {
       openConfirmAppointmentDialog(appointment);
     } else if (newStatus === 'cancelled') {
       openCancelAppointmentDialog(appointment);
-    } else { // For 'completed' or any other direct status changes
+    } else { 
       setIsUpdatingStatus(appointmentId);
       const result = await updateAppointmentStatus(appointmentId, newStatus);
       if (result.success) {
@@ -665,9 +669,9 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
         
-        <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
-          <DialogTrigger asChild>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        {/* Site Settings Card - Now a Link */}
+        <Link href="/admin/settings" passHref>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xl font-medium font-sans">
                   Configuración del Sitio
@@ -680,45 +684,7 @@ export default function AdminPage() {
                 </p>
               </CardContent>
             </Card>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle className="font-sans">Configuración del Sitio</DialogTitle>
-              <DialogDescription>
-                Modifica el nombre y la descripción de tu sitio web. Estos cambios (simulados) se aplicarían globalmente.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...settingsForm}>
-              <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-4 py-4">
-                <FormField control={settingsForm.control} name="siteName" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre del Sitio</FormLabel>
-                      <FormControl><Input placeholder="Ej: JoacoBarber" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField control={settingsForm.control} name="siteDescription" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descripción del Sitio</FormLabel>
-                      <FormControl><Textarea placeholder="Ej: La mejor barbería de la ciudad." className="resize-none" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <DialogClose asChild>
-                     <Button type="button" variant="outline">Cancelar</Button>
-                  </DialogClose>
-                  <Button type="submit" disabled={isSubmittingSettings}>
-                    {isSubmittingSettings && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Guardar Cambios
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        </Link>
 
         {/* Product Manager Dialog & Trigger */}
         <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,}); }}}>
