@@ -527,12 +527,13 @@ const appointmentsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project
 const productsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'products');
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
     try {
-        // Server-side double booking check
-        const preferredDateObj = data.preferredDate; // This is already a JS Date object
-        // Create a query to check for existing appointments for the exact date and time slot
-        // Firestore's Timestamp equality works well if the JS Date object represents the start of the day
-        // and we are matching against a Firestore Timestamp that also represents the start of that day.
-        const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(preferredDateObj)), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
+        // Explicitly normalize preferredDate to the start of the day in the client's local timezone,
+        // then convert to Firestore Timestamp. This ensures consistency.
+        const clientPreferredDate = data.preferredDate; // Original JS Date from client
+        const normalizedPreferredDate = new Date(clientPreferredDate.getFullYear(), clientPreferredDate.getMonth(), clientPreferredDate.getDate());
+        const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(normalizedPreferredDate);
+        // Server-side double booking check using the normalized timestamp
+        const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', preferredDateTimestamp), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
         ]));
@@ -545,7 +546,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
         }
         const appointmentData = {
             userId: data.userId,
-            preferredDate: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(data.preferredDate),
+            preferredDate: preferredDateTimestamp,
             preferredTime: data.preferredTime,
             services: data.services,
             message: data.message || '',
