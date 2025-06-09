@@ -653,6 +653,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: auto;
 }
 
+.mr-1\.5 {
+  margin-right: .375rem;
+}
+
 .block {
   display: block;
 }
@@ -780,6 +784,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .h-svh {
   height: 100svh;
+}
+
+.h-3 {
+  height: .75rem;
 }
 
 .max-h-96 {
@@ -924,6 +932,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .w-full {
   width: 100%;
+}
+
+.w-3 {
+  width: .75rem;
 }
 
 .min-w-0 {
@@ -1877,6 +1889,10 @@ h1, h2, h3, h4, h5, h6 {
 .text-blue-600 {
   --tw-text-opacity: 1;
   color: rgb(37 99 235 / var(--tw-text-opacity, 1));
+}
+
+.text-primary\/80 {
+  color: hsl(var(--primary) / .8);
 }
 
 .underline {

@@ -36,7 +36,7 @@ import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type Pr
 import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct, getAppointments, updateAppointmentStatus, type Appointment } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -125,7 +125,6 @@ export default function AdminPage() {
   }, [isProductManagerOpen]);
 
   async function fetchAppointmentsAdmin() {
-    // No longer conditional on isAppointmentManagerOpen, always fetch if admin
      if (currentUser?.email === 'joacoadmin@admin.com') {
       console.log("Admin Page: Calling getAppointments server action.");
       setIsLoadingAppointments(true);
@@ -143,12 +142,11 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    // Fetch appointments when component mounts and if user is admin, or when dialog opens
-    if (isAppointmentManagerOpen || (!isAppointmentManagerOpen && appointments.length === 0)) {
+    if (currentUser?.email === 'joacoadmin@admin.com' && (isAppointmentManagerOpen || appointments.length === 0)) {
         fetchAppointmentsAdmin();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAppointmentManagerOpen, currentUser]);
+  }, [isAppointmentManagerOpen, currentUser, appointments.length]);
 
 
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
@@ -201,7 +199,7 @@ export default function AdminPage() {
 
     if (result.success && result.product) {
       toast({ title: editingProduct ? '¡Producto Actualizado!' : '¡Producto Añadido!', description: result.message });
-      fetchProductsAdmin(); // Re-fetch all products to ensure sorted list
+      fetchProductsAdmin(); 
       productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,});
       setShowAddEditProductForm(false);
       setEditingProduct(null);
@@ -226,7 +224,7 @@ export default function AdminPage() {
     const result = await updateAppointmentStatus(appointmentId, newStatus);
     if (result.success) {
       toast({ title: 'Éxito', description: result.message });
-      fetchAppointmentsAdmin(); // Re-fetch para actualizar la lista y mover la cita a la tab correcta
+      fetchAppointmentsAdmin(); 
     } else {
       toast({ title: 'Error', description: result.message, variant: 'destructive' });
     }
@@ -261,9 +259,9 @@ export default function AdminPage() {
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status?.toLowerCase()) {
-      case 'pending': return 'default'; // Primary color for pending
+      case 'pending': return 'default'; 
       case 'confirmed': return 'secondary'; 
-      case 'completed': return 'secondary'; // Similar to confirmed, but could be different
+      case 'completed': return 'secondary'; 
       case 'cancelled': return 'destructive';
       default: return 'outline';
     }
@@ -356,9 +354,20 @@ export default function AdminPage() {
                               <CardTitle className="text-lg font-sans">
                                 {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
                               </CardTitle>
-                              <div className="text-xs text-muted-foreground flex items-center mt-1">
-                                <UserCircle2 className="h-4 w-4 mr-1 text-primary"/> ID Cliente: {appt.userId}
+                              <div className="text-sm text-muted-foreground flex items-center mt-1">
+                                <UserCircle2 className="h-4 w-4 mr-1 text-primary"/> 
+                                {appt.userName || 'Nombre no disponible'}
                               </div>
+                               {appt.userPhone && (
+                                <div className="text-xs text-muted-foreground flex items-center mt-1">
+                                  <Phone className="h-3 w-3 mr-1.5 text-primary/80"/> {appt.userPhone}
+                                </div>
+                              )}
+                              {appt.userEmail && (
+                                <div className="text-xs text-muted-foreground flex items-center mt-1">
+                                  <Mail className="h-3 w-3 mr-1.5 text-primary/80"/> {appt.userEmail}
+                                </div>
+                              )}
                             </div>
                             <Badge variant={getStatusVariant(appt.status)} className="capitalize">{appt.status}</Badge>
                           </div>
@@ -674,6 +683,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-
-    
