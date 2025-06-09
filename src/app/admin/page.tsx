@@ -42,12 +42,12 @@ import {
   getAppointments, 
   updateAppointmentStatus, 
   type Appointment,
-  getUsers, // Import getUsers
-  type UserDetail // Import UserDetail type
+  getUsers,
+  type UserDetail
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, Briefcase } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, Briefcase, MessageSquare } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -267,6 +267,18 @@ export default function AdminPage() {
     setIsUpdatingStatus(null);
   };
 
+  const handleWhatsAppRedirect = (user: UserDetail) => {
+    if (!user.phoneNumber) {
+      toast({ title: 'Error', description: 'Este usuario no tiene un número de teléfono registrado.', variant: 'destructive'});
+      return;
+    }
+    // Basic cleaning: remove non-digits. More robust cleaning might be needed.
+    const cleanedPhoneNumber = user.phoneNumber.replace(/\D/g, '');
+    const message = encodeURIComponent(`Hola ${user.fullName}, te contacto desde ${siteConfig.name} con respecto a tus servicios.`);
+    const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
 
   if (loading) {
     return (
@@ -471,13 +483,13 @@ export default function AdminPage() {
              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xl font-medium font-sans">
-                  Gestión de Usuarios
+                  Gestionar Usuarios
                 </CardTitle>
                 <Users className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Visualiza la lista de usuarios registrados.
+                  Visualiza y contacta a los usuarios registrados.
                 </p>
               </CardContent>
             </Card>
@@ -507,21 +519,31 @@ export default function AdminPage() {
                           {user.fullName}
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="text-sm space-y-1 pb-4">
+                      <CardContent className="text-sm space-y-1 pb-3">
                         <div className="flex items-center">
                           <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
                           <span className="text-muted-foreground">{user.email}</span>
                         </div>
                         <div className="flex items-center">
                           <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                           <span className="text-muted-foreground">{user.phoneNumber}</span>
+                           <span className="text-muted-foreground">{user.phoneNumber || 'No registrado'}</span>
                         </div>
                          <div className="flex items-center text-xs text-muted-foreground/80 pt-1">
                           <CalendarDays className="h-3 w-3 mr-1.5" />
                           Registrado: {format(new Date(user.createdAt), "PPP 'a las' p", { locale: es })}
                         </div>
                       </CardContent>
-                      {/* Future: Add actions like View Details, Edit Role, Disable User etc. in CardFooter */}
+                       <CardFooter className="pt-3 border-t flex justify-end">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => handleWhatsAppRedirect(user)}
+                          disabled={!user.phoneNumber}
+                          className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                        >
+                          <MessageSquare className="mr-2 h-4 w-4"/> Enviar WhatsApp
+                        </Button>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -774,3 +796,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

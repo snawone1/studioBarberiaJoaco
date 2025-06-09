@@ -497,13 +497,14 @@ firestore = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f4
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ {"0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","60df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ {"0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","008945fd2a69b2f92ca2e307a103b4c75c7dee6185":"getUsers","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","60df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
     "addProduct": (()=>addProduct),
     "deleteProduct": (()=>deleteProduct),
     "getAIStyleAdvice": (()=>getAIStyleAdvice),
     "getAppointments": (()=>getAppointments),
     "getBookedSlotsForDate": (()=>getBookedSlotsForDate),
     "getProducts": (()=>getProducts),
+    "getUsers": (()=>getUsers),
     "submitAppointmentRequest": (()=>submitAppointmentRequest),
     "submitSiteSettings": (()=>submitSiteSettings),
     "updateAppointmentStatus": (()=>updateAppointmentStatus),
@@ -526,6 +527,49 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 // Firestore collection references
 const appointmentsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appointments');
 const productsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'products');
+const usersCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'users');
+async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
+    console.log("Admin: Attempting to fetch users from Firestore...");
+    try {
+        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(usersCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
+        const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
+        console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
+        if (querySnapshot.empty) {
+            console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
+            return [];
+        }
+        const users = querySnapshot.docs.map((docSnap)=>{
+            const data = docSnap.data();
+            let createdAtISO;
+            if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtISO = data.createdAt;
+            } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAtISO = data.createdAt.toDate().toISOString();
+            } else {
+                console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+                createdAtISO = new Date(0).toISOString();
+            }
+            const userDetail = {
+                id: docSnap.id,
+                fullName: data.fullName || 'N/A',
+                email: data.email || 'N/A',
+                phoneNumber: data.phoneNumber || 'N/A',
+                createdAt: createdAtISO
+            };
+            return userDetail;
+        });
+        console.log(`Admin: Successfully mapped ${users.length} users.`);
+        return users;
+    } catch (error) {
+        console.error("Admin: Error fetching or mapping users from Firestore:", error);
+        if (error.code === 'failed-precondition') {
+            console.error("IMPORTANT: Firestore 'failed-precondition' error for users query. This might mean a composite index is required if you add more complex ordering or filtering. Check Firestore console for index suggestions.");
+        } else {
+            console.error("An unexpected error occurred while fetching users:", error.message, error.stack);
+        }
+        return [];
+    }
+}
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
     console.log("Server Action: submitAppointmentRequest received data:", data);
     try {
@@ -575,19 +619,39 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
     console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
     try {
-        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
+        const qAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
-        const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
-        console.log(`Admin: Found ${querySnapshot.docs.length} appointment documents in total.`);
-        if (querySnapshot.empty) {
-            console.warn("Admin: No appointments matched the query. This could be due to:");
-            console.warn("1. Firestore security rules preventing read access for the admin user ('joacoadmin@admin.com').");
-            console.warn("2. No appointments actually existing in the 'appointments' collection.");
-            console.warn("3. The composite index for orderBy clauses might still be building or was not created correctly.");
-            console.warn("PLEASE VERIFY YOUR FIRESTORE SECURITY RULES, DATA, AND COMPOSITE INDEXES.");
+        const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qAppointments);
+        console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
+        if (appointmentSnapshot.empty) {
+            console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
             return [];
         }
-        const appointments = querySnapshot.docs.map((docSnap)=>{
+        // Fetch user details for all appointments
+        const userIds = [
+            ...new Set(appointmentSnapshot.docs.map((docSnap)=>docSnap.data().userId).filter((id)=>!!id))
+        ];
+        let usersMap = new Map();
+        if (userIds.length > 0) {
+            // Firestore 'in' query can take up to 30 elements per query
+            const MAX_USER_IDS_PER_QUERY = 30;
+            for(let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY){
+                const batchUserIds = userIds.slice(i, i + MAX_USER_IDS_PER_QUERY);
+                if (batchUserIds.length === 0) continue;
+                const qUsers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(usersCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('uid', 'in', batchUserIds));
+                const userSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUsers);
+                userSnapshot.docs.forEach((docSnap)=>{
+                    const userData = docSnap.data();
+                    usersMap.set(userData.uid, {
+                        fullName: userData.fullName,
+                        email: userData.email,
+                        phoneNumber: userData.phoneNumber
+                    });
+                });
+            }
+        }
+        console.log(`Admin: Fetched details for ${usersMap.size} users.`);
+        const appointments = appointmentSnapshot.docs.map((docSnap)=>{
             const data = docSnap.data();
             let preferredDateISO;
             let createdAtISO;
@@ -603,9 +667,13 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
                 console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
                 createdAtISO = new Date(0).toISOString();
             }
+            const userDetails = usersMap.get(data.userId) || {};
             const appointment = {
                 id: docSnap.id,
                 userId: data.userId || 'Unknown User',
+                userName: userDetails.fullName || 'Nombre no disponible',
+                userEmail: userDetails.email || 'Email no disponible',
+                userPhone: userDetails.phoneNumber || 'Teléfono no disponible',
                 preferredDate: preferredDateISO,
                 preferredTime: data.preferredTime || 'N/A',
                 services: Array.isArray(data.services) ? data.services : [],
@@ -828,6 +896,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ deleteProduct(productId
 }
 ;
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$validate$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ensureServerEntryExports"])([
+    getUsers,
     submitAppointmentRequest,
     getAppointments,
     updateAppointmentStatus,
@@ -839,6 +908,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ deleteProduct(productId
     updateProduct,
     deleteProduct
 ]);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUsers, "008945fd2a69b2f92ca2e307a103b4c75c7dee6185", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(submitAppointmentRequest, "402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAppointments, "005ce712c32342acd38082636e5dc614daa6adfb4c", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateAppointmentStatus, "60df8604b55fb28ca85f574dd721ecefbfd80a9cdf", null);
@@ -856,6 +926,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ deleteProduct(productId
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({});
+;
 ;
 ;
 ;
@@ -884,6 +955,7 @@ var { g: global, __dirname } = __turbopack_context__;
 __turbopack_context__.s({
     "0035970fe75c1458b3307dd66a4d7ba82bd85edc12": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getProducts"]),
     "005ce712c32342acd38082636e5dc614daa6adfb4c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAppointments"]),
+    "008945fd2a69b2f92ca2e307a103b4c75c7dee6185": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUsers"]),
     "402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submitAppointmentRequest"]),
     "402e89c30120e3199bf7b7164003300e5d32c67d2d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["deleteProduct"]),
     "408c3740241a917b864710f949e092258b8e366293": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["submitSiteSettings"]),
@@ -904,6 +976,7 @@ var { g: global, __dirname } = __turbopack_context__;
 __turbopack_context__.s({
     "0035970fe75c1458b3307dd66a4d7ba82bd85edc12": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["0035970fe75c1458b3307dd66a4d7ba82bd85edc12"]),
     "005ce712c32342acd38082636e5dc614daa6adfb4c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["005ce712c32342acd38082636e5dc614daa6adfb4c"]),
+    "008945fd2a69b2f92ca2e307a103b4c75c7dee6185": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["008945fd2a69b2f92ca2e307a103b4c75c7dee6185"]),
     "402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3"]),
     "402e89c30120e3199bf7b7164003300e5d32c67d2d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["402e89c30120e3199bf7b7164003300e5d32c67d2d"]),
     "408c3740241a917b864710f949e092258b8e366293": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["408c3740241a917b864710f949e092258b8e366293"]),
