@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react'; // Keep for potential other uses, or remove if not needed elsewhere
 // Remove direct lucide-react icon imports for mainNav here
 // import { Home, ShoppingBag, CalendarDays, LayoutDashboard } from 'lucide-react'; 
@@ -22,8 +23,8 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "joaco",
-  description: "Estilo y precisión en cada corte. Experimenta la barbería tradicional con un toque moderno.",
+  name: "JoacoBarber Studio",
+  description: "Tu experiencia de barbería elevada. Estilo, precisión y cuidado profesional.",
   mainNav: [
     { title: "Inicio", href: "/", iconName: "Home" },
     { title: "Productos", href: "/products", iconName: "ShoppingBag" },

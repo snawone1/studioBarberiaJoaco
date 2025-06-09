@@ -137,10 +137,12 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 export async function getAppointments(): Promise<Appointment[]> {
   console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
   try {
+    // If you still face issues, ensure the composite index for these orderBy clauses exists in Firestore.
+    // Firestore usually provides an error message in the server console with a link to create it if missing.
     const qAppointments = query(
       appointmentsCollectionRef, 
       orderBy('preferredDate', 'desc'), 
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc') 
     );
     console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
 
@@ -157,13 +159,13 @@ export async function getAppointments(): Promise<Appointment[]> {
     let usersMap: Map<string, { fullName?: string; email?: string; phoneNumber?: string }> = new Map();
 
     if (userIds.length > 0) {
-      // Firestore 'in' query can take up to 30 elements per query
       const MAX_USER_IDS_PER_QUERY = 30;
       for (let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY) {
           const batchUserIds = userIds.slice(i, i + MAX_USER_IDS_PER_QUERY);
           if (batchUserIds.length === 0) continue;
-
-          const qUsers = query(usersCollectionRef, where('uid', 'in', batchUserIds));
+          
+          // Assuming user documents in 'users' collection have 'uid' field matching Auth user.uid
+          const qUsers = query(collection(firestore, 'users'), where('uid', 'in', batchUserIds));
           const userSnapshot = await getDocs(qUsers);
           userSnapshot.docs.forEach(docSnap => {
             const userData = docSnap.data();
@@ -279,9 +281,12 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
-  console.log('Site Settings Update Received:', data);
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true, message: '¡Configuración del sitio guardada con éxito! (Simulado)' };
+  console.log('Site Settings Update Received by Server Action:', data);
+  // In a real app, this would save to a database or config file.
+  // For this prototype, the AI will modify src/config/site.ts directly.
+  // We just simulate a successful processing here.
+  // No need for await new Promise for this simulation.
+  return { success: true, message: 'Configuración del sitio procesada. Los cambios se reflejarán en breve.' };
 }
 
 // --- Product Management Actions ---

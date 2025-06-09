@@ -9,8 +9,8 @@ __turbopack_context__.s({
     "siteConfig": (()=>siteConfig)
 });
 const siteConfig = {
-    name: "joaco",
-    description: "Estilo y precisión en cada corte. Experimenta la barbería tradicional con un toque moderno.",
+    name: "JoacoBarber Studio",
+    description: "Tu experiencia de barbería elevada. Estilo, precisión y cuidado profesional.",
     mainNav: [
         {
             title: "Inicio",
