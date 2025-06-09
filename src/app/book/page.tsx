@@ -22,25 +22,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock } from "lucide-react"
+import { CalendarIcon, Loader2, Clock, ListChecks } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'; 
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
-import { submitAppointmentRequest, getBookedSlotsForDate } from '@/app/actions';
+import { submitAppointmentRequest, getBookedSlotsForDate, getServices, type Service } from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
-const availableServices = [
-  { id: 'classic-cut', label: 'Corte de Pelo Clásico' },
-  { id: 'modern-style', label: 'Corte Moderno + Styling' },
-  { id: 'classic-shave', label: 'Afeitado Clásico' },
-  { id: 'beard-trim', label: 'Perfilado de Barba' },
-  { id: 'coloring', label: 'Coloración' },
-];
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", 
@@ -61,6 +54,10 @@ export default function BookAppointmentPage() {
   const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  const [dynamicServices, setDynamicServices] = useState<Service[]>([]);
+  const [isLoadingServices, setIsLoadingServices] = useState(true);
+
+
   const form = useForm<ClientAppointmentFormValues>({
     resolver: zodResolver(clientAppointmentSchema),
     defaultValues: {
@@ -70,6 +67,24 @@ export default function BookAppointmentPage() {
       message: '',
     },
   });
+
+  useEffect(() => {
+    async function fetchPageServices() {
+      setIsLoadingServices(true);
+      try {
+        const fetchedServices = await getServices();
+        setDynamicServices(fetchedServices);
+      } catch (error) {
+        console.error("Error fetching services for booking page:", error);
+        toast({ title: 'Error', description: 'No se pudieron cargar los servicios disponibles.', variant: 'destructive' });
+      } finally {
+        setIsLoadingServices(false);
+      }
+    }
+    fetchPageServices();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const watchedDate = form.watch('preferredDate');
   const formattedSelectedDate = watchedDate 
@@ -369,46 +384,64 @@ export default function BookAppointmentPage() {
               render={() => (
                 <FormItem>
                   <div className="mb-4">
-                    <FormLabel className="text-lg font-semibold">Servicios</FormLabel>
+                    <FormLabel className="text-lg font-semibold flex items-center">
+                      <ListChecks className="mr-2 h-5 w-5 text-primary" />
+                      Servicios
+                    </FormLabel>
                     <FormDescription className="text-sm">
                       Selecciona el/los servicio(s) que te interesan.
                     </FormDescription>
                   </div>
-                  <div className="space-y-2">
-                    {availableServices.map((service) => (
-                      <FormField
-                        key={service.id}
-                        control={form.control}
-                        name="services"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              className="flex flex-row items-center space-x-3 space-y-0 p-2 rounded-md hover:bg-muted transition-colors"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(service.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...(field.value || []), service.id])
-                                      : field.onChange(
-                                          (field.value || []).filter(
-                                            (value) => value !== service.id
+                  {isLoadingServices ? (
+                    <div className="flex justify-center items-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                      <span className="ml-2">Cargando servicios...</span>
+                    </div>
+                  ) : dynamicServices.length === 0 ? (
+                     <p className="text-sm text-muted-foreground text-center py-4">
+                        No hay servicios disponibles en este momento.
+                     </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {dynamicServices.map((service) => (
+                        <FormField
+                          key={service.id}
+                          control={form.control}
+                          name="services"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(service.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...(field.value || []), service.id])
+                                        : field.onChange(
+                                            (field.value || []).filter(
+                                              (value) => value !== service.id
+                                            )
                                           )
-                                        )
-                                  }}
-                                  className="h-5 w-5"
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal text-base cursor-pointer">
-                                {service.label}
-                              </FormLabel>
-                            </FormItem>
-                          )
-                        }}
-                      />
-                    ))}
-                  </div>
+                                    }}
+                                    className="h-5 w-5"
+                                  />
+                                </FormControl>
+                                <div className="flex-grow">
+                                  <FormLabel className="font-normal text-base cursor-pointer flex justify-between items-center w-full">
+                                    <span>{service.name}</span>
+                                    <span className="text-sm text-primary font-medium">{service.price}</span>
+                                  </FormLabel>
+                                  <p className="text-xs text-muted-foreground mt-0.5">{service.description}</p>
+                                </div>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -434,15 +467,15 @@ export default function BookAppointmentPage() {
              <Button 
                 type="submit" 
                 className="w-full py-6 text-lg" 
-                disabled={isLoading || !currentUser || isLoadingBookedSlots}
+                disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices}
               >
               <Loader2 
                 className={cn(
                   "mr-2 h-5 w-5 animate-spin",
-                  (isLoading || isLoadingBookedSlots) ? "inline-block" : "hidden"
+                  (isLoading || isLoadingBookedSlots || isLoadingServices) ? "inline-block" : "hidden"
                 )} 
               />
-              {isLoading || isLoadingBookedSlots ? (
+              {isLoading || isLoadingBookedSlots || isLoadingServices ? (
                 'Procesando...'
               ) : (
                 currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'

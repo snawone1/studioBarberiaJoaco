@@ -661,6 +661,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: -.5rem;
 }
 
+.mt-0\.5 {
+  margin-top: .125rem;
+}
+
 .block {
   display: block;
 }
@@ -820,6 +824,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .max-h-screen {
   max-height: 100vh;
+}
+
+.max-h-\[250px\] {
+  max-height: 250px;
 }
 
 .min-h-0 {
@@ -1492,6 +1500,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #0000;
 }
 
+.bg-secondary\/30 {
+  background-color: hsl(var(--secondary) / .3);
+}
+
 .fill-current {
   fill: currentColor;
 }
@@ -1526,6 +1538,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .p-\[1px\] {
   padding: 1px;
+}
+
+.p-8 {
+  padding: 2rem;
 }
 
 .px-0 {
@@ -1905,6 +1921,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-sidebar-foreground\/70 {
   color: hsl(var(--foreground) / .7);
+}
+
+.text-foreground\/90 {
+  color: hsl(var(--foreground) / .9);
+}
+
+.text-muted-foreground\/70 {
+  color: hsl(var(--muted-foreground) / .7);
 }
 
 .underline {
@@ -2291,6 +2315,18 @@ h1, h2, h3, h4, h5, h6 {
 
 .hover\:bg-transparent:hover {
   background-color: #0000;
+}
+
+.hover\:bg-blue-500\/10:hover {
+  background-color: #3b82f61a;
+}
+
+.hover\:bg-muted\/20:hover {
+  background-color: hsl(var(--muted) / .2);
+}
+
+.hover\:bg-red-500\/10:hover {
+  background-color: #ef44441a;
 }
 
 .hover\:text-accent-foreground:hover {
@@ -3043,8 +3079,20 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
   }
 
+  .sm\:mr-0 {
+    margin-right: 0;
+  }
+
   .sm\:flex {
     display: flex;
+  }
+
+  .sm\:hidden {
+    display: none;
+  }
+
+  .sm\:w-auto {
+    width: auto;
   }
 
   .sm\:max-w-2xl {

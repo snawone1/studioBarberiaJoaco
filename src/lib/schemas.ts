@@ -69,3 +69,13 @@ export const productSchema = z.object({
   stock: z.coerce.number().min(0, { message: "El stock no puede ser negativo." }).optional().default(0),
 });
 export type ProductFormValues = z.infer<typeof productSchema>;
+
+// Service Form Schema
+export const serviceSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, { message: "El nombre del servicio debe tener al menos 3 caracteres." }),
+  description: z.string().min(5, { message: "La descripción debe tener al menos 5 caracteres." }),
+  price: z.string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, { message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX" }),
+  // duration: z.string().min(1, { message: "La duración es requerida (ej: 30 min, 1 hora)." }), // Example: if you want duration
+});
+export type ServiceFormValues = z.infer<typeof serviceSchema>;

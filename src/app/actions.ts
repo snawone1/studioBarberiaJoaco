@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues } from '@/lib/schemas';
+import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
 import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
@@ -12,6 +12,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getD
 const appointmentsCollectionRef = collection(firestore, 'appointments');
 const productsCollectionRef = collection(firestore, 'products');
 const usersCollectionRef = collection(firestore, 'users');
+const servicesCollectionRef = collection(firestore, 'services'); // New collection
 
 // --- User Types ---
 export type UserDetail = {
@@ -32,11 +33,21 @@ export type Appointment = {
   userPhone?: string;
   preferredDate: string; // ISO string for client
   preferredTime: string;
-  services: string[];
+  services: string[]; // Array of service IDs
   message?: string;
   status: string; // Kept as string for DB flexibility, UI will handle known states
   createdAt: string; // ISO string for client
 };
+
+// --- Service Type ---
+export type Service = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  createdAt?: string; // ISO string
+};
+
 
 // --- User Management Actions ---
 export async function getUsers(): Promise<UserDetail[]> {
@@ -164,6 +175,7 @@ export async function getAppointments(): Promise<Appointment[]> {
 
       for (const batchUserIds of userBatches) {
         if (batchUserIds.length === 0) continue;
+        // Assuming user documents in 'users' collection have 'uid' field that matches auth.uid
         const qUsers = query(usersCollectionRef, where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
@@ -281,10 +293,10 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
   console.log('Site Settings Update Received by Server Action:', data);
-  // The AI will modify src/config/site.ts directly via XML.
-  // This server action just confirms receipt and simulates success.
-  revalidatePath('/admin/settings'); // Revalidate the new settings page
-  return { success: true, message: 'Configuración del sitio procesada. Los cambios se reflejarán en breve (puede requerir refrescar la página).' };
+  // The AI will modify src/config/site.ts directly via XML for siteName and siteDescription.
+  // Other settings like services, hours, will be managed via Firestore.
+  revalidatePath('/admin/settings');
+  return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página).' };
 }
 
 // --- Product Management Actions ---
@@ -338,6 +350,7 @@ export async function addProduct(data: ProductFormValues) {
       createdAt: productDataToAdd.createdAt.toDate().toISOString(),
     };
     revalidatePath('/products');
+    revalidatePath('/admin/settings'); // Also revalidate settings if products are managed there in future
     revalidatePath('/admin');
     return { success: true, message: 'Producto añadido con éxito a Firestore.', product: newProduct };
   } catch (error) {
@@ -381,6 +394,7 @@ export async function updateProduct(data: ProductFormValues) {
       createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
     };
     revalidatePath('/products');
+    revalidatePath('/admin/settings');
     revalidatePath('/admin');
     return { success: true, message: 'Producto actualizado con éxito.', product: updatedProduct };
   } catch (error) {
@@ -394,10 +408,105 @@ export async function deleteProduct(productId: string) {
     const productDocRef = doc(firestore, 'products', productId);
     await deleteDoc(productDocRef);
     revalidatePath('/products');
+    revalidatePath('/admin/settings');
     revalidatePath('/admin');
     return { success: true, message: 'Producto eliminado con éxito de Firestore.' };
   } catch (error) {
     console.error("Error deleting product from Firestore:", error);
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
+  }
+}
+
+
+// --- Service Management Actions ---
+export async function getServices(): Promise<Service[]> {
+  try {
+    const q = query(servicesCollectionRef, orderBy('name', 'asc')); // Order by name for consistency
+    const querySnapshot = await getDocs(q);
+    const services = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        name: data.name || 'Unnamed Service',
+        description: data.description || '',
+        price: data.price || 'ARS$ 0',
+        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined,
+      } as Service;
+    });
+    return services;
+  } catch (error) {
+    console.error("Error fetching services from Firestore:", error);
+    return [];
+  }
+}
+
+export async function addService(data: ServiceFormValues) {
+  try {
+    const serviceDataToAdd = {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      createdAt: Timestamp.now()
+    };
+    const docRef = await addDoc(servicesCollectionRef, serviceDataToAdd);
+    const newService: Service = {
+      id: docRef.id,
+      ...serviceDataToAdd,
+      createdAt: serviceDataToAdd.createdAt.toDate().toISOString(),
+    };
+    revalidatePath('/admin/settings');
+    revalidatePath('/book'); // Revalidate booking page as services list might change
+    return { success: true, message: 'Servicio añadido con éxito.', service: newService };
+  } catch (error) {
+    console.error("Error adding service to Firestore:", error);
+    return { success: false, message: 'Error al añadir el servicio.' };
+  }
+}
+
+export async function updateService(data: ServiceFormValues) {
+  if (!data.id) {
+    return { success: false, message: 'Service ID is missing for update.' };
+  }
+  try {
+    const serviceDocRef = doc(firestore, 'services', data.id);
+    const serviceDataToUpdate = {
+      name: data.name,
+      description: data.description,
+      price: data.price,
+    };
+    await updateDoc(serviceDocRef, serviceDataToUpdate);
+    
+    const updatedDocSnap = await getDoc(serviceDocRef);
+     if (!updatedDocSnap.exists()) {
+        return { success: false, message: 'Failed to retrieve updated service.' };
+    }
+    const updatedData = updatedDocSnap.data();
+    const updatedService: Service = {
+      id: updatedDocSnap.id,
+      name: updatedData.name,
+      description: updatedData.description,
+      price: updatedData.price,
+      createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
+    };
+
+    revalidatePath('/admin/settings');
+    revalidatePath('/book');
+    return { success: true, message: 'Servicio actualizado con éxito.', service: updatedService };
+  } catch (error) {
+    console.error("Error updating service in Firestore:", error);
+    return { success: false, message: 'Error al actualizar el servicio.' };
+  }
+}
+
+export async function deleteService(serviceId: string) {
+  try {
+    const serviceDocRef = doc(firestore, 'services', serviceId);
+    await deleteDoc(serviceDocRef);
+    revalidatePath('/admin/settings');
+    revalidatePath('/book');
+    return { success: true, message: 'Servicio eliminado con éxito.' };
+  } catch (error) {
+    console.error("Error deleting service from Firestore:", error);
+    return { success: false, message: 'Error al eliminar el servicio.' };
   }
 }
