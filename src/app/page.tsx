@@ -73,7 +73,7 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-xl mx-auto">
             Estilo y precisión en cada corte. Experimenta la barbería tradicional con un toque moderno.
           </p>
-          <Link href="/appointments">
+          <Link href="/book">
             <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-10 py-6 rounded-lg shadow-md transition-transform hover:scale-105">
               Reservar Turno
             </Button>
