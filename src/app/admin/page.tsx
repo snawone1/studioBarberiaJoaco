@@ -18,6 +18,17 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -47,7 +58,7 @@ import {
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, Briefcase, MessageSquare } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, MessageSquare } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -80,6 +91,11 @@ export default function AdminPage() {
   const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
   const [allUsers, setAllUsers] = useState<UserDetail[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+  const [isConfirmAppointmentDialogOpen, setIsConfirmAppointmentDialogOpen] = useState(false);
+  const [appointmentToConfirm, setAppointmentToConfirm] = useState<Appointment | null>(null);
+  const [sendWhatsAppNotification, setSendWhatsAppNotification] = useState(true);
+
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -255,7 +271,54 @@ export default function AdminPage() {
     }
   }
   
+  const openConfirmAppointmentDialog = (appointment: Appointment) => {
+    setAppointmentToConfirm(appointment);
+    setSendWhatsAppNotification(true); // Default to checked
+    setIsConfirmAppointmentDialogOpen(true);
+  };
+
+  const handleActualConfirmAppointment = async () => {
+    if (!appointmentToConfirm) return;
+
+    setIsUpdatingStatus(appointmentToConfirm.id);
+    setIsConfirmAppointmentDialogOpen(false); // Close dialog immediately
+
+    const result = await updateAppointmentStatus(appointmentToConfirm.id, 'confirmed');
+    
+    if (result.success) {
+      toast({ title: 'Éxito', description: 'Cita confirmada con éxito.' });
+      fetchAppointmentsAdmin(); 
+
+      if (sendWhatsAppNotification && appointmentToConfirm.userPhone && appointmentToConfirm.userName) {
+        const clientName = appointmentToConfirm.userName;
+        const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
+        const apptTime = appointmentToConfirm.preferredTime;
+        
+        const message = encodeURIComponent(
+          `Hola ${clientName}, tu cita en ${siteConfig.name} para el ${apptDate} a las ${apptTime} ha sido CONFIRMADA. ¡Te esperamos!`
+        );
+        const cleanedPhoneNumber = appointmentToConfirm.userPhone.replace(/\D/g, '');
+        const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+      }
+    } else {
+      toast({ title: 'Error', description: result.message, variant: 'destructive' });
+    }
+    
+    setIsUpdatingStatus(null);
+    setAppointmentToConfirm(null);
+  };
+  
   const handleUpdateAppointmentStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
+    // If confirming, go through dialog, otherwise update directly
+    if (newStatus === 'confirmed') {
+       const apptToConfirm = appointments.find(a => a.id === appointmentId);
+       if (apptToConfirm) {
+         openConfirmAppointmentDialog(apptToConfirm);
+       }
+       return;
+    }
+
     setIsUpdatingStatus(appointmentId);
     const result = await updateAppointmentStatus(appointmentId, newStatus);
     if (result.success) {
@@ -272,7 +335,6 @@ export default function AdminPage() {
       toast({ title: 'Error', description: 'Este usuario no tiene un número de teléfono registrado.', variant: 'destructive'});
       return;
     }
-    // Basic cleaning: remove non-digits. More robust cleaning might be needed.
     const cleanedPhoneNumber = user.phoneNumber.replace(/\D/g, '');
     const message = encodeURIComponent(`Hola ${user.fullName}, te contacto desde ${siteConfig.name} con respecto a tus servicios.`);
     const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
@@ -442,7 +504,7 @@ export default function AdminPage() {
                             <>
                               {appt.status === 'pending' && (
                                 <>
-                                  <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => handleUpdateAppointmentStatus(appt.id, 'confirmed')}>
+                                  <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => openConfirmAppointmentDialog(appt)}>
                                     <CheckCircle className="mr-2 h-4 w-4"/> Confirmar
                                   </Button>
                                   <Button size="sm" variant="destructive" onClick={() => handleUpdateAppointmentStatus(appt.id, 'cancelled')}>
@@ -793,7 +855,52 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Appointment Confirmation Dialog */}
+      {appointmentToConfirm && (
+        <AlertDialog open={isConfirmAppointmentDialogOpen} onOpenChange={setIsConfirmAppointmentDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Cita</AlertDialogTitle>
+              <AlertDialogDescription>
+                Estás a punto de confirmar la siguiente cita:
+                <div className="mt-2 text-sm text-foreground">
+                  <p><strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}</p>
+                  <p><strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}</p>
+                  <p><strong>Hora:</strong> {appointmentToConfirm.preferredTime}</p>
+                  <p><strong>Servicios:</strong> {appointmentToConfirm.services.join(', ')}</p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex items-center space-x-2 my-4">
+              <Checkbox
+                id="sendWhatsApp"
+                checked={sendWhatsAppNotification}
+                onCheckedChange={(checked) => setSendWhatsAppNotification(checked as boolean)}
+                disabled={!appointmentToConfirm.userPhone || !appointmentToConfirm.userName}
+              />
+              <Label htmlFor="sendWhatsApp" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Enviar notificación de confirmación por WhatsApp al cliente
+              </Label>
+            </div>
+             {(!appointmentToConfirm.userPhone || !appointmentToConfirm.userName) && sendWhatsAppNotification && (
+                <p className="text-xs text-destructive -mt-2 mb-2">
+                    No se puede enviar WhatsApp: falta el número de teléfono o el nombre del cliente.
+                </p>
+            )}
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setAppointmentToConfirm(null)}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleActualConfirmAppointment} disabled={isUpdatingStatus === appointmentToConfirm.id}>
+                {isUpdatingStatus === appointmentToConfirm.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirmar Cita
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
 
+
+      
