@@ -20,7 +20,7 @@ export type Appointment = {
   preferredTime: string;
   services: string[];
   message?: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | string;
+  status: string; // Kept as string for DB flexibility, UI will handle known states
   createdAt: string; // ISO string for client
 };
 
@@ -30,7 +30,6 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
   try {
     const clientPreferredDate = data.preferredDate; 
     
-    // Normalize to the start of the day in the client's local timezone, then convert to Timestamp
     const normalizedPreferredDateObject = new Date(clientPreferredDate);
     normalizedPreferredDateObject.setHours(0, 0, 0, 0); 
     
@@ -56,7 +55,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       preferredTime: data.preferredTime,
       services: data.services,
       message: data.message || '',
-      status: 'pending',
+      status: 'pending', // Default status
       createdAt: Timestamp.now(),
     };
     console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
@@ -74,7 +73,6 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 export async function getAppointments(): Promise<Appointment[]> {
   console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
   try {
-    // RESTORED: orderBy clauses. Firestore will require a composite index for this.
     const q = query(
       appointmentsCollectionRef, 
       orderBy('preferredDate', 'desc'), 
@@ -103,7 +101,6 @@ export async function getAppointments(): Promise<Appointment[]> {
         preferredDateISO = data.preferredDate.toDate().toISOString();
       } else {
         console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
-        // Default to a very old date if preferredDate is invalid, so it sorts last or can be identified
         preferredDateISO = new Date(0).toISOString(); 
       }
 
@@ -111,7 +108,6 @@ export async function getAppointments(): Promise<Appointment[]> {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
         console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
-        // Default to a very old date if createdAt is invalid
         createdAtISO = new Date(0).toISOString(); 
       }
       
@@ -128,7 +124,7 @@ export async function getAppointments(): Promise<Appointment[]> {
       return appointment;
     });
     console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
-    return appointments; // Firestore handles the sorting with orderBy
+    return appointments; 
 
   } catch (error: any) { 
     console.error("Admin: Error fetching or mapping appointments from Firestore:", error);
@@ -140,6 +136,21 @@ export async function getAppointments(): Promise<Appointment[]> {
     return [];
   }
 }
+
+export async function updateAppointmentStatus(appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed') {
+  console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}`);
+  try {
+    const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
+    await updateDoc(appointmentDocRef, { status: newStatus });
+    console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+    revalidatePath('/admin');
+    return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
+  } catch (error) {
+    console.error(`Server Action: Error updating appointment ${appointmentId} status in Firestore:`, error);
+    return { success: false, message: 'Error al actualizar el estado de la cita.' };
+  }
+}
+
 
 export async function getBookedSlotsForDate(date: Date): Promise<string[]> {
   try {

@@ -33,14 +33,17 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
-import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct, getAppointments, type Appointment } from '@/app/actions';
+import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct, getAppointments, updateAppointmentStatus, type Appointment } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
 export default function AdminPage() {
   const { currentUser, loading } = useAuth();
@@ -60,6 +63,8 @@ export default function AdminPage() {
   const [isAppointmentManagerOpen, setIsAppointmentManagerOpen] = useState(false);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
+  const [activeAppointmentTab, setActiveAppointmentTab] = useState<AppointmentStatus | 'all'>('pending');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null); // Stores appointmentId for loader
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -120,13 +125,17 @@ export default function AdminPage() {
   }, [isProductManagerOpen]);
 
   async function fetchAppointmentsAdmin() {
-    if (isAppointmentManagerOpen) {
+    // No longer conditional on isAppointmentManagerOpen, always fetch if admin
+     if (currentUser?.email === 'joacoadmin@admin.com') {
+      console.log("Admin Page: Calling getAppointments server action.");
       setIsLoadingAppointments(true);
       try {
         const fetchedAppointments = await getAppointments();
-        setAppointments(fetchedAppointments); // Already sorted by action
+        console.log("Admin Page: Fetched appointments from server action:", fetchedAppointments);
+        setAppointments(fetchedAppointments); 
       } catch (error) {
         toast({ title: 'Error', description: 'No se pudieron cargar las citas.', variant: 'destructive' });
+        console.error("Admin Page: Error fetching appointments:", error);
       } finally {
         setIsLoadingAppointments(false);
       }
@@ -134,9 +143,12 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    fetchAppointmentsAdmin();
+    // Fetch appointments when component mounts and if user is admin, or when dialog opens
+    if (isAppointmentManagerOpen || (!isAppointmentManagerOpen && appointments.length === 0)) {
+        fetchAppointmentsAdmin();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAppointmentManagerOpen]);
+  }, [isAppointmentManagerOpen, currentUser]);
 
 
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
@@ -189,19 +201,7 @@ export default function AdminPage() {
 
     if (result.success && result.product) {
       toast({ title: editingProduct ? '¡Producto Actualizado!' : '¡Producto Añadido!', description: result.message });
-      if (editingProduct) {
-        setProducts(prev => prev.map(p => p.id === result.product!.id ? result.product! : p).sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA;
-        }));
-      } else {
-        setProducts(prev => [...prev, result.product!].sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA;
-        }));
-      }
+      fetchProductsAdmin(); // Re-fetch all products to ensure sorted list
       productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,});
       setShowAddEditProductForm(false);
       setEditingProduct(null);
@@ -220,6 +220,19 @@ export default function AdminPage() {
       toast({ title: 'Error', description: result.message || 'No se pudo eliminar el producto.', variant: 'destructive' });
     }
   }
+  
+  const handleUpdateAppointmentStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
+    setIsUpdatingStatus(appointmentId);
+    const result = await updateAppointmentStatus(appointmentId, newStatus);
+    if (result.success) {
+      toast({ title: 'Éxito', description: result.message });
+      fetchAppointmentsAdmin(); // Re-fetch para actualizar la lista y mover la cita a la tab correcta
+    } else {
+      toast({ title: 'Error', description: result.message, variant: 'destructive' });
+    }
+    setIsUpdatingStatus(null);
+  };
+
 
   if (loading) {
     return (
@@ -247,17 +260,27 @@ export default function AdminPage() {
   }
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'default'; // Primary color for pending
-      case 'confirmed':
-        return 'secondary'; // Or another distinct color like a green, if you add one
-      case 'cancelled':
-        return 'destructive';
-      default:
-        return 'outline';
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'default'; // Primary color for pending
+      case 'confirmed': return 'secondary'; 
+      case 'completed': return 'secondary'; // Similar to confirmed, but could be different
+      case 'cancelled': return 'destructive';
+      default: return 'outline';
     }
   };
+  
+  const appointmentTabs: { label: string; value: AppointmentStatus | 'all' }[] = [
+    { label: "Pendientes", value: "pending" },
+    { label: "Confirmadas", value: "confirmed" },
+    { label: "Realizadas", value: "completed" },
+    { label: "Canceladas", value: "cancelled" },
+    { label: "Todas", value: "all" },
+  ];
+
+  const filteredAppointments = appointments.filter(appt => {
+    if (activeAppointmentTab === 'all') return true;
+    return appt.status?.toLowerCase() === activeAppointmentTab.toLowerCase();
+  });
 
 
   return (
@@ -300,61 +323,95 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl max-h-[calc(100vh-8rem)] flex flex-col">
+          <DialogContent className="sm:max-w-3xl md:max-w-4xl max-h-[calc(100vh-8rem)] flex flex-col">
             <DialogHeader>
-              <DialogTitle className="font-sans">Gestionar Citas</DialogTitle>
+              <DialogTitle className="font-sans text-2xl">Gestionar Citas</DialogTitle>
               <DialogDescription>
-                Visualiza las citas solicitadas. Próximamente: confirmar, cancelar.
+                Filtra y actualiza el estado de las citas solicitadas.
               </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1">
-              {isLoadingAppointments ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
-              ) : appointments.length === 0 ? (
-                <div className="text-center py-10 text-muted-foreground">
-                  <CalendarCheck className="h-12 w-12 mx-auto mb-2" />
-                  <p>No hay citas para mostrar.</p>
-                </div>
-              ) : (
-                <div className="space-y-4 p-2">
-                  {appointments.map((appt) => (
-                    <Card key={appt.id} className="shadow-md">
-                      <CardHeader className="pb-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-lg font-sans">
-                              {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
-                            </CardTitle>
-                            <CardDescription className="text-xs">ID Usuario: {appt.userId}</CardDescription>
+
+            <Tabs value={activeAppointmentTab} onValueChange={(value) => setActiveAppointmentTab(value as AppointmentStatus | 'all')} className="w-full mt-4">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
+                {appointmentTabs.map(tab => (
+                  <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
+                ))}
+              </TabsList>
+            
+              <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1 mt-4 max-h-[calc(100vh-20rem)]">
+                {isLoadingAppointments ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+                ) : filteredAppointments.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground">
+                    <CalendarCheck className="h-12 w-12 mx-auto mb-2" />
+                    <p>No hay citas para mostrar en esta sección.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 p-2">
+                    {filteredAppointments.map((appt) => (
+                      <Card key={appt.id} className="shadow-md">
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-lg font-sans">
+                                {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
+                              </CardTitle>
+                              <div className="text-xs text-muted-foreground flex items-center mt-1">
+                                <UserCircle2 className="h-4 w-4 mr-1 text-primary"/> ID Cliente: {appt.userId}
+                              </div>
+                            </div>
+                            <Badge variant={getStatusVariant(appt.status)} className="capitalize">{appt.status}</Badge>
                           </div>
-                          <Badge variant={getStatusVariant(appt.status)} className="capitalize">{appt.status}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-3 space-y-1 text-sm">
-                        <div>
-                          <span className="font-semibold">Servicios: </span>
-                          {appt.services.join(', ')}
-                        </div>
-                        {appt.message && (
+                        </CardHeader>
+                        <CardContent className="pb-3 space-y-1 text-sm">
                           <div>
-                            <span className="font-semibold">Mensaje: </span>
-                            {appt.message}
+                            <span className="font-semibold">Servicios: </span>
+                            {appt.services.join(', ')}
                           </div>
-                        )}
-                        <div className="text-xs text-muted-foreground pt-1">
-                          Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
-                        </div>
-                      </CardContent>
-                      {/* Future: Add actions like confirm/cancel here */}
-                      {/* <CardFooter className="pt-3">
-                        <Button size="sm" variant="outline" className="mr-2">Confirmar</Button>
-                        <Button size="sm" variant="destructive">Cancelar Cita</Button>
-                      </CardFooter> */}
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
+                          {appt.message && (
+                            <div>
+                              <span className="font-semibold">Mensaje: </span>
+                              {appt.message}
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground pt-1">
+                            Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
+                          </div>
+                        </CardContent>
+                        <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
+                          {isUpdatingStatus === appt.id ? (
+                             <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          ) : (
+                            <>
+                              {appt.status === 'pending' && (
+                                <>
+                                  <Button size="sm" variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => handleUpdateAppointmentStatus(appt.id, 'confirmed')}>
+                                    <CheckCircle className="mr-2 h-4 w-4"/> Confirmar
+                                  </Button>
+                                  <Button size="sm" variant="destructive" onClick={() => handleUpdateAppointmentStatus(appt.id, 'cancelled')}>
+                                    <XIcon className="mr-2 h-4 w-4"/> Cancelar
+                                  </Button>
+                                </>
+                              )}
+                              {appt.status === 'confirmed' && (
+                                <>
+                                  <Button size="sm" variant="outline" className="border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-700" onClick={() => handleUpdateAppointmentStatus(appt.id, 'completed')}>
+                                     <PlayCircle className="mr-2 h-4 w-4"/> Marcar Realizada
+                                  </Button>
+                                  <Button size="sm" variant="destructive" onClick={() => handleUpdateAppointmentStatus(appt.id, 'cancelled')}>
+                                     <XIcon className="mr-2 h-4 w-4"/> Cancelar
+                                  </Button>
+                                </>
+                              )}
+                            </>
+                          )}
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </Tabs>
             <DialogFooter className="mt-auto pt-4 border-t">
               <DialogClose asChild>
                 <Button type="button" variant="outline">Cerrar</Button>
@@ -617,3 +674,6 @@ export default function AdminPage() {
     </div>
   );
 }
+
+
+    
