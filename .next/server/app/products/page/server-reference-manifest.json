@@ -98,6 +98,17 @@
       "layer": {
         "app/products/page": "action-browser"
       }
+    },
+    "60df8604b55fb28ca85f574dd721ecefbfd80a9cdf": {
+      "workers": {
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/products/page": "action-browser"
+      }
     }
   },
   "edge": {}

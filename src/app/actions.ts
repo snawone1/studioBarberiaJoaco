@@ -11,11 +11,25 @@ import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getD
 // Firestore collection references
 const appointmentsCollectionRef = collection(firestore, 'appointments');
 const productsCollectionRef = collection(firestore, 'products');
+const usersCollectionRef = collection(firestore, 'users');
+
+// --- User Types ---
+export type UserDetail = {
+  id: string; // Firestore document ID (which is user.uid)
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  createdAt: string; // ISO string
+};
+
 
 // --- Appointment Types ---
 export type Appointment = {
   id: string;
   userId: string;
+  userName?: string;
+  userEmail?: string;
+  userPhone?: string;
   preferredDate: string; // ISO string for client
   preferredTime: string;
   services: string[];
@@ -23,6 +37,56 @@ export type Appointment = {
   status: string; // Kept as string for DB flexibility, UI will handle known states
   createdAt: string; // ISO string for client
 };
+
+// --- User Management Actions ---
+export async function getUsers(): Promise<UserDetail[]> {
+  console.log("Admin: Attempting to fetch users from Firestore...");
+  try {
+    const q = query(usersCollectionRef, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
+
+    if (querySnapshot.empty) {
+      console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
+      return [];
+    }
+
+    const users = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      let createdAtISO: string;
+
+      if (data.createdAt && typeof data.createdAt === 'string') { // Assuming createdAt is stored as ISO string during signup
+        createdAtISO = data.createdAt;
+      } else if (data.createdAt && typeof data.createdAt.toDate === 'function') { // Handle if stored as Firestore Timestamp
+        createdAtISO = data.createdAt.toDate().toISOString();
+      } else {
+        console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+        createdAtISO = new Date(0).toISOString();
+      }
+      
+      const userDetail: UserDetail = {
+        id: docSnap.id,
+        fullName: data.fullName || 'N/A',
+        email: data.email || 'N/A',
+        phoneNumber: data.phoneNumber || 'N/A',
+        createdAt: createdAtISO,
+      };
+      return userDetail;
+    });
+    console.log(`Admin: Successfully mapped ${users.length} users.`);
+    return users;
+
+  } catch (error: any) {
+    console.error("Admin: Error fetching or mapping users from Firestore:", error);
+    if (error.code === 'failed-precondition') {
+        console.error("IMPORTANT: Firestore 'failed-precondition' error for users query. This might mean a composite index is required if you add more complex ordering or filtering. Check Firestore console for index suggestions.");
+    } else {
+        console.error("An unexpected error occurred while fetching users:", error.message, error.stack);
+    }
+    return [];
+  }
+}
+
 
 // --- Appointment Actions ---
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
@@ -73,26 +137,47 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 export async function getAppointments(): Promise<Appointment[]> {
   console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
   try {
-    const q = query(
+    const qAppointments = query(
       appointmentsCollectionRef, 
       orderBy('preferredDate', 'desc'), 
       orderBy('createdAt', 'desc')
     );
     console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
 
-    const querySnapshot = await getDocs(q);
-    console.log(`Admin: Found ${querySnapshot.docs.length} appointment documents in total.`);
+    const appointmentSnapshot = await getDocs(qAppointments);
+    console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
     
-    if (querySnapshot.empty) {
-      console.warn("Admin: No appointments matched the query. This could be due to:");
-      console.warn("1. Firestore security rules preventing read access for the admin user ('joacoadmin@admin.com').");
-      console.warn("2. No appointments actually existing in the 'appointments' collection.");
-      console.warn("3. The composite index for orderBy clauses might still be building or was not created correctly.");
-      console.warn("PLEASE VERIFY YOUR FIRESTORE SECURITY RULES, DATA, AND COMPOSITE INDEXES.");
+    if (appointmentSnapshot.empty) {
+      console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
       return [];
     }
 
-    const appointments = querySnapshot.docs.map(docSnap => {
+    // Fetch user details for all appointments
+    const userIds = [...new Set(appointmentSnapshot.docs.map(docSnap => docSnap.data().userId as string).filter(id => !!id))];
+    let usersMap: Map<string, { fullName?: string; email?: string; phoneNumber?: string }> = new Map();
+
+    if (userIds.length > 0) {
+      // Firestore 'in' query can take up to 30 elements per query
+      const MAX_USER_IDS_PER_QUERY = 30;
+      for (let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY) {
+          const batchUserIds = userIds.slice(i, i + MAX_USER_IDS_PER_QUERY);
+          if (batchUserIds.length === 0) continue;
+
+          const qUsers = query(usersCollectionRef, where('uid', 'in', batchUserIds));
+          const userSnapshot = await getDocs(qUsers);
+          userSnapshot.docs.forEach(docSnap => {
+            const userData = docSnap.data();
+            usersMap.set(userData.uid, { 
+              fullName: userData.fullName, 
+              email: userData.email, 
+              phoneNumber: userData.phoneNumber 
+            });
+          });
+      }
+    }
+    console.log(`Admin: Fetched details for ${usersMap.size} users.`);
+
+    const appointments = appointmentSnapshot.docs.map(docSnap => {
       const data = docSnap.data();
       let preferredDateISO: string;
       let createdAtISO: string;
@@ -111,9 +196,14 @@ export async function getAppointments(): Promise<Appointment[]> {
         createdAtISO = new Date(0).toISOString(); 
       }
       
+      const userDetails = usersMap.get(data.userId) || {};
+
       const appointment: Appointment = {
         id: docSnap.id,
-        userId: data.userId || 'Unknown User', 
+        userId: data.userId || 'Unknown User',
+        userName: userDetails.fullName || 'Nombre no disponible',
+        userEmail: userDetails.email || 'Email no disponible',
+        userPhone: userDetails.phoneNumber || 'Teléfono no disponible',
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A', 
         services: Array.isArray(data.services) ? data.services : [], 
@@ -308,5 +398,3 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
-
-    

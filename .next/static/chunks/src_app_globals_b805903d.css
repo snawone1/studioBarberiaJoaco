@@ -814,6 +814,10 @@ h1, h2, h3, h4, h5, h6 {
   max-height: calc(100vh - 20rem);
 }
 
+.max-h-\[calc\(100vh-16rem\)\] {
+  max-height: calc(100vh - 16rem);
+}
+
 .min-h-0 {
   min-height: 0;
 }
@@ -1893,6 +1897,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-primary\/80 {
   color: hsl(var(--primary) / .8);
+}
+
+.text-muted-foreground\/80 {
+  color: hsl(var(--muted-foreground) / .8);
 }
 
 .underline {

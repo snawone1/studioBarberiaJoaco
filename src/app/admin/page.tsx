@@ -33,10 +33,21 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { siteSettingsSchema, type SiteSettingsFormValues, productSchema, type ProductFormValues } from '@/lib/schemas';
-import { submitSiteSettings, getProducts, addProduct, deleteProduct, updateProduct, getAppointments, updateAppointmentStatus, type Appointment } from '@/app/actions';
+import { 
+  submitSiteSettings, 
+  getProducts, 
+  addProduct, 
+  deleteProduct, 
+  updateProduct, 
+  getAppointments, 
+  updateAppointmentStatus, 
+  type Appointment,
+  getUsers, // Import getUsers
+  type UserDetail // Import UserDetail type
+} from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, Briefcase } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -64,7 +75,11 @@ export default function AdminPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
   const [activeAppointmentTab, setActiveAppointmentTab] = useState<AppointmentStatus | 'all'>('pending');
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null); // Stores appointmentId for loader
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null);
+
+  const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState<UserDetail[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -142,11 +157,32 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (currentUser?.email === 'joacoadmin@admin.com' && (isAppointmentManagerOpen || appointments.length === 0)) {
+    if (currentUser?.email === 'joacoadmin@admin.com' && (isAppointmentManagerOpen || (appointments.length === 0 && currentUser))) {
         fetchAppointmentsAdmin();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAppointmentManagerOpen, currentUser, appointments.length]);
+  }, [isAppointmentManagerOpen, currentUser]);
+
+
+  async function fetchAllUsersAdmin() {
+    if (currentUser?.email === 'joacoadmin@admin.com' && isUserManagerOpen) {
+      setIsLoadingUsers(true);
+      try {
+        const fetchedUsers = await getUsers();
+        setAllUsers(fetchedUsers);
+      } catch (error) {
+        toast({ title: 'Error', description: 'No se pudieron cargar los usuarios.', variant: 'destructive' });
+        console.error("Admin Page: Error fetching users:", error);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchAllUsersAdmin();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUserManagerOpen, currentUser]);
 
 
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
@@ -429,20 +465,75 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
 
-
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xl font-medium font-sans">
-              Gestión de Usuarios
-            </CardTitle>
-            <Users className="h-6 w-6 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Supervisa las cuentas y roles de los usuarios. (Funcionalidad futura)
-            </p>
-          </CardContent>
-        </Card>
+        {/* User Manager Dialog & Trigger */}
+        <Dialog open={isUserManagerOpen} onOpenChange={setIsUserManagerOpen}>
+          <DialogTrigger asChild>
+             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-medium font-sans">
+                  Gestión de Usuarios
+                </CardTitle>
+                <Users className="h-6 w-6 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Visualiza la lista de usuarios registrados.
+                </p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-2xl max-h-[calc(100vh-8rem)] flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="font-sans text-2xl">Gestionar Usuarios</DialogTitle>
+              <DialogDescription>
+                Lista de todos los usuarios registrados en el sistema.
+              </DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="flex-grow overflow-y-auto p-1 pr-2 -mr-1 mt-4 max-h-[calc(100vh-16rem)]">
+              {isLoadingUsers ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+              ) : allUsers.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground">
+                  <Users className="h-12 w-12 mx-auto mb-2" />
+                  <p>No hay usuarios registrados para mostrar.</p>
+                </div>
+              ) : (
+                <div className="space-y-3 p-2">
+                  {allUsers.map((user) => (
+                    <Card key={user.id} className="shadow-sm">
+                      <CardHeader className="pb-2 pt-4">
+                        <CardTitle className="text-lg font-sans flex items-center">
+                          <UserCircle2 className="h-5 w-5 mr-2 text-primary" />
+                          {user.fullName}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm space-y-1 pb-4">
+                        <div className="flex items-center">
+                          <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <span className="text-muted-foreground">{user.email}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                           <span className="text-muted-foreground">{user.phoneNumber}</span>
+                        </div>
+                         <div className="flex items-center text-xs text-muted-foreground/80 pt-1">
+                          <CalendarDays className="h-3 w-3 mr-1.5" />
+                          Registrado: {format(new Date(user.createdAt), "PPP 'a las' p", { locale: es })}
+                        </div>
+                      </CardContent>
+                      {/* Future: Add actions like View Details, Edit Role, Disable User etc. in CardFooter */}
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+            <DialogFooter className="mt-auto pt-4 border-t">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         
         <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
           <DialogTrigger asChild>
