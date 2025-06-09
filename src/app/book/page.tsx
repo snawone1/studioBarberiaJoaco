@@ -31,7 +31,7 @@ import { PageHeader } from '@/components/page-header';
 import { submitAppointmentRequest, getBookedSlotsForDate } from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 const availableServices = [
@@ -50,7 +50,7 @@ const timeSlots = [
 ];
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
-const now = new Date(); // Define now once at the component level
+const now = new Date(); 
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
@@ -59,6 +59,7 @@ export default function BookAppointmentPage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string | undefined>(undefined);
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
   const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const form = useForm<ClientAppointmentFormValues>({
     resolver: zodResolver(clientAppointmentSchema),
@@ -93,7 +94,6 @@ export default function BookAppointmentPage() {
         setSelectedTimeSlot(undefined); 
         form.setValue('preferredTime', ''); 
         setIsLoadingBookedSlots(true); 
-        // No es necesario setBookedSlots([]) aquí, el loader se encargará
       }
 
       try {
@@ -119,7 +119,8 @@ export default function BookAppointmentPage() {
     return () => {
       isActive = false; 
     };
-  }, [watchedDate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedDate, form, toast]);
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
@@ -169,7 +170,6 @@ export default function BookAppointmentPage() {
       setSelectedTimeSlot(undefined);
       if (watchedDate) { 
         setIsLoadingBookedSlots(true);
-        // No es necesario setBookedSlots([]) aquí
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
@@ -190,7 +190,6 @@ export default function BookAppointmentPage() {
        if (result.message && result.message.includes('Este horario ya no está disponible')) {
           if (watchedDate) {
             setIsLoadingBookedSlots(true);
-            // No es necesario setBookedSlots([]) aquí
             getBookedSlotsForDate(watchedDate)
               .then(newSlots => {
                 setBookedSlots(newSlots);
@@ -205,41 +204,7 @@ export default function BookAppointmentPage() {
        }
     }
   }
-
-  const availableSlotsToDisplay = React.useMemo(() => {
-    if (!watchedDate) return [];
-
-    return timeSlots.filter(slot => {
-        const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
-        let slotIsTooSoonOrPast = false;
-
-        if (isToday) {
-            const timeParts = slot.split(' ');
-            const timeDigits = timeParts[0].split(':');
-            let slotHours = parseInt(timeDigits[0]);
-            const slotMinutes = parseInt(timeDigits[1]);
-            const period = timeParts[1].toUpperCase();
-
-            if (period === 'PM' && slotHours !== 12) slotHours += 12;
-            else if (period === 'AM' && slotHours === 12) slotHours = 0; 
-
-            const slotStartDateTime = new Date(watchedDate); // Use a new date object for each slot
-            slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-            
-            // Calculate cutoff time relative to the *current* `now`
-            const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-
-            if (slotStartDateTime <= cutoffTime) {
-                slotIsTooSoonOrPast = true;
-            }
-        }
-        
-        const isSlotBooked = bookedSlots.includes(slot);
-        
-        return !isSlotBooked && !slotIsTooSoonOrPast;
-    });
-  }, [watchedDate, bookedSlots]); // isLoadingBookedSlots removed as filter runs when data is ready
-
+  
   return (
     <div className="container mx-auto px-4 py-12">
       <PageHeader
@@ -255,7 +220,7 @@ export default function BookAppointmentPage() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="text-lg font-semibold">Fecha Preferida</FormLabel>
-                  <Popover>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -280,6 +245,7 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
+                          setIsCalendarOpen(false); // Close popover on date select
                         }}
                         disabled={(date) =>
                           date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
@@ -315,30 +281,79 @@ export default function BookAppointmentPage() {
                       </div>
                     ) : (
                       <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {availableSlotsToDisplay.length === 0 ? (
+                        {timeSlots.map((slot) => {
+                            const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                            let slotIsTooSoonOrPast = false;
+
+                            if (isToday) {
+                                const timeParts = slot.split(' ');
+                                const timeDigits = timeParts[0].split(':');
+                                let slotHours = parseInt(timeDigits[0]);
+                                const slotMinutes = parseInt(timeDigits[1]);
+                                const period = timeParts[1].toUpperCase();
+
+                                if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                                else if (period === 'AM' && slotHours === 12) slotHours = 0; 
+
+                                const slotStartDateTime = new Date(watchedDate); 
+                                slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                                
+                                const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+
+                                if (slotStartDateTime <= cutoffTime) {
+                                    slotIsTooSoonOrPast = true;
+                                }
+                            }
+                            
+                            const isSlotBooked = bookedSlots.includes(slot);
+                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
+
+                            return (
+                               <Button
+                                  key={slot}
+                                  type="button"
+                                  variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
+                                  className={cn(
+                                    "w-full py-3 text-sm",
+                                    selectedTimeSlot === slot && !isDisabled
+                                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                      : isDisabled 
+                                        ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed"
+                                        : "text-foreground hover:bg-muted"
+                                  )}
+                                  onClick={() => {
+                                    if (!isDisabled) {
+                                      setSelectedTimeSlot(slot);
+                                      field.onChange(slot);
+                                    }
+                                  }}
+                                  disabled={isDisabled}
+                                >
+                                  {slot}
+                                </Button>
+                            );
+                        })}
+                        {timeSlots.filter(slot => {
+                            const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                            let slotIsTooSoonOrPast = false;
+                            if (isToday) {
+                                const timeParts = slot.split(' ');
+                                const timeDigits = timeParts[0].split(':');
+                                let slotHours = parseInt(timeDigits[0]);
+                                const slotMinutes = parseInt(timeDigits[1]);
+                                const period = timeParts[1].toUpperCase();
+                                if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                                else if (period === 'AM' && slotHours === 12) slotHours = 0;
+                                const slotStartDateTime = new Date(watchedDate);
+                                slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                                const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+                                if (slotStartDateTime <= cutoffTime) slotIsTooSoonOrPast = true;
+                            }
+                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast;
+                        }).length === 0 && (
                            <p className="text-sm text-muted-foreground text-center col-span-full">
                              No hay horarios disponibles para esta fecha.
                            </p>
-                        ) : (
-                          availableSlotsToDisplay.map((slot) => (
-                            <Button
-                              key={slot}
-                              type="button"
-                              variant={selectedTimeSlot === slot ? "default" : "outline"}
-                              className={cn(
-                                "w-full py-3 text-sm",
-                                selectedTimeSlot === slot
-                                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                  : "text-foreground hover:bg-muted"
-                              )}
-                              onClick={() => {
-                                setSelectedTimeSlot(slot);
-                                field.onChange(slot);
-                              }}
-                            >
-                              {slot}
-                            </Button>
-                          ))
                         )}
                       </div>
                     )}
