@@ -52,13 +52,14 @@ export default function AdminSettingsPage() {
     }
   }, [currentUser, authLoading, router, toast]);
 
-  // Reset form if siteConfig changes (e.g., after successful save and re-render)
+  // Reset form if siteConfig values (name or description) change.
+  // This ensures the form reflects the latest saved values after HMR.
   useEffect(() => {
     settingsForm.reset({
       siteName: siteConfig.name,
       siteDescription: siteConfig.description,
     });
-  }, [settingsForm]);
+  }, [siteConfig.name, siteConfig.description, settingsForm]);
 
 
   async function onSiteSettingsSubmit(data: SiteSettingsFormValues) {
@@ -66,8 +67,8 @@ export default function AdminSettingsPage() {
     const result = await submitSiteSettings(data);
     if (result.success) {
       toast({ title: '¡Configuración Guardada!', description: result.message });
-      // The siteConfig.ts is updated by the AI, a page refresh/rebuild will show changes.
-      // You might want to trigger a re-fetch or re-render if values were from a DB.
+      // After successful submission, siteConfig.ts will be updated by the AI.
+      // The useEffect above will then pick up these changes upon HMR and reset the form.
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
     }
