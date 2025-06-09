@@ -27,15 +27,22 @@ export type Appointment = {
 // --- Appointment Actions ---
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
   try {
-    // Server-side double booking check
-    const preferredDateObj = data.preferredDate; // This is already a JS Date object
-    
-    // Create a query to check for existing appointments for the exact date and time slot
-    // Firestore's Timestamp equality works well if the JS Date object represents the start of the day
-    // and we are matching against a Firestore Timestamp that also represents the start of that day.
+    // Explicitly normalize preferredDate to the start of the day in the client's local timezone,
+    // then convert to Firestore Timestamp. This ensures consistency.
+    const clientPreferredDate = data.preferredDate; // Original JS Date from client
+    const normalizedPreferredDate = new Date(
+      clientPreferredDate.getFullYear(),
+      clientPreferredDate.getMonth(),
+      clientPreferredDate.getDate()
+      // Time will be 00:00:00 in the local timezone of the server,
+      // which should align with how the client's calendar provides the date.
+    );
+    const preferredDateTimestamp = Timestamp.fromDate(normalizedPreferredDate);
+
+    // Server-side double booking check using the normalized timestamp
     const qCheck = query(
       appointmentsCollectionRef,
-      where('preferredDate', '==', Timestamp.fromDate(preferredDateObj)),
+      where('preferredDate', '==', preferredDateTimestamp),
       where('preferredTime', '==', data.preferredTime),
       where('status', 'in', ['pending', 'confirmed'])
     );
@@ -47,7 +54,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 
     const appointmentData = {
       userId: data.userId,
-      preferredDate: Timestamp.fromDate(data.preferredDate),
+      preferredDate: preferredDateTimestamp, // Store the normalized timestamp
       preferredTime: data.preferredTime,
       services: data.services,
       message: data.message || '',
@@ -245,3 +252,5 @@ export async function deleteProduct(productId: string) {
     return { success: false, message: 'Error al eliminar el producto de Firestore. Inténtalo de nuevo.' };
   }
 }
+
+    
