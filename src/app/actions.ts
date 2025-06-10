@@ -6,13 +6,15 @@ import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendat
 import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
 import { firestore } from '@/lib/firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getDoc, query, where, orderBy, setDoc } from 'firebase/firestore';
 
 // Firestore collection references
 const appointmentsCollectionRef = collection(firestore, 'appointments');
 const productsCollectionRef = collection(firestore, 'products');
 const usersCollectionRef = collection(firestore, 'users');
-const servicesCollectionRef = collection(firestore, 'services'); // New collection
+const servicesCollectionRef = collection(firestore, 'services');
+const timeSlotSettingsCollectionRef = collection(firestore, 'timeSlotSettings');
+
 
 // --- User Types ---
 export type UserDetail = {
@@ -48,6 +50,20 @@ export type Service = {
   createdAt?: string; // ISO string
 };
 
+// --- Time Slot Settings Types ---
+export type TimeSlotSetting = {
+  time: string;
+  isActive: boolean;
+};
+
+// --- CONSTANTS ---
+export const ALL_TIME_SLOTS = [
+  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+  "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
+  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
+  "06:00 PM", "06:30 PM", "07:00 PM"
+];
+
 
 // --- User Management Actions ---
 export async function getUsers(): Promise<UserDetail[]> {
@@ -66,9 +82,9 @@ export async function getUsers(): Promise<UserDetail[]> {
       const data = docSnap.data();
       let createdAtISO: string;
 
-      if (data.createdAt && typeof data.createdAt === 'string') { // Assuming createdAt is stored as ISO string during signup
+      if (data.createdAt && typeof data.createdAt === 'string') {
         createdAtISO = data.createdAt;
-      } else if (data.createdAt && typeof data.createdAt.toDate === 'function') { // Handle if stored as Firestore Timestamp
+      } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
         console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
@@ -130,7 +146,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       preferredTime: data.preferredTime,
       services: data.services,
       message: data.message || '',
-      status: 'pending', // Default status
+      status: 'pending', 
       createdAt: Timestamp.now(),
     };
     console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
@@ -175,7 +191,6 @@ export async function getAppointments(): Promise<Appointment[]> {
 
       for (const batchUserIds of userBatches) {
         if (batchUserIds.length === 0) continue;
-        // Assuming user documents in 'users' collection have 'uid' field that matches auth.uid
         const qUsers = query(usersCollectionRef, where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
@@ -293,8 +308,6 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
   console.log('Site Settings Update Received by Server Action:', data);
-  // The AI will modify src/config/site.ts directly via XML for siteName and siteDescription.
-  // Other settings like services, hours, will be managed via Firestore.
   revalidatePath('/admin/settings');
   return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página).' };
 }
@@ -350,7 +363,7 @@ export async function addProduct(data: ProductFormValues) {
       createdAt: productDataToAdd.createdAt.toDate().toISOString(),
     };
     revalidatePath('/products');
-    revalidatePath('/admin/settings'); // Also revalidate settings if products are managed there in future
+    revalidatePath('/admin/settings'); 
     revalidatePath('/admin');
     return { success: true, message: 'Producto añadido con éxito a Firestore.', product: newProduct };
   } catch (error) {
@@ -421,7 +434,7 @@ export async function deleteProduct(productId: string) {
 // --- Service Management Actions ---
 export async function getServices(): Promise<Service[]> {
   try {
-    const q = query(servicesCollectionRef, orderBy('name', 'asc')); // Order by name for consistency
+    const q = query(servicesCollectionRef, orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
     const services = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
@@ -455,7 +468,7 @@ export async function addService(data: ServiceFormValues) {
       createdAt: serviceDataToAdd.createdAt.toDate().toISOString(),
     };
     revalidatePath('/admin/settings');
-    revalidatePath('/book'); // Revalidate booking page as services list might change
+    revalidatePath('/book');
     return { success: true, message: 'Servicio añadido con éxito.', service: newService };
   } catch (error) {
     console.error("Error adding service to Firestore:", error);
@@ -510,3 +523,39 @@ export async function deleteService(serviceId: string) {
     return { success: false, message: 'Error al eliminar el servicio.' };
   }
 }
+
+// --- Time Slot Settings Actions ---
+export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
+  try {
+    const snapshot = await getDocs(timeSlotSettingsCollectionRef);
+    const savedSettingsMap = new Map<string, boolean>();
+    snapshot.forEach(docSnap => {
+      savedSettingsMap.set(docSnap.id, docSnap.data().isActive as boolean);
+    });
+
+    const settings = ALL_TIME_SLOTS.map(time => ({
+      time,
+      isActive: savedSettingsMap.get(time) ?? true, 
+    }));
+    return settings;
+  } catch (error) {
+    console.error("Error fetching time slot settings:", error);
+    return ALL_TIME_SLOTS.map(time => ({ time, isActive: true }));
+  }
+}
+
+export async function updateTimeSlotSetting(time: string, isActive: boolean) {
+  try {
+    const settingDocRef = doc(timeSlotSettingsCollectionRef, time);
+    await setDoc(settingDocRef, { time, isActive }); 
+    revalidatePath('/admin/settings');
+    revalidatePath('/book');
+    return { success: true, message: `Time slot ${time} ${isActive ? 'activated' : 'deactivated'}.` };
+  } catch (error) {
+    console.error("Error updating time slot setting:", error);
+    return { success: false, message: 'Failed to update time slot setting.' };
+  }
+}
+
+
+    
