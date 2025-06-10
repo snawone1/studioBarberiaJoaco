@@ -438,6 +438,54 @@ function useAuth() {
     }
     return context;
 }
+// Function to normalize Argentinian phone numbers
+function normalizeArgentinianPhoneNumber(phoneNumber) {
+    // Remove all non-digit characters except a leading '+'
+    let cleaned = phoneNumber.replace(/[^\d+]/g, '');
+    if (cleaned.startsWith('+')) {
+        // If it already has a country code, assume it's correct or handled
+        // For +549..., ensure it's just +54...
+        if (cleaned.startsWith('+549')) {
+            cleaned = '+54' + cleaned.substring(4);
+        }
+        return cleaned;
+    }
+    // Remove leading zeros if any, common in local inputs
+    cleaned = cleaned.replace(/^0+/, '');
+    // Typical lengths for Argentinian numbers without country code:
+    // Area code (2-4 digits) + Number (6-8 digits) = Total 8-10 digits.
+    // Mobile numbers often written as 10 digits (e.g., 1123456789) or 11 if '15' was used.
+    // If it looks like a local Argentinian number (usually 10 digits, e.g. 11XXXXXXXX or 2XX XXXXXXX, or 2XXX XXXXXX)
+    // or 8 digits for some regions.
+    if (cleaned.length >= 8 && cleaned.length <= 11 && /^\d+$/.test(cleaned)) {
+        // Prepend +54. If it's a mobile number like 11XXXXYYYY, some systems expect +54911XXXXYYYY.
+        // For simplicity now, we'll just add +54.
+        // If it starts with '15' (common old mobile prefix), remove it before adding +54,
+        // as '+54 11...' is more standard than '+54 15...'.
+        if (cleaned.startsWith('15') && (cleaned.length === 10 || cleaned.length === 11)) {
+            cleaned = cleaned.substring(2); // Remove '15'
+        }
+        // If after removing '15', the number starts with a common area code (like 11, 221, 341 etc.)
+        // and total length is now appropriate, prepend +54.
+        // A simple heuristic: if it's 8-10 digits now, prepend +54.
+        if (cleaned.length >= 8 && cleaned.length <= 10) {
+            // For mobile numbers, it's common to add a '9' after '+54'.
+            // Example: if number is 1123456789 (Buenos Aires mobile), it becomes +5491123456789
+            // Let's check if it's likely a mobile number (e.g., starts with 11 for BA, or other mobile area codes)
+            // This can get complex. A simpler approach:
+            // If it's 10 digits, assume it's Area Code + Number (e.g. 11 XXXX XXXX or 261 XXX XXXX)
+            // Let's try adding +54 directly for now and see.
+            // If it's likely a mobile (e.g., 10 digits starting with 11, 15, or area codes that are mostly mobile)
+            // For now, a general rule: if 10 digits, add '+549', otherwise '+54' for shorter numbers (might be landlines)
+            if (cleaned.length === 10) {
+                return '+549' + cleaned;
+            }
+            return '+54' + cleaned;
+        }
+    }
+    // If no specific Argentinian rule matched, return the original cleaned number or original if it had '+'
+    return phoneNumber.replace(/[^\d+]/g, '').startsWith('+') ? phoneNumber.replace(/[^\d+]/g, '') : cleaned;
+}
 function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
@@ -446,13 +494,13 @@ function AuthProvider({ children }) {
             const userCredential = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$node$2d$esm$2f$totp$2d$219bb96f$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__aa__as__createUserWithEmailAndPassword$3e$__["createUserWithEmailAndPassword"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["auth"], data.email, data.password);
             const user = userCredential.user;
             if (user) {
-                // Save additional user data to Firestore
+                const normalizedPhoneNumber = normalizeArgentinianPhoneNumber(data.phoneNumber);
                 const userDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["firestore"], 'users', user.uid);
                 const userData = {
                     uid: user.uid,
                     email: user.email,
                     fullName: data.fullName,
-                    phoneNumber: data.phoneNumber,
+                    phoneNumber: normalizedPhoneNumber,
                     createdAt: new Date().toISOString()
                 };
                 console.log("Attempting to save user data to Firestore:", userData);
@@ -461,10 +509,6 @@ function AuthProvider({ children }) {
                     console.log("User data successfully saved to Firestore for UID:", user.uid);
                 } catch (firestoreError) {
                     console.error("Error saving user data to Firestore:", firestoreError);
-                    // Optionally, you might want to handle this error more gracefully,
-                    // e.g., by deleting the Firebase Auth user if Firestore write fails,
-                    // or by returning a specific error object.
-                    // For now, we'll just log it and return the auth error object if it exists, or a new one.
                     return {
                         code: 'firestore/save-error',
                         message: `User created in Auth, but failed to save data to Firestore: ${firestoreError.message}`
@@ -512,7 +556,7 @@ function AuthProvider({ children }) {
         children: !loading && children
     }, void 0, false, {
         fileName: "[project]/src/context/AuthContext.tsx",
-        lineNumber: 114,
+        lineNumber: 163,
         columnNumber: 10
     }, this);
 }
