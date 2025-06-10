@@ -23,7 +23,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
+  FormLabel, // This is the context-aware one
   FormMessage,
 } from '@/components/ui/form';
 import { PageHeader } from '@/components/page-header';
@@ -39,8 +39,8 @@ import {
   getTimeSlotSettings,
   updateTimeSlotSetting,
   type TimeSlotSetting,
-  getMessageTemplate,     // New import
-  updateMessageTemplate,  // New import
+  getMessageTemplate,
+  updateMessageTemplate,
 } from '@/app/actions';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
@@ -49,7 +49,7 @@ import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockI
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
-import { Label as UiLabel } from '@/components/ui/label';
+import { Label as UiLabel } from '@/components/ui/label'; // This is the generic one
 
 export default function AdminSettingsPage() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -175,9 +175,6 @@ export default function AdminSettingsPage() {
     const result = await submitSiteSettings(data);
     if (result.success) {
       toast({ title: '¡Configuración Guardada!', description: result.message });
-      // Note: The AI agent handles updating siteConfig.ts, which might require a page refresh/rebuild to see changes everywhere.
-      // This form reset might happen before siteConfig.ts is "live" with new values if not handled carefully.
-      // For now, we reset based on the data submitted, assuming it's now the "source of truth" for the form.
       settingsForm.reset({ siteName: data.siteName, siteDescription: data.siteDescription });
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
@@ -543,7 +540,7 @@ export default function AdminSettingsPage() {
                 ) : (
                     <>
                         <div className="space-y-2">
-                            <FormLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación</FormLabel>
+                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación</UiLabel>
                             <Textarea
                                 id="confirmationTemplate"
                                 value={confirmationTemplate}
@@ -564,7 +561,7 @@ export default function AdminSettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <FormLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación</FormLabel>
+                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación</UiLabel>
                             <Textarea
                                 id="cancellationTemplate"
                                 value={cancellationTemplate}
@@ -605,4 +602,3 @@ export default function AdminSettingsPage() {
   );
 }
     
-

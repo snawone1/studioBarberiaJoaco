@@ -356,6 +356,28 @@
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser"
       }
+    },
+    "40caf416edbb707356716f925239e16c8970013236": {
+      "workers": {
+        "app/admin/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/admin/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/admin/settings/page": "action-browser"
+      }
+    },
+    "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": {
+      "workers": {
+        "app/admin/settings/page": {
+          "moduleId": "[project]/.next-internal/server/app/admin/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/admin/settings/page": "action-browser"
+      }
     }
   },
   "edge": {},
