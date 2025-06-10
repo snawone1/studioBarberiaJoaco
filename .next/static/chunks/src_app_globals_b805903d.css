@@ -2329,6 +2329,10 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #ef44441a;
 }
 
+.hover\:bg-muted\/30:hover {
+  background-color: hsl(var(--muted) / .3);
+}
+
 .hover\:text-accent-foreground:hover {
   color: hsl(var(--accent-foreground));
 }

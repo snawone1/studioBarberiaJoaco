@@ -29,14 +29,25 @@ import {
 import { PageHeader } from '@/components/page-header';
 import { useAuth } from '@/context/AuthContext';
 import { siteSettingsSchema, type SiteSettingsFormValues, serviceSchema, type ServiceFormValues } from '@/lib/schemas';
-import { submitSiteSettings, getServices, addService, updateService, deleteService, type Service } from '@/app/actions';
+import { 
+  submitSiteSettings, 
+  getServices, 
+  addService, 
+  updateService, 
+  deleteService, 
+  type Service,
+  getTimeSlotSettings, // New import
+  updateTimeSlotSetting, // New import
+  type TimeSlotSetting,    // New import
+  ALL_TIME_SLOTS
+} from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image'; // Not used here but good for consistency if needed later
 import { ScrollArea } from '@/components/ui/scroll-area';
-
+import { Switch } from '@/components/ui/switch'; // New import
+import { Label as UiLabel } from '@/components/ui/label'; // For Switch label
 
 export default function AdminSettingsPage() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -50,6 +61,11 @@ export default function AdminSettingsPage() {
   const [isSubmittingService, setIsSubmittingService] = useState(false);
   const [showAddEditServiceForm, setShowAddEditServiceForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+
+  // States for Time Slot Management
+  const [timeSlotSettingsList, setTimeSlotSettingsList] = useState<TimeSlotSetting[]>([]);
+  const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
+  const [isUpdatingTimeSlot, setIsUpdatingTimeSlot] = useState<string | null>(null);
 
 
   const settingsForm = useForm<SiteSettingsFormValues>({
@@ -97,7 +113,7 @@ export default function AdminSettingsPage() {
       setServices(fetchedServices.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return dateB - dateA; // Show newest first
+        return dateB - dateA; 
       }));
     } catch (error) {
       toast({ title: 'Error', description: 'No se pudieron cargar los servicios.', variant: 'destructive' });
@@ -106,9 +122,22 @@ export default function AdminSettingsPage() {
     }
   }
 
+  async function fetchTimeSlotSettingsAdmin() {
+    setIsLoadingTimeSlots(true);
+    try {
+      const fetchedSettings = await getTimeSlotSettings();
+      setTimeSlotSettingsList(fetchedSettings);
+    } catch (error) {
+      toast({ title: 'Error', description: 'No se pudieron cargar los horarios.', variant: 'destructive' });
+    } finally {
+      setIsLoadingTimeSlots(false);
+    }
+  }
+
   useEffect(() => {
     if (currentUser?.email === 'joacoadmin@admin.com') {
       fetchAdminServices();
+      fetchTimeSlotSettingsAdmin();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
@@ -175,6 +204,23 @@ export default function AdminSettingsPage() {
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo eliminar el servicio.', variant: 'destructive' });
     }
+  }
+
+  async function handleTimeSlotToggle(time: string, isActive: boolean) {
+    setIsUpdatingTimeSlot(time);
+    const result = await updateTimeSlotSetting(time, isActive);
+    if (result.success) {
+      toast({ title: 'Horario Actualizado', description: `El horario ${time} ahora está ${isActive ? 'activo' : 'inactivo'}.` });
+      // Optimistic update or re-fetch
+      setTimeSlotSettingsList(prev => 
+        prev.map(slot => slot.time === time ? { ...slot, isActive } : slot)
+      );
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo actualizar el horario.', variant: 'destructive' });
+       // Revert optimistic update if needed, or re-fetch full list
+       fetchTimeSlotSettingsAdmin();
+    }
+    setIsUpdatingTimeSlot(null);
   }
   
   if (authLoading) {
@@ -362,14 +408,53 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Placeholder for Business Hours Configuration */}
+        {/* Business Hours Configuration */}
         <Card>
           <CardHeader>
-            <CardTitle>Horarios de Atención</CardTitle>
-            <CardDescription>Define los horarios disponibles para agendar citas.</CardDescription>
+            <CardTitle className="flex items-center">
+                <ClockIcon className="h-5 w-5 mr-2 text-primary" />
+                Horarios de Atención
+            </CardTitle>
+            <CardDescription>Define los horarios disponibles para agendar citas. Desactiva los horarios que no estarán disponibles.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Próximamente: Configuración de horarios aquí.</p>
+            {isLoadingTimeSlots ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+            ) : timeSlotSettingsList.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
+                <p className="font-medium">No se pudieron cargar los horarios.</p>
+                <p className="text-sm">Intenta recargar la página o contacta a soporte.</p>
+              </div>
+            ) : (
+              <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
+                <div className="space-y-1 p-3">
+                  {timeSlotSettingsList.map((slotSetting) => (
+                    <div key={slotSetting.time} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                      <UiLabel htmlFor={`timeslot-${slotSetting.time.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">
+                        {slotSetting.time}
+                      </UiLabel>
+                      <div className="flex items-center space-x-2">
+                        {isUpdatingTimeSlot === slotSetting.time ? (
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        ) : (
+                           <Switch
+                            id={`timeslot-${slotSetting.time.replace(/\s|:/g, '-')}`}
+                            checked={slotSetting.isActive}
+                            onCheckedChange={(checked) => handleTimeSlotToggle(slotSetting.time, checked)}
+                            aria-label={`Activar o desactivar horario ${slotSetting.time}`}
+                          />
+                        )}
+                        {slotSetting.isActive ? 
+                           <Check className="h-5 w-5 text-green-500" /> : 
+                           <X className="h-5 w-5 text-destructive" />
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
           </CardContent>
         </Card>
 
@@ -387,3 +472,5 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
+    
