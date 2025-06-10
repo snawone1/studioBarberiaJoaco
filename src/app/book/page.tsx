@@ -51,7 +51,7 @@ export default function BookAppointmentPage() {
   const [dynamicServices, setDynamicServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
 
-  const [activeTimeSlots, setActiveTimeSlots] = useState<TimeSlotSetting[]>([]);
+  const [activeTimeSlotSettings, setActiveTimeSlotSettings] = useState<TimeSlotSetting[]>([]);
   const [isLoadingSlotSettings, setIsLoadingSlotSettings] = useState(true);
 
 
@@ -83,7 +83,7 @@ export default function BookAppointmentPage() {
       setIsLoadingSlotSettings(true);
       try {
         const settings = await getTimeSlotSettings();
-        setActiveTimeSlots(settings);
+        setActiveTimeSlotSettings(settings);
       } catch (error) {
         console.error("Error fetching time slot settings from book/page:", error);
         toast({ title: 'Error', description: 'No se pudieron cargar las configuraciones de horarios.', variant: 'destructive' });
@@ -95,7 +95,7 @@ export default function BookAppointmentPage() {
     fetchPageServices();
     fetchSlotSettings();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Changed dependency from [toast] to [] to run once on mount
+  }, []); 
 
 
   const watchedDate = form.watch('preferredDate');
@@ -231,6 +231,11 @@ export default function BookAppointmentPage() {
        }
     }
   }
+
+  const currentlyActiveSlots = ALL_TIME_SLOTS.filter(slot => {
+    const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
+    return slotSetting ? slotSetting.isActive : true; // Default to active if not found
+  });
   
   return (
     <div className="container mx-auto px-4 py-12">
@@ -308,11 +313,11 @@ export default function BookAppointmentPage() {
                       </div>
                     ) : (
                       <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {ALL_TIME_SLOTS.map((slot) => {
-                            const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                        {currentlyActiveSlots.map((slot) => {
+                            const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
                             let slotIsTooSoonOrPast = false;
 
-                            if (isToday) {
+                            if (watchedDate && isToday) {
                                 const timeParts = slot.split(' ');
                                 const timeDigits = timeParts[0].split(':');
                                 let slotHours = parseInt(timeDigits[0]);
@@ -333,9 +338,8 @@ export default function BookAppointmentPage() {
                             }
                             
                             const isSlotBooked = bookedSlots.includes(slot);
-                            const slotSetting = activeTimeSlots.find(s => s.time === slot);
-                            const isSlotActive = slotSetting ? slotSetting.isActive : true;
-                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast || !isSlotActive;
+                            // Deactivated slots are already filtered out from currentlyActiveSlots
+                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
 
                             return (
                                <Button
@@ -347,7 +351,7 @@ export default function BookAppointmentPage() {
                                     selectedTimeSlot === slot && !isDisabled
                                       ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                       : isDisabled 
-                                        ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed"
+                                        ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed" // Only booked or past slots get this style
                                         : "text-foreground hover:bg-muted"
                                   )}
                                   onClick={() => {
@@ -362,10 +366,10 @@ export default function BookAppointmentPage() {
                                 </Button>
                             );
                         })}
-                        {ALL_TIME_SLOTS.filter(slot => {
-                            const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
+                        {currentlyActiveSlots.filter(slot => {
+                            const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
                             let slotIsTooSoonOrPast = false;
-                            if (isToday) {
+                            if (watchedDate && isToday) {
                                 const timeParts = slot.split(' ');
                                 const timeDigits = timeParts[0].split(':');
                                 let slotHours = parseInt(timeDigits[0]);
@@ -378,10 +382,8 @@ export default function BookAppointmentPage() {
                                 const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
                                 if (slotStartDateTime <= cutoffTime) slotIsTooSoonOrPast = true;
                             }
-                            const slotSetting = activeTimeSlots.find(s => s.time === slot);
-                            const isSlotActive = slotSetting ? slotSetting.isActive : true;
-                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast && isSlotActive;
-                        }).length === 0 && (
+                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast;
+                        }).length === 0 && watchedDate && !isLoadingBookedSlots && !isLoadingSlotSettings && (
                            <p className="text-sm text-muted-foreground text-center col-span-full">
                              No hay horarios disponibles para esta fecha.
                            </p>
