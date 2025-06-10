@@ -48,7 +48,8 @@ import {
   type Appointment,
   getUsers,
   type UserDetail,
-  getMessageTemplate, // Import getMessageTemplate
+  getMessageTemplate,
+  getServices, // Ensure getServices is imported
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
@@ -263,7 +264,13 @@ export default function AdminPage() {
           const clientName = appointmentToConfirm.userName;
           const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToConfirm.preferredTime;
-          const servicesText = appointmentToConfirm.services.join(', ') || 'No especificados';
+          
+          const allServices = await getServices();
+          const serviceNames = appointmentToConfirm.services.map(serviceId => {
+            const serviceDetail = allServices.find(s => s.id === serviceId);
+            return serviceDetail ? serviceDetail.name : serviceId; 
+          });
+          const servicesText = serviceNames.join(', ') || 'No especificados';
           
           messageContent = messageContent
             .replace(/\{\{clientName\}\}/g, clientName)
@@ -312,7 +319,13 @@ export default function AdminPage() {
           const clientName = appointmentToCancel.userName;
           const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToCancel.preferredTime;
-          const servicesText = appointmentToCancel.services.join(', ') || 'No especificados';
+          
+          const allServices = await getServices();
+          const serviceNames = appointmentToCancel.services.map(serviceId => {
+            const serviceDetail = allServices.find(s => s.id === serviceId);
+            return serviceDetail ? serviceDetail.name : serviceId; 
+          });
+          const servicesText = serviceNames.join(', ') || 'No especificados';
 
           messageContent = messageContent
             .replace(/\{\{clientName\}\}/g, clientName)
