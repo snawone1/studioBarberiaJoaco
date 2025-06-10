@@ -28,19 +28,13 @@ import { es } from 'date-fns/locale';
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
-import { submitAppointmentRequest, getBookedSlotsForDate, getServices, type Service } from '@/app/actions';
+import { submitAppointmentRequest, getBookedSlotsForDate, getServices, type Service, getTimeSlotSettings, type TimeSlotSetting } from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { ALL_TIME_SLOTS } from '@/lib/constants';
 
-
-const timeSlots = [
-  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", 
-  "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", 
-  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
-  "06:00 PM", "06:30 PM", "07:00 PM"
-];
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
 const now = new Date(); 
@@ -56,6 +50,9 @@ export default function BookAppointmentPage() {
 
   const [dynamicServices, setDynamicServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
+
+  const [activeTimeSlots, setActiveTimeSlots] = useState<TimeSlotSetting[]>([]);
+  const [isLoadingSlotSettings, setIsLoadingSlotSettings] = useState(true);
 
 
   const form = useForm<ClientAppointmentFormValues>({
@@ -81,9 +78,24 @@ export default function BookAppointmentPage() {
         setIsLoadingServices(false);
       }
     }
+
+    async function fetchSlotSettings() {
+      setIsLoadingSlotSettings(true);
+      try {
+        const settings = await getTimeSlotSettings();
+        setActiveTimeSlots(settings);
+      } catch (error) {
+        console.error("Error fetching time slot settings from book/page:", error);
+        toast({ title: 'Error', description: 'No se pudieron cargar las configuraciones de horarios.', variant: 'destructive' });
+      } finally {
+        setIsLoadingSlotSettings(false);
+      }
+    }
+
     fetchPageServices();
+    fetchSlotSettings();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Changed dependency from [toast] to [] to run once on mount
 
 
   const watchedDate = form.watch('preferredDate');
@@ -260,7 +272,7 @@ export default function BookAppointmentPage() {
                         selected={field.value}
                         onSelect={(date) => {
                           field.onChange(date);
-                          setIsCalendarOpen(false); // Close popover on date select
+                          setIsCalendarOpen(false); 
                         }}
                         disabled={(date) =>
                           date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
@@ -289,14 +301,14 @@ export default function BookAppointmentPage() {
                   <div className="min-h-[70px] py-2">
                     {!watchedDate ? (
                       <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
-                    ) : isLoadingBookedSlots ? (
+                    ) : isLoadingBookedSlots || isLoadingSlotSettings ? (
                       <div key="loading-slots" className="flex justify-center items-center h-full">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         <span className="ml-2">Cargando horarios...</span>
                       </div>
                     ) : (
                       <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {timeSlots.map((slot) => {
+                        {ALL_TIME_SLOTS.map((slot) => {
                             const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
                             let slotIsTooSoonOrPast = false;
 
@@ -321,7 +333,9 @@ export default function BookAppointmentPage() {
                             }
                             
                             const isSlotBooked = bookedSlots.includes(slot);
-                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
+                            const slotSetting = activeTimeSlots.find(s => s.time === slot);
+                            const isSlotActive = slotSetting ? slotSetting.isActive : true;
+                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast || !isSlotActive;
 
                             return (
                                <Button
@@ -348,7 +362,7 @@ export default function BookAppointmentPage() {
                                 </Button>
                             );
                         })}
-                        {timeSlots.filter(slot => {
+                        {ALL_TIME_SLOTS.filter(slot => {
                             const isToday = format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd');
                             let slotIsTooSoonOrPast = false;
                             if (isToday) {
@@ -364,7 +378,9 @@ export default function BookAppointmentPage() {
                                 const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
                                 if (slotStartDateTime <= cutoffTime) slotIsTooSoonOrPast = true;
                             }
-                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast;
+                            const slotSetting = activeTimeSlots.find(s => s.time === slot);
+                            const isSlotActive = slotSetting ? slotSetting.isActive : true;
+                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast && isSlotActive;
                         }).length === 0 && (
                            <p className="text-sm text-muted-foreground text-center col-span-full">
                              No hay horarios disponibles para esta fecha.
@@ -467,15 +483,15 @@ export default function BookAppointmentPage() {
              <Button 
                 type="submit" 
                 className="w-full py-6 text-lg" 
-                disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices}
+                disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
               >
               <Loader2 
                 className={cn(
                   "mr-2 h-5 w-5 animate-spin",
-                  (isLoading || isLoadingBookedSlots || isLoadingServices) ? "inline-block" : "hidden"
+                  (isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
                 )} 
               />
-              {isLoading || isLoadingBookedSlots || isLoadingServices ? (
+              {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
                 'Procesando...'
               ) : (
                 currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
@@ -492,3 +508,4 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+

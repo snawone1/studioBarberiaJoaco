@@ -236,6 +236,7 @@ __turbopack_context__.s({
     "loginSchema": (()=>loginSchema),
     "productSchema": (()=>productSchema),
     "registerSchema": (()=>registerSchema),
+    "serviceSchema": (()=>serviceSchema),
     "siteSettingsSchema": (()=>siteSettingsSchema),
     "styleAdvisorSchema": (()=>styleAdvisorSchema)
 });
@@ -331,6 +332,18 @@ const productSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modul
     stock: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].coerce.number().min(0, {
         message: "El stock no puede ser negativo."
     }).optional().default(0)
+});
+const serviceSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].object({
+    id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().optional(),
+    name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(3, {
+        message: "El nombre del servicio debe tener al menos 3 caracteres."
+    }),
+    description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(5, {
+        message: "La descripción debe tener al menos 5 caracteres."
+    }),
+    price: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, {
+        message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX"
+    })
 });
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
