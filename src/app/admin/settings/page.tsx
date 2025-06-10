@@ -36,17 +36,17 @@ import {
   updateService, 
   deleteService, 
   type Service,
-  getTimeSlotSettings, // New import
-  updateTimeSlotSetting, // New import
-  type TimeSlotSetting,    // New import
-  ALL_TIME_SLOTS
+  getTimeSlotSettings,
+  updateTimeSlotSetting,
+  type TimeSlotSetting,
 } from '@/app/actions';
+import { ALL_TIME_SLOTS } from '@/lib/constants'; // Import ALL_TIME_SLOTS from the new location
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
 import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Switch } from '@/components/ui/switch'; // New import
+import { Switch } from '@/components/ui/switch';
 import { Label as UiLabel } from '@/components/ui/label'; // For Switch label
 
 export default function AdminSettingsPage() {
@@ -420,12 +420,37 @@ export default function AdminSettingsPage() {
           <CardContent>
             {isLoadingTimeSlots ? (
               <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : timeSlotSettingsList.length === 0 ? (
+            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( // Check if ALL_TIME_SLOTS is also empty
               <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
                 <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
-                <p className="font-medium">No se pudieron cargar los horarios.</p>
-                <p className="text-sm">Intenta recargar la página o contacta a soporte.</p>
+                <p className="font-medium">No hay horarios configurados en el sistema.</p>
+                <p className="text-sm">Contacta a soporte si esto es un error.</p>
               </div>
+            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( // Show ALL_TIME_SLOTS if settings list is empty but master list exists
+                 <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
+                    <div className="space-y-1 p-3">
+                      {ALL_TIME_SLOTS.map((slotTime) => (
+                        <div key={slotTime} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                          <UiLabel htmlFor={`timeslot-${slotTime.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">
+                            {slotTime}
+                          </UiLabel>
+                          <div className="flex items-center space-x-2">
+                            {isUpdatingTimeSlot === slotTime ? (
+                              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                            ) : (
+                              <Switch
+                                id={`timeslot-${slotTime.replace(/\s|:/g, '-')}`}
+                                checked={true} // Default to active if not in timeSlotSettingsList
+                                onCheckedChange={(checked) => handleTimeSlotToggle(slotTime, checked)}
+                                aria-label={`Activar o desactivar horario ${slotTime}`}
+                              />
+                            )}
+                            <Check className="h-5 w-5 text-green-500" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                </ScrollArea>
             ) : (
               <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
                 <div className="space-y-1 p-3">

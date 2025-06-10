@@ -7,6 +7,7 @@ import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
 import { firestore } from '@/lib/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getDoc, query, where, orderBy, setDoc } from 'firebase/firestore';
+import { ALL_TIME_SLOTS } from '@/lib/constants'; // Import the constant
 
 // Firestore collection references
 const appointmentsCollectionRef = collection(firestore, 'appointments');
@@ -57,12 +58,7 @@ export type TimeSlotSetting = {
 };
 
 // --- CONSTANTS ---
-export const ALL_TIME_SLOTS = [
-  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-  "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM",
-  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
-  "06:00 PM", "06:30 PM", "07:00 PM"
-];
+// ALL_TIME_SLOTS is now imported from '@/lib/constants'
 
 
 // --- User Management Actions ---
@@ -533,6 +529,7 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
       savedSettingsMap.set(docSnap.id, docSnap.data().isActive as boolean);
     });
 
+    // Use the imported ALL_TIME_SLOTS
     const settings = ALL_TIME_SLOTS.map(time => ({
       time,
       isActive: savedSettingsMap.get(time) ?? true, 
@@ -540,6 +537,7 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
     return settings;
   } catch (error) {
     console.error("Error fetching time slot settings:", error);
+    // Use the imported ALL_TIME_SLOTS
     return ALL_TIME_SLOTS.map(time => ({ time, isActive: true }));
   }
 }
