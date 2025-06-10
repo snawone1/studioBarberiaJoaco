@@ -39,15 +39,17 @@ import {
   getTimeSlotSettings,
   updateTimeSlotSetting,
   type TimeSlotSetting,
+  getMessageTemplate,     // New import
+  updateMessageTemplate,  // New import
 } from '@/app/actions';
-import { ALL_TIME_SLOTS } from '@/lib/constants'; // Import ALL_TIME_SLOTS from the new location
+import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
-import { Label as UiLabel } from '@/components/ui/label'; // For Switch label
+import { Label as UiLabel } from '@/components/ui/label';
 
 export default function AdminSettingsPage() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -66,6 +68,14 @@ export default function AdminSettingsPage() {
   const [timeSlotSettingsList, setTimeSlotSettingsList] = useState<TimeSlotSetting[]>([]);
   const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
   const [isUpdatingTimeSlot, setIsUpdatingTimeSlot] = useState<string | null>(null);
+
+  // States for WhatsApp Message Templates
+  const [confirmationTemplate, setConfirmationTemplate] = useState('');
+  const [cancellationTemplate, setCancellationTemplate] = useState('');
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [isSubmittingTemplate, setIsSubmittingTemplate] = useState<'confirmation' | 'cancellation' | null>(null);
+
+  const availablePlaceholders = ['{{clientName}}', '{{appointmentDate}}', '{{appointmentTime}}', '{{siteName}}', '{{servicesList}}'];
 
 
   const settingsForm = useForm<SiteSettingsFormValues>({
@@ -134,10 +144,27 @@ export default function AdminSettingsPage() {
     }
   }
 
+  async function fetchMessageTemplates() {
+    setIsLoadingTemplates(true);
+    try {
+      const [confTemplate, cancTemplate] = await Promise.all([
+        getMessageTemplate('confirmation'),
+        getMessageTemplate('cancellation')
+      ]);
+      setConfirmationTemplate(confTemplate);
+      setCancellationTemplate(cancTemplate);
+    } catch (error) {
+      toast({ title: 'Error', description: 'No se pudieron cargar las plantillas de mensajes.', variant: 'destructive' });
+    } finally {
+      setIsLoadingTemplates(false);
+    }
+  }
+
   useEffect(() => {
     if (currentUser?.email === 'joacoadmin@admin.com') {
       fetchAdminServices();
       fetchTimeSlotSettingsAdmin();
+      fetchMessageTemplates();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
@@ -148,6 +175,10 @@ export default function AdminSettingsPage() {
     const result = await submitSiteSettings(data);
     if (result.success) {
       toast({ title: '¡Configuración Guardada!', description: result.message });
+      // Note: The AI agent handles updating siteConfig.ts, which might require a page refresh/rebuild to see changes everywhere.
+      // This form reset might happen before siteConfig.ts is "live" with new values if not handled carefully.
+      // For now, we reset based on the data submitted, assuming it's now the "source of truth" for the form.
+      settingsForm.reset({ siteName: data.siteName, siteDescription: data.siteDescription });
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
     }
@@ -211,16 +242,26 @@ export default function AdminSettingsPage() {
     const result = await updateTimeSlotSetting(time, isActive);
     if (result.success) {
       toast({ title: 'Horario Actualizado', description: `El horario ${time} ahora está ${isActive ? 'activo' : 'inactivo'}.` });
-      // Optimistic update or re-fetch
       setTimeSlotSettingsList(prev => 
         prev.map(slot => slot.time === time ? { ...slot, isActive } : slot)
       );
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo actualizar el horario.', variant: 'destructive' });
-       // Revert optimistic update if needed, or re-fetch full list
        fetchTimeSlotSettingsAdmin();
     }
     setIsUpdatingTimeSlot(null);
+  }
+
+  async function handleSaveTemplate(templateId: 'confirmation' | 'cancellation') {
+    setIsSubmittingTemplate(templateId);
+    const content = templateId === 'confirmation' ? confirmationTemplate : cancellationTemplate;
+    const result = await updateMessageTemplate(templateId, content);
+    if (result.success) {
+      toast({ title: 'Plantilla Guardada', description: result.message });
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo guardar la plantilla.', variant: 'destructive' });
+    }
+    setIsSubmittingTemplate(null);
   }
   
   if (authLoading) {
@@ -248,6 +289,7 @@ export default function AdminSettingsPage() {
       />
 
       <div className="max-w-2xl mx-auto space-y-8">
+        {/* General Site Info */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -420,13 +462,13 @@ export default function AdminSettingsPage() {
           <CardContent>
             {isLoadingTimeSlots ? (
               <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( // Check if ALL_TIME_SLOTS is also empty
+            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( 
               <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
                 <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
                 <p className="font-medium">No hay horarios configurados en el sistema.</p>
                 <p className="text-sm">Contacta a soporte si esto es un error.</p>
               </div>
-            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( // Show ALL_TIME_SLOTS if settings list is empty but master list exists
+            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( 
                  <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
                     <div className="space-y-1 p-3">
                       {ALL_TIME_SLOTS.map((slotTime) => (
@@ -440,7 +482,7 @@ export default function AdminSettingsPage() {
                             ) : (
                               <Switch
                                 id={`timeslot-${slotTime.replace(/\s|:/g, '-')}`}
-                                checked={true} // Default to active if not in timeSlotSettingsList
+                                checked={true} 
                                 onCheckedChange={(checked) => handleTimeSlotToggle(slotTime, checked)}
                                 aria-label={`Activar o desactivar horario ${slotTime}`}
                               />
@@ -483,19 +525,84 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Placeholder for WhatsApp Messages Configuration */}
+        {/* WhatsApp Messages Configuration */}
         <Card>
-          <CardHeader>
-            <CardTitle>Mensajes de WhatsApp</CardTitle>
-            <CardDescription>Personaliza los mensajes de confirmación y cancelación.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">Próximamente: Configuración de plantillas de mensajes aquí.</p>
-          </CardContent>
+            <CardHeader>
+                <CardTitle className="flex items-center">
+                    <MessageSquareIcon className="h-5 w-5 mr-2 text-primary" />
+                    Mensajes de WhatsApp
+                </CardTitle>
+                <CardDescription>
+                    Personaliza los mensajes de confirmación y cancelación de citas.
+                    Utiliza los marcadores de posición disponibles para incluir detalles dinámicos.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {isLoadingTemplates ? (
+                     <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+                ) : (
+                    <>
+                        <div className="space-y-2">
+                            <FormLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación</FormLabel>
+                            <Textarea
+                                id="confirmationTemplate"
+                                value={confirmationTemplate}
+                                onChange={(e) => setConfirmationTemplate(e.target.value)}
+                                placeholder="Escribe tu mensaje de confirmación aquí..."
+                                rows={5}
+                                className="text-sm"
+                            />
+                            <Button 
+                                onClick={() => handleSaveTemplate('confirmation')} 
+                                disabled={isSubmittingTemplate === 'confirmation'}
+                                size="sm"
+                                className="mt-2"
+                            >
+                                {isSubmittingTemplate === 'confirmation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Guardar Confirmación
+                            </Button>
+                        </div>
+
+                        <div className="space-y-2">
+                            <FormLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación</FormLabel>
+                            <Textarea
+                                id="cancellationTemplate"
+                                value={cancellationTemplate}
+                                onChange={(e) => setCancellationTemplate(e.target.value)}
+                                placeholder="Escribe tu mensaje de cancelación aquí..."
+                                rows={5}
+                                className="text-sm"
+                            />
+                            <Button 
+                                onClick={() => handleSaveTemplate('cancellation')} 
+                                disabled={isSubmittingTemplate === 'cancellation'}
+                                size="sm"
+                                className="mt-2"
+                            >
+                                {isSubmittingTemplate === 'cancellation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Guardar Cancelación
+                            </Button>
+                        </div>
+                    </>
+                )}
+                 <Card className="mt-4 bg-secondary/30">
+                    <CardHeader className="pb-2 pt-3">
+                        <CardTitle className="text-sm font-medium flex items-center">
+                            <InfoIcon className="h-4 w-4 mr-2 text-primary" />
+                            Marcadores de Posición Disponibles
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0 pb-3">
+                        <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
+                            {availablePlaceholders.map(ph => <li key={ph}><code>{ph}</code></li>)}
+                        </ul>
+                    </CardContent>
+                </Card>
+            </CardContent>
         </Card>
       </div>
     </div>
   );
 }
-
     
+

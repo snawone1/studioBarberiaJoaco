@@ -7,7 +7,8 @@ import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
 import { firestore } from '@/lib/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, Timestamp, updateDoc, getDoc, query, where, orderBy, setDoc } from 'firebase/firestore';
-import { ALL_TIME_SLOTS } from '@/lib/constants'; // Import the constant
+import { ALL_TIME_SLOTS } from '@/lib/constants'; 
+import { siteConfig } from '@/config/site';
 
 // Firestore collection references
 const appointmentsCollectionRef = collection(firestore, 'appointments');
@@ -15,15 +16,16 @@ const productsCollectionRef = collection(firestore, 'products');
 const usersCollectionRef = collection(firestore, 'users');
 const servicesCollectionRef = collection(firestore, 'services');
 const timeSlotSettingsCollectionRef = collection(firestore, 'timeSlotSettings');
+const messageTemplatesCollectionRef = collection(firestore, 'messageTemplates');
 
 
 // --- User Types ---
 export type UserDetail = {
-  id: string; // Firestore document ID (which is user.uid)
+  id: string; 
   fullName: string;
   email: string;
   phoneNumber: string;
-  createdAt: string; // ISO string
+  createdAt: string; 
 };
 
 
@@ -34,12 +36,12 @@ export type Appointment = {
   userName?: string;
   userEmail?: string;
   userPhone?: string;
-  preferredDate: string; // ISO string for client
+  preferredDate: string; 
   preferredTime: string;
-  services: string[]; // Array of service IDs
+  services: string[]; 
   message?: string;
-  status: string; // Kept as string for DB flexibility, UI will handle known states
-  createdAt: string; // ISO string for client
+  status: string; 
+  createdAt: string; 
 };
 
 // --- Service Type ---
@@ -48,7 +50,7 @@ export type Service = {
   name: string;
   description: string;
   price: string;
-  createdAt?: string; // ISO string
+  createdAt?: string; 
 };
 
 // --- Time Slot Settings Types ---
@@ -57,8 +59,11 @@ export type TimeSlotSetting = {
   isActive: boolean;
 };
 
-// --- CONSTANTS ---
-// ALL_TIME_SLOTS is now imported from '@/lib/constants'
+// --- Message Template Type ---
+export type MessageTemplate = {
+  id: string; // e.g., 'confirmation', 'cancellation'
+  content: string;
+};
 
 
 // --- User Management Actions ---
@@ -187,7 +192,8 @@ export async function getAppointments(): Promise<Appointment[]> {
 
       for (const batchUserIds of userBatches) {
         if (batchUserIds.length === 0) continue;
-        const qUsers = query(usersCollectionRef, where('uid', 'in', batchUserIds));
+        // Firestore `in` queries are limited to 30 items per query
+        const qUsers = query(collection(firestore, 'users'), where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
           const userData = docSnap.data();
@@ -304,9 +310,14 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
   console.log('Site Settings Update Received by Server Action:', data);
-  revalidatePath('/admin/settings');
-  return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página).' };
+  // The actual update to siteConfig.ts is handled by the AI agent's XML response.
+  // This server action primarily serves to receive the form data and trigger revalidation if needed.
+  revalidatePath('/admin/settings'); // Revalidate the settings page
+  // Revalidate other paths if siteName/description are used in their layout/metadata directly and not through siteConfig
+  revalidatePath('/'); // Example: revalidate homepage if it uses siteName in header/footer directly
+  return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página o reconstrucción).' };
 }
+
 
 // --- Product Management Actions ---
 export async function getProducts(): Promise<Product[]> {
@@ -525,11 +536,10 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
   try {
     const snapshot = await getDocs(timeSlotSettingsCollectionRef);
     const savedSettingsMap = new Map<string, boolean>();
-    snapshot.forEach(docSnap => {
+    snapshot.forEach(docSnap => { 
       savedSettingsMap.set(docSnap.id, docSnap.data().isActive as boolean);
     });
 
-    // Use the imported ALL_TIME_SLOTS
     const settings = ALL_TIME_SLOTS.map(time => ({
       time,
       isActive: savedSettingsMap.get(time) ?? true, 
@@ -537,14 +547,13 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
     return settings;
   } catch (error) {
     console.error("Error fetching time slot settings:", error);
-    // Use the imported ALL_TIME_SLOTS
     return ALL_TIME_SLOTS.map(time => ({ time, isActive: true }));
   }
 }
 
 export async function updateTimeSlotSetting(time: string, isActive: boolean) {
   try {
-    const settingDocRef = doc(timeSlotSettingsCollectionRef, time);
+    const settingDocRef = doc(timeSlotSettingsCollectionRef, time); 
     await setDoc(settingDocRef, { time, isActive }); 
     revalidatePath('/admin/settings');
     revalidatePath('/book');
@@ -555,5 +564,35 @@ export async function updateTimeSlotSetting(time: string, isActive: boolean) {
   }
 }
 
+// --- WhatsApp Message Template Actions ---
+const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. ¡Te esperamos!`;
+const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
 
+export async function getMessageTemplate(templateId: 'confirmation' | 'cancellation'): Promise<string> {
+  try {
+    const templateDocRef = doc(messageTemplatesCollectionRef, templateId);
+    const docSnap = await getDoc(templateDocRef);
+    if (docSnap.exists()) {
+      return docSnap.data().content as string;
+    }
+    // Return default if not found
+    return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+  } catch (error) {
+    console.error(`Error fetching message template ${templateId}:`, error);
+    // Return default on error
+    return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+  }
+}
+
+export async function updateMessageTemplate(templateId: 'confirmation' | 'cancellation', content: string) {
+  try {
+    const templateDocRef = doc(messageTemplatesCollectionRef, templateId);
+    await setDoc(templateDocRef, { content });
+    revalidatePath('/admin/settings');
+    return { success: true, message: `Plantilla de mensaje de ${templateId} actualizada.` };
+  } catch (error) {
+    console.error(`Error updating message template ${templateId}:`, error);
+    return { success: false, message: `Error al actualizar la plantilla de ${templateId}.` };
+  }
+}
     
