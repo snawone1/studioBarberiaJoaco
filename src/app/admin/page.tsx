@@ -33,20 +33,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 // import { Textarea } from '@/components/ui/textarea'; // No longer used here
 import { ScrollArea } from '@/components/ui/scroll-area';
-// import {
-//   Form, // No longer used here
-//   FormControl, // No longer used here
-//   FormField, // No longer used here
-//   FormItem, // No longer used here
-//   FormLabel, // No longer used here
-//   FormMessage, // No longer used here
-// } from '@/components/ui/form'; // No longer used here
-// import { useForm } from 'react-hook-form'; // No longer used here
-// import { zodResolver } from '@hookform/resolvers/zod'; // No longer used here
-// import { siteSettingsSchema, type SiteSettingsFormValues } from '@/lib/schemas'; // No longer used here
+import {
+  Form, FormLabel, FormControl, FormField, FormItem, FormMessage
+} from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea'; // Needed for product form
 import { productSchema, type ProductFormValues } from '@/lib/schemas';
 import { 
-  // submitSiteSettings, // No longer used here for dialog
   getProducts, 
   addProduct, 
   deleteProduct, 
@@ -55,7 +47,8 @@ import {
   updateAppointmentStatus, 
   type Appointment,
   getUsers,
-  type UserDetail
+  type UserDetail,
+  getMessageTemplate, // Import getMessageTemplate
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
@@ -67,8 +60,8 @@ import { es } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form'; // Still needed for product form
-import { zodResolver } from '@hookform/resolvers/zod'; // Still needed for product form
+import { useForm } from 'react-hook-form'; 
+import { zodResolver } from '@hookform/resolvers/zod'; 
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
@@ -76,9 +69,6 @@ export default function AdminPage() {
   const { currentUser, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-
-  // const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false); // Replaced by navigation
-  // const [isSubmittingSettings, setIsSubmittingSettings] = useState(false); // Replaced by navigation
 
   const [isProductManagerOpen, setIsProductManagerOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -105,15 +95,6 @@ export default function AdminPage() {
   const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
   const [sendCancelWhatsAppNotification, setSendCancelWhatsAppNotification] = useState(true);
 
-
-  // const settingsForm = useForm<SiteSettingsFormValues>({ // Moved to settings page
-  //   resolver: zodResolver(siteSettingsSchema),
-  //   defaultValues: {
-  //     siteName: siteConfig.name,
-  //     siteDescription: siteConfig.description,
-  //   },
-  // });
-
   const productForm = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -131,15 +112,6 @@ export default function AdminPage() {
       router.push('/login?redirect=/admin');
     }
   }, [currentUser, loading, router]);
-
-  // useEffect(() => { // Moved to settings page
-  //   if (isSettingsDialogOpen) {
-  //     settingsForm.reset({
-  //       siteName: siteConfig.name,
-  //       siteDescription: siteConfig.description,
-  //     });
-  //   }
-  // }, [isSettingsDialogOpen, settingsForm]);
   
   async function fetchProductsAdmin() {
     if (isProductManagerOpen) {
@@ -208,19 +180,6 @@ export default function AdminPage() {
     fetchAllUsersAdmin();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUserManagerOpen, currentUser]);
-
-
-  // async function onSiteSettingsSubmit(data: SiteSettingsFormValues) { // Moved to settings page
-  //   setIsSubmittingSettings(true);
-  //   const result = await submitSiteSettings(data);
-  //   if (result.success) {
-  //     toast({ title: '¡Configuración Guardada!', description: result.message });
-  //     setIsSettingsDialogOpen(false);
-  //   } else {
-  //     toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
-  //   }
-  //   setIsSubmittingSettings(false);
-  // }
 
   const handleAddNewProductClick = () => {
     setEditingProduct(null);
@@ -299,16 +258,27 @@ export default function AdminPage() {
       fetchAppointmentsAdmin(); 
 
       if (sendWhatsAppNotification && appointmentToConfirm.userPhone && appointmentToConfirm.userName) {
-        const clientName = appointmentToConfirm.userName;
-        const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
-        const apptTime = appointmentToConfirm.preferredTime;
-        
-        const message = encodeURIComponent(
-          `Hola ${clientName}, tu cita en ${siteConfig.name} para el ${apptDate} a las ${apptTime} ha sido CONFIRMADA. ¡Te esperamos!`
-        );
-        const cleanedPhoneNumber = appointmentToConfirm.userPhone.replace(/\D/g, '');
-        const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
+        try {
+          let messageContent = await getMessageTemplate('confirmation');
+          const clientName = appointmentToConfirm.userName;
+          const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
+          const apptTime = appointmentToConfirm.preferredTime;
+          const servicesText = appointmentToConfirm.services.join(', ') || 'No especificados';
+          
+          messageContent = messageContent
+            .replace(/\{\{clientName\}\}/g, clientName)
+            .replace(/\{\{appointmentDate\}\}/g, apptDate)
+            .replace(/\{\{appointmentTime\}\}/g, apptTime)
+            .replace(/\{\{siteName\}\}/g, siteConfig.name)
+            .replace(/\{\{servicesList\}\}/g, servicesText);
+
+          const cleanedPhoneNumber = appointmentToConfirm.userPhone.replace(/\D/g, '');
+          const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
+          window.open(whatsappUrl, '_blank');
+        } catch (templateError) {
+          console.error("Error processing WhatsApp template for confirmation:", templateError);
+          toast({ title: 'Error de Plantilla', description: 'No se pudo generar el mensaje de WhatsApp.', variant: 'destructive' });
+        }
       }
     } else {
       toast({ title: 'Error', description: result.message, variant: 'destructive' });
@@ -337,16 +307,27 @@ export default function AdminPage() {
       fetchAppointmentsAdmin();
 
       if (sendCancelWhatsAppNotification && appointmentToCancel.userPhone && appointmentToCancel.userName) {
-        const clientName = appointmentToCancel.userName;
-        const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
-        const apptTime = appointmentToCancel.preferredTime;
-        
-        const message = encodeURIComponent(
-          `Hola ${clientName}, lamentamos informarte que tu cita en ${siteConfig.name} para el ${apptDate} a las ${apptTime} ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`
-        );
-        const cleanedPhoneNumber = appointmentToCancel.userPhone.replace(/\D/g, '');
-        const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
+        try {
+          let messageContent = await getMessageTemplate('cancellation');
+          const clientName = appointmentToCancel.userName;
+          const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
+          const apptTime = appointmentToCancel.preferredTime;
+          const servicesText = appointmentToCancel.services.join(', ') || 'No especificados';
+
+          messageContent = messageContent
+            .replace(/\{\{clientName\}\}/g, clientName)
+            .replace(/\{\{appointmentDate\}\}/g, apptDate)
+            .replace(/\{\{appointmentTime\}\}/g, apptTime)
+            .replace(/\{\{siteName\}\}/g, siteConfig.name)
+            .replace(/\{\{servicesList\}\}/g, servicesText);
+          
+          const cleanedPhoneNumber = appointmentToCancel.userPhone.replace(/\D/g, '');
+          const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
+          window.open(whatsappUrl, '_blank');
+        } catch (templateError) {
+          console.error("Error processing WhatsApp template for cancellation:", templateError);
+          toast({ title: 'Error de Plantilla', description: 'No se pudo generar el mensaje de WhatsApp.', variant: 'destructive' });
+        }
       }
     } else {
       toast({ title: 'Error', description: result.message, variant: 'destructive' });
@@ -977,3 +958,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

@@ -143,6 +143,17 @@
         "app/admin/page": "action-browser"
       }
     },
+    "40caf416edbb707356716f925239e16c8970013236": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": "[project]/.next-internal/server/app/admin/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    },
     "40cb18cfde7898d1c1d082dc9266894eb9881f296d": {
       "workers": {
         "app/admin/page": {
@@ -166,6 +177,17 @@
       }
     },
     "604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4": {
+      "workers": {
+        "app/admin/page": {
+          "moduleId": "[project]/.next-internal/server/app/admin/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/admin/page": "action-browser"
+      }
+    },
+    "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": {
       "workers": {
         "app/admin/page": {
           "moduleId": "[project]/.next-internal/server/app/admin/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
