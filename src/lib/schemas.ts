@@ -76,6 +76,14 @@ export const serviceSchema = z.object({
   name: z.string().min(3, { message: "El nombre del servicio debe tener al menos 3 caracteres." }),
   description: z.string().min(5, { message: "La descripción debe tener al menos 5 caracteres." }),
   price: z.string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, { message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX" }),
-  // duration: z.string().min(1, { message: "La duración es requerida (ej: 30 min, 1 hora)." }), // Example: if you want duration
 });
 export type ServiceFormValues = z.infer<typeof serviceSchema>;
+
+// Admin Edit User Form Schema
+export const adminEditUserSchema = z.object({
+  fullName: z.string().min(2, { message: "El nombre completo debe tener al menos 2 caracteres." }),
+  email: z.string().email({ message: "Correo electrónico inválido." }), // Included for form structure, but will be read-only
+  phoneNumber: z.string().min(8, { message: "El número de teléfono debe tener al menos 8 dígitos." }),
+});
+export type AdminEditUserFormValues = z.infer<typeof adminEditUserSchema>;
+

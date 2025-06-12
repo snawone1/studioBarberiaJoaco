@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues } from '@/lib/schemas';
+import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues, AdminEditUserFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
 import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
@@ -113,6 +113,27 @@ export async function getUsers(): Promise<UserDetail[]> {
         console.error("An unexpected error occurred while fetching users:", error.message, error.stack);
     }
     return [];
+  }
+}
+
+export async function updateUserDetail(
+  data: { userId: string; fullName: string; phoneNumber: string }
+): Promise<{ success: boolean; message: string }> {
+  console.log(`[updateUserDetail] Called for userId: ${data.userId} with data:`, data);
+  try {
+    const userDocRef = doc(firestore, 'users', data.userId);
+    await updateDoc(userDocRef, {
+      fullName: data.fullName,
+      phoneNumber: data.phoneNumber,
+      // Consider adding an 'updatedAt' timestamp if needed
+      // updatedAt: Timestamp.now(),
+    });
+    console.log(`[updateUserDetail] User ${data.userId} details updated successfully.`);
+    revalidatePath('/admin'); // For admin panel user list
+    return { success: true, message: 'Detalles del usuario actualizados con éxito.' };
+  } catch (error: any) {
+    console.error(`[updateUserDetail] Error updating user ${data.userId} details:`, error);
+    return { success: false, message: `Error al actualizar los detalles del usuario: ${error.message}` };
   }
 }
 
