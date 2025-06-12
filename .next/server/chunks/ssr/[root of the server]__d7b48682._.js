@@ -650,7 +650,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
         };
         console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data:", JSON.stringify(appointmentData));
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addDoc"])(appointmentsCollectionRef, appointmentData);
-        console.log("[submitAppointmentRequest] Appointment added successfully.");
+        console.log("[submitAppointmentRequest] Appointment added successfully with userId:", data.userId);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         return {
@@ -752,13 +752,23 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
         return [];
     }
     try {
-        console.log(`[getUserAppointments] Constructing query for appointments collection, where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
+        console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
         const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         console.log(`[getUserAppointments] Executing query...`);
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUserAppointments);
         console.log(`[getUserAppointments] Query executed. Found ${appointmentSnapshot.docs.length} appointment documents for user ${userId}.`);
         if (appointmentSnapshot.empty) {
-            console.log(`[getUserAppointments] Snapshot is empty. Returning empty array.`);
+            console.log(`[getUserAppointments] Snapshot is empty. Will try querying without orderBy to check for data/index issues.`);
+            const qSimpleUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId));
+            const simpleSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qSimpleUserAppointments);
+            if (simpleSnapshot.empty) {
+                console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
+            } else {
+                console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' and 'createdAt'. Please verify the index in Firestore.`);
+                simpleSnapshot.docs.forEach((docSnap)=>{
+                    console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
+                });
+            }
             return [];
         }
         console.log(`[getUserAppointments] Mapping ${appointmentSnapshot.docs.length} documents...`);
@@ -789,12 +799,12 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
                 status: data.status || 'unknown',
                 createdAt: createdAtISO
             };
-            // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment)); // Log individual mapped appointments if needed
+            // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment));
             return appointment;
         });
         const appointments = await Promise.all(appointmentsPromises);
         console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
-        // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); // Avoid logging all data if too large
+        // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); 
         return appointments;
     } catch (error) {
         console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
