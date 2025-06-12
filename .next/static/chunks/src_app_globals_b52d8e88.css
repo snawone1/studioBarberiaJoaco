@@ -669,6 +669,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: auto;
 }
 
+.mt-3 {
+  margin-top: .75rem;
+}
+
 .block {
   display: block;
 }
@@ -1163,6 +1167,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .items-stretch {
   align-items: stretch;
+}
+
+.justify-start {
+  justify-content: flex-start;
 }
 
 .justify-end {

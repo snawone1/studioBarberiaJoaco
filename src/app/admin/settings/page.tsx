@@ -23,7 +23,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel, // This is the context-aware one
+  FormLabel, 
   FormMessage,
 } from '@/components/ui/form';
 import { PageHeader } from '@/components/page-header';
@@ -41,15 +41,17 @@ import {
   type TimeSlotSetting,
   getMessageTemplate,
   updateMessageTemplate,
+  getAdminPhoneNumber,
+  updateAdminPhoneNumber,
 } from '@/app/actions';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
-import { Label as UiLabel } from '@/components/ui/label'; // This is the generic one
+import { Label as UiLabel } from '@/components/ui/label'; 
 
 export default function AdminSettingsPage() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -69,11 +71,18 @@ export default function AdminSettingsPage() {
   const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
   const [isUpdatingTimeSlot, setIsUpdatingTimeSlot] = useState<string | null>(null);
 
-  // States for WhatsApp Message Templates
+  // States for WhatsApp Message Templates & Admin Contact
   const [confirmationTemplate, setConfirmationTemplate] = useState('');
   const [cancellationTemplate, setCancellationTemplate] = useState('');
+  const [adminContactCancellationTemplate, setAdminContactCancellationTemplate] = useState('');
+  const [adminContactQueryTemplate, setAdminContactQueryTemplate] = useState('');
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
-  const [isSubmittingTemplate, setIsSubmittingTemplate] = useState<'confirmation' | 'cancellation' | null>(null);
+  const [isSubmittingTemplate, setIsSubmittingTemplate] = useState<'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery' | null>(null);
+  
+  const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
+  const [isLoadingAdminPhone, setIsLoadingAdminPhone] = useState(false);
+  const [isSubmittingAdminPhone, setIsSubmittingAdminPhone] = useState(false);
+
 
   const availablePlaceholders = ['{{clientName}}', '{{appointmentDate}}', '{{appointmentTime}}', '{{siteName}}', '{{servicesList}}'];
 
@@ -144,15 +153,37 @@ export default function AdminSettingsPage() {
     }
   }
 
+  async function fetchAdminContactSettings() {
+    setIsLoadingAdminPhone(true);
+    try {
+      const phone = await getAdminPhoneNumber();
+      if (phone) setAdminPhoneNumber(phone);
+    } catch (error) {
+      toast({ title: 'Error', description: 'No se pudo cargar el número de teléfono del administrador.', variant: 'destructive' });
+    } finally {
+      setIsLoadingAdminPhone(false);
+    }
+  }
+
   async function fetchMessageTemplates() {
     setIsLoadingTemplates(true);
     try {
-      const [confTemplate, cancTemplate] = await Promise.all([
+      const [
+        confTemplate, 
+        cancTemplate,
+        adminCancTemplate,
+        adminQueryTemplate
+      ] = await Promise.all([
         getMessageTemplate('confirmation'),
-        getMessageTemplate('cancellation')
+        getMessageTemplate('cancellation'),
+        getMessageTemplate('adminContactCancellationRequest'),
+        getMessageTemplate('adminContactQuery')
       ]);
       setConfirmationTemplate(confTemplate);
       setCancellationTemplate(cancTemplate);
+      setAdminContactCancellationTemplate(adminCancTemplate);
+      setAdminContactQueryTemplate(adminQueryTemplate);
+
     } catch (error) {
       toast({ title: 'Error', description: 'No se pudieron cargar las plantillas de mensajes.', variant: 'destructive' });
     } finally {
@@ -165,6 +196,7 @@ export default function AdminSettingsPage() {
       fetchAdminServices();
       fetchTimeSlotSettingsAdmin();
       fetchMessageTemplates();
+      fetchAdminContactSettings();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
@@ -175,6 +207,8 @@ export default function AdminSettingsPage() {
     const result = await submitSiteSettings(data);
     if (result.success) {
       toast({ title: '¡Configuración Guardada!', description: result.message });
+      // siteConfig.name = data.siteName; // This won't work as siteConfig is not reactive
+      // siteConfig.description = data.siteDescription; // Update local config if necessary or re-fetch
       settingsForm.reset({ siteName: data.siteName, siteDescription: data.siteDescription });
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
@@ -249,9 +283,15 @@ export default function AdminSettingsPage() {
     setIsUpdatingTimeSlot(null);
   }
 
-  async function handleSaveTemplate(templateId: 'confirmation' | 'cancellation') {
+  async function handleSaveTemplate(templateId: 'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery') {
     setIsSubmittingTemplate(templateId);
-    const content = templateId === 'confirmation' ? confirmationTemplate : cancellationTemplate;
+    let content = '';
+    switch (templateId) {
+      case 'confirmation': content = confirmationTemplate; break;
+      case 'cancellation': content = cancellationTemplate; break;
+      case 'adminContactCancellationRequest': content = adminContactCancellationTemplate; break;
+      case 'adminContactQuery': content = adminContactQueryTemplate; break;
+    }
     const result = await updateMessageTemplate(templateId, content);
     if (result.success) {
       toast({ title: 'Plantilla Guardada', description: result.message });
@@ -259,6 +299,25 @@ export default function AdminSettingsPage() {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la plantilla.', variant: 'destructive' });
     }
     setIsSubmittingTemplate(null);
+  }
+
+  async function handleSaveAdminPhoneNumber() {
+    setIsSubmittingAdminPhone(true);
+    // Basic validation for Argentinian numbers (can be improved)
+    const cleanedPhone = adminPhoneNumber.replace(/\D/g, '');
+    if (!cleanedPhone.startsWith('54') || cleanedPhone.length < 11 ) { // e.g. 54911... or 5411...
+         toast({ title: 'Número Inválido', description: 'El formato debe ser Ej: 5491123456789 o 542211234567.', variant: 'destructive'});
+         setIsSubmittingAdminPhone(false);
+         return;
+    }
+
+    const result = await updateAdminPhoneNumber(adminPhoneNumber);
+    if (result.success) {
+      toast({ title: 'Número Guardado', description: result.message });
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo guardar el número.', variant: 'destructive' });
+    }
+    setIsSubmittingAdminPhone(false);
   }
   
   if (authLoading) {
@@ -332,6 +391,47 @@ export default function AdminSettingsPage() {
             </Form>
           </CardContent>
         </Card>
+
+        {/* Admin Contact Configuration */}
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center">
+                    <PhoneIcon className="h-5 w-5 mr-2 text-primary" />
+                    Contacto del Administrador (WhatsApp)
+                </CardTitle>
+                <CardDescription>
+                    Configura el número de teléfono para que los clientes te contacten por WhatsApp.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {isLoadingAdminPhone ? (
+                    <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                ) : (
+                    <div>
+                        <UiLabel htmlFor="adminPhoneNumber" className="text-base font-medium">Número de WhatsApp del Administrador</UiLabel>
+                        <Input
+                            id="adminPhoneNumber"
+                            type="tel"
+                            value={adminPhoneNumber}
+                            onChange={(e) => setAdminPhoneNumber(e.target.value)}
+                            placeholder="Ej: 5491123456789 (incluir código de país)"
+                            className="mt-1"
+                        />
+                         <p className="text-xs text-muted-foreground mt-1">Incluir código de país y área sin el '+' ni espacios. Ej: 5491123456789</p>
+                        <Button 
+                            onClick={handleSaveAdminPhoneNumber} 
+                            disabled={isSubmittingAdminPhone}
+                            size="sm"
+                            className="mt-3"
+                        >
+                            {isSubmittingAdminPhone && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Guardar Número
+                        </Button>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+
 
         {/* Services Configuration */}
         <Card>
@@ -527,10 +627,10 @@ export default function AdminSettingsPage() {
             <CardHeader>
                 <CardTitle className="flex items-center">
                     <MessageSquareIcon className="h-5 w-5 mr-2 text-primary" />
-                    Mensajes de WhatsApp
+                    Plantillas de Mensajes de WhatsApp
                 </CardTitle>
                 <CardDescription>
-                    Personaliza los mensajes de confirmación y cancelación de citas.
+                    Personaliza los mensajes para diferentes interacciones.
                     Utiliza los marcadores de posición disponibles para incluir detalles dinámicos.
                 </CardDescription>
             </CardHeader>
@@ -540,7 +640,7 @@ export default function AdminSettingsPage() {
                 ) : (
                     <>
                         <div className="space-y-2">
-                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación</UiLabel>
+                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación de Cita (Admin)</UiLabel>
                             <Textarea
                                 id="confirmationTemplate"
                                 value={confirmationTemplate}
@@ -556,12 +656,12 @@ export default function AdminSettingsPage() {
                                 className="mt-2"
                             >
                                 {isSubmittingTemplate === 'confirmation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Confirmación
+                                Guardar Confirmación (Admin)
                             </Button>
                         </div>
 
                         <div className="space-y-2">
-                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación</UiLabel>
+                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación de Cita (Admin)</UiLabel>
                             <Textarea
                                 id="cancellationTemplate"
                                 value={cancellationTemplate}
@@ -577,7 +677,49 @@ export default function AdminSettingsPage() {
                                 className="mt-2"
                             >
                                 {isSubmittingTemplate === 'cancellation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Cancelación
+                                Guardar Cancelación (Admin)
+                            </Button>
+                        </div>
+
+                         <div className="space-y-2">
+                            <UiLabel htmlFor="adminContactCancellationTemplate" className="text-base font-medium">Plantilla para "Solicitar Cancelación" (Cliente a Admin)</UiLabel>
+                            <Textarea
+                                id="adminContactCancellationTemplate"
+                                value={adminContactCancellationTemplate}
+                                onChange={(e) => setAdminContactCancellationTemplate(e.target.value)}
+                                placeholder="Mensaje prellenado cuando el cliente quiere cancelar vía WhatsApp..."
+                                rows={5}
+                                className="text-sm"
+                            />
+                            <Button 
+                                onClick={() => handleSaveTemplate('adminContactCancellationRequest')} 
+                                disabled={isSubmittingTemplate === 'adminContactCancellationRequest'}
+                                size="sm"
+                                className="mt-2"
+                            >
+                                {isSubmittingTemplate === 'adminContactCancellationRequest' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Guardar Plantilla Cliente-Cancelación
+                            </Button>
+                        </div>
+
+                        <div className="space-y-2">
+                            <UiLabel htmlFor="adminContactQueryTemplate" className="text-base font-medium">Plantilla para "Hacer Consulta" (Cliente a Admin)</UiLabel>
+                            <Textarea
+                                id="adminContactQueryTemplate"
+                                value={adminContactQueryTemplate}
+                                onChange={(e) => setAdminContactQueryTemplate(e.target.value)}
+                                placeholder="Mensaje prellenado cuando el cliente tiene una consulta vía WhatsApp..."
+                                rows={5}
+                                className="text-sm"
+                            />
+                            <Button 
+                                onClick={() => handleSaveTemplate('adminContactQuery')} 
+                                disabled={isSubmittingTemplate === 'adminContactQuery'}
+                                size="sm"
+                                className="mt-2"
+                            >
+                                {isSubmittingTemplate === 'adminContactQuery' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Guardar Plantilla Cliente-Consulta
                             </Button>
                         </div>
                     </>
@@ -593,6 +735,7 @@ export default function AdminSettingsPage() {
                         <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
                             {availablePlaceholders.map(ph => <li key={ph}><code>{ph}</code></li>)}
                         </ul>
+                         <p className="text-xs text-muted-foreground mt-2">Para la plantilla "Hacer Consulta", el cliente deberá añadir manualmente su pregunta donde dice `[ESCRIBE TU CONSULTA AQUÍ]`.</p>
                     </CardContent>
                 </Card>
             </CardContent>
@@ -602,3 +745,4 @@ export default function AdminSettingsPage() {
   );
 }
     
+```

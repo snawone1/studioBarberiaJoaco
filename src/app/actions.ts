@@ -17,6 +17,7 @@ const usersCollectionRef = collection(firestore, 'users');
 const servicesCollectionRef = collection(firestore, 'services');
 const timeSlotSettingsCollectionRef = collection(firestore, 'timeSlotSettings');
 const messageTemplatesCollectionRef = collection(firestore, 'messageTemplates');
+const appSettingsCollectionRef = collection(firestore, 'appSettings');
 
 
 // --- User Types ---
@@ -185,19 +186,20 @@ export async function getAppointments(): Promise<Appointment[]> {
     let usersMap: Map<string, { fullName?: string; email?: string; phoneNumber?: string }> = new Map();
 
     if (userIds.length > 0) {
-      const MAX_USER_IDS_PER_QUERY = 30;
+      const MAX_USER_IDS_PER_QUERY = 30; // Firestore 'in' query limit
       const userBatches: string[][] = [];
       for (let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY) {
         userBatches.push(userIds.slice(i, i + MAX_USER_IDS_PER_QUERY));
       }
 
       for (const batchUserIds of userBatches) {
-        if (batchUserIds.length === 0) continue;
+        if (batchUserIds.length === 0) continue; // Skip empty batches
+        // Assuming user documents have a 'uid' field that matches the userId from appointments
         const qUsers = query(collection(firestore, 'users'), where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
           const userData = docSnap.data();
-          usersMap.set(userData.uid, {
+          usersMap.set(userData.uid, { // Ensure you are mapping by the correct field (e.g. docSnap.id or userData.uid)
             fullName: userData.fullName,
             email: userData.email,
             phoneNumber: userData.phoneNumber
@@ -294,7 +296,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     console.log(`[getUserAppointments] Mapping ${appointmentSnapshot.docs.length} documents...`);
     const appointmentsPromises = appointmentSnapshot.docs.map(async (docSnap) => {
       const data = docSnap.data();
-      console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
+      // console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
 
       let preferredDateISO: string;
       let createdAtISO: string;
@@ -315,7 +317,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 
       const appointment: Appointment = {
         id: docSnap.id,
-        userId: data.userId, // Ensure this userId is what we expect
+        userId: data.userId,
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A',
         services: Array.isArray(data.services) ? data.services : [],
@@ -329,13 +331,13 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 
     const appointments = await Promise.all(appointmentsPromises);
     console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
-    // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); 
+    // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments));
     return appointments;
 
   } catch (error: any) {
     console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
     if (error.code === 'failed-precondition') {
-      console.error("[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console.");
+      console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
     } else if (error.code === 'permission-denied') {
       console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
     } else {
@@ -366,15 +368,19 @@ export async function updateAppointmentStatus(
         console.warn(`[updateAppointmentStatus] User ${currentUserId} does not own appointment ${appointmentId} (owner: ${appointmentData.userId}).`);
         return { success: false, message: 'No tienes permiso para cancelar esta cita.' };
       }
-      if (appointmentData.status !== 'pending') {
-        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' (status: ${appointmentData.status}), cannot be cancelled by user.`);
-        return { success: false, message: 'Solo puedes cancelar citas que estén pendientes.' };
+      if (appointmentData.status !== 'pending' && appointmentData.status !== 'confirmed') {
+        // Allow user to cancel 'pending' or 'confirmed' citas, but admin can cancel any.
+        // This logic is for when currentUserId is present (i.e., user is cancelling)
+        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' or 'confirmed' (status: ${appointmentData.status}), cannot be cancelled by user via this route.`);
+        return { success: false, message: 'Solo puedes solicitar cancelar citas que estén pendientes o confirmadas. Contacta al administrador para otros casos.' };
       }
-      console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own pending appointment ${appointmentId}.`);
+      console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own ${appointmentData.status} appointment ${appointmentId}.`);
     } else if (currentUserId && newStatus !== 'cancelled') {
-      console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed.`);
+      // User trying to do something other than cancel their own appointment
+      console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed through this specific user-facing cancel action.`);
       return { success: false, message: 'No tienes permiso para realizar esta acción.' };
     }
+    // If no currentUserId, it's an admin action, allow any status change.
 
     await updateDoc(appointmentDocRef, { status: newStatus });
     console.log(`[updateAppointmentStatus] Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
@@ -677,25 +683,38 @@ export async function updateTimeSlotSetting(time: string, isActive: boolean) {
   }
 }
 
-// --- WhatsApp Message Template Actions ---
+// --- WhatsApp Message Template & Admin Contact Actions ---
 const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. ¡Te esperamos!`;
 const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
+const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${siteConfig.name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nGracias.`;
+const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${siteConfig.name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
 
-export async function getMessageTemplate(templateId: 'confirmation' | 'cancellation'): Promise<string> {
+
+export async function getMessageTemplate(templateId: 'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery'): Promise<string> {
   try {
     const templateDocRef = doc(messageTemplatesCollectionRef, templateId);
     const docSnap = await getDoc(templateDocRef);
     if (docSnap.exists()) {
       return docSnap.data().content as string;
     }
-    return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+    // Default templates
+    if (templateId === 'confirmation') return DEFAULT_CONFIRMATION_TEMPLATE;
+    if (templateId === 'cancellation') return DEFAULT_CANCELLATION_TEMPLATE;
+    if (templateId === 'adminContactCancellationRequest') return DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE;
+    if (templateId === 'adminContactQuery') return DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE;
+    
+    return `Contenido predeterminado para ${templateId} no encontrado.`;
   } catch (error) {
     console.error(`Error fetching message template ${templateId}:`, error);
-    return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+    if (templateId === 'confirmation') return DEFAULT_CONFIRMATION_TEMPLATE;
+    if (templateId === 'cancellation') return DEFAULT_CANCELLATION_TEMPLATE;
+    if (templateId === 'adminContactCancellationRequest') return DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE;
+    if (templateId === 'adminContactQuery') return DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE;
+    return `Error al cargar la plantilla para ${templateId}.`;
   }
 }
 
-export async function updateMessageTemplate(templateId: 'confirmation' | 'cancellation', content: string) {
+export async function updateMessageTemplate(templateId: 'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery', content: string) {
   try {
     const templateDocRef = doc(messageTemplatesCollectionRef, templateId);
     await setDoc(templateDocRef, { content });
@@ -706,3 +725,37 @@ export async function updateMessageTemplate(templateId: 'confirmation' | 'cancel
     return { success: false, message: `Error al actualizar la plantilla de ${templateId}.` };
   }
 }
+
+export async function getAdminPhoneNumber(): Promise<string | null> {
+  try {
+    const contactDetailsDocRef = doc(appSettingsCollectionRef, 'contactDetails');
+    const docSnap = await getDoc(contactDetailsDocRef);
+    if (docSnap.exists() && docSnap.data().adminPhoneNumber) {
+      return docSnap.data().adminPhoneNumber as string;
+    }
+    return null; 
+  } catch (error) {
+    console.error("Error fetching admin phone number:", error);
+    return null;
+  }
+}
+
+export async function updateAdminPhoneNumber(phoneNumber: string) {
+  try {
+    const contactDetailsDocRef = doc(appSettingsCollectionRef, 'contactDetails');
+    // Validate phone number format if necessary before saving
+    const cleanedPhoneNumber = phoneNumber.replace(/\D/g, ''); // Basic cleaning
+    if (!cleanedPhoneNumber.startsWith('54')) { // Example very basic validation
+        // return { success: false, message: 'El número de teléfono debe ser un número argentino válido (ej: 54911... o 5411...).' };
+    }
+
+    await setDoc(contactDetailsDocRef, { adminPhoneNumber: phoneNumber }, { merge: true });
+    revalidatePath('/admin/settings');
+    return { success: true, message: 'Número de teléfono del administrador actualizado.' };
+  } catch (error) {
+    console.error("Error updating admin phone number:", error);
+    return { success: false, message: 'Error al actualizar el número de teléfono del administrador.' };
+  }
+}
+
+```

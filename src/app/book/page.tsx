@@ -30,12 +30,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle } from "lucide-react" // Removed Edit icon
+import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle, MessageSquare, HelpCircle, Phone } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
@@ -51,12 +62,15 @@ import {
   getUserAppointments,
   updateAppointmentStatus,
   type Appointment,
+  getAdminPhoneNumber,
+  getMessageTemplate,
 } from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
+import { siteConfig } from '@/config/site';
 
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
@@ -64,7 +78,7 @@ const now = new Date();
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth(); // Added authLoading
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string | undefined>(undefined);
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
@@ -83,6 +97,10 @@ export default function BookAppointmentPage() {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isCancellingAppointment, setIsCancellingAppointment] = useState(false);
   const [activeTab, setActiveTab] = useState("request");
+
+  const [contactAdminDialogOpen, setContactAdminDialogOpen] = useState(false);
+  const [selectedAppointmentForContact, setSelectedAppointmentForContact] = useState<Appointment | null>(null);
+  const [isProcessingWhatsAppLink, setIsProcessingWhatsAppLink] = useState(false);
 
 
   const form = useForm<ClientAppointmentFormValues>({
@@ -119,7 +137,7 @@ export default function BookAppointmentPage() {
   };
 
   const fetchUserAppointments = async () => {
-    if (currentUser) {
+    if (currentUser && !authLoading) { // Ensure auth is not loading
       console.log(`BookPage: fetchUserAppointments called. currentUser UID: ${currentUser.uid}`);
       setIsLoadingMyAppointments(true);
       try {
@@ -132,7 +150,7 @@ export default function BookAppointmentPage() {
       } finally {
         setIsLoadingMyAppointments(false);
       }
-    } else {
+    } else if (!currentUser && !authLoading) {
       console.log("BookPage: fetchUserAppointments - no current user, clearing appointments.");
       setMyAppointments([]);
       setIsLoadingMyAppointments(false);
@@ -144,11 +162,11 @@ export default function BookAppointmentPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'my-appointments') {
+    if (activeTab === 'my-appointments' && !authLoading) { // Check authLoading here too
       fetchUserAppointments();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, activeTab]);
+  }, [currentUser, activeTab, authLoading]);
 
 
   const watchedDate = form.watch('preferredDate');
@@ -242,7 +260,7 @@ export default function BookAppointmentPage() {
       });
       form.reset({
         services: [],
-        preferredDate: watchedDate, // Keep the date so slots refresh
+        preferredDate: watchedDate, 
         preferredTime: '',
         message: ''
       });
@@ -252,7 +270,7 @@ export default function BookAppointmentPage() {
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
-            fetchUserAppointments(); // Refresh user appointments
+            fetchUserAppointments(); 
           })
           .catch(fetchError => {
             console.error("Error re-fetching booked slots after submission:", fetchError);
@@ -261,7 +279,7 @@ export default function BookAppointmentPage() {
             setIsLoadingBookedSlots(false);
           });
       } else {
-         fetchUserAppointments(); // Refresh user appointments even if date wasn't set (edge case)
+         fetchUserAppointments(); 
       }
     } else {
       toast({
@@ -290,6 +308,7 @@ export default function BookAppointmentPage() {
   const handleCancelAppointment = async () => {
     if (!appointmentToCancel || !currentUser) return;
     setIsCancellingAppointment(true);
+    // Pass currentUserId for ownership verification if user is cancelling their own 'pending' or 'confirmed' appointment.
     const result = await updateAppointmentStatus(appointmentToCancel.id, 'cancelled', currentUser.uid);
     setIsCancellingAppointment(false);
     setIsCancelDialogOpen(false);
@@ -303,6 +322,65 @@ export default function BookAppointmentPage() {
     setAppointmentToCancel(null);
   };
 
+  const handleOpenContactAdminDialog = (appointment: Appointment) => {
+    setSelectedAppointmentForContact(appointment);
+    setContactAdminDialogOpen(true);
+  };
+
+  const handleWhatsAppRedirect = async (type: 'requestCancellation' | 'query') => {
+    if (!selectedAppointmentForContact || !currentUser) {
+      toast({ title: 'Error', description: 'No se pudo procesar la solicitud de contacto.', variant: 'destructive' });
+      return;
+    }
+    setIsProcessingWhatsAppLink(true);
+    try {
+      const adminPhoneNumber = await getAdminPhoneNumber();
+      if (!adminPhoneNumber) {
+        toast({ title: 'Error', description: 'No se pudo obtener el número de contacto del administrador.', variant: 'destructive' });
+        setIsProcessingWhatsAppLink(false);
+        return;
+      }
+
+      const templateId = type === 'requestCancellation' ? 'adminContactCancellationRequest' : 'adminContactQuery';
+      let messageContent = await getMessageTemplate(templateId);
+      
+      // Ensure allServices are loaded if not already
+      let currentServices = allServices;
+      if (currentServices.length === 0) {
+        currentServices = await getServices(); // Fetch if not already available
+      }
+
+      const serviceNames = selectedAppointmentForContact.services.map(serviceId => {
+        const serviceDetail = currentServices.find(s => s.id === serviceId);
+        return serviceDetail ? serviceDetail.name : serviceId; 
+      });
+      const servicesText = serviceNames.join(', ') || 'No especificados';
+      const clientName = currentUser.displayName || currentUser.email || 'Cliente'; 
+      const apptDate = format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es });
+      const apptTime = selectedAppointmentForContact.preferredTime;
+
+      messageContent = messageContent
+        .replace(/\{\{clientName\}\}/g, clientName)
+        .replace(/\{\{appointmentDate\}\}/g, apptDate)
+        .replace(/\{\{appointmentTime\}\}/g, apptTime)
+        .replace(/\{\{siteName\}\}/g, siteConfig.name)
+        .replace(/\{\{servicesList\}\}/g, servicesText);
+      
+      const cleanedAdminPhoneNumber = adminPhoneNumber.replace(/\D/g, '');
+      const whatsappUrl = `https://wa.me/${cleanedAdminPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
+      
+      window.open(whatsappUrl, '_blank');
+      setContactAdminDialogOpen(false);
+
+    } catch (error) {
+      console.error("Error preparing WhatsApp redirect:", error);
+      toast({ title: 'Error', description: 'No se pudo generar el enlace de WhatsApp.', variant: 'destructive' });
+    } finally {
+      setIsProcessingWhatsAppLink(false);
+    }
+  };
+
+
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status?.toLowerCase()) {
       case 'pending': return 'default';
@@ -315,7 +393,7 @@ export default function BookAppointmentPage() {
 
   const currentlyActiveSlots = ALL_TIME_SLOTS.filter(slot => {
     const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
-    return slotSetting ? slotSetting.isActive : true;
+    return slotSetting ? slotSetting.isActive : true; // Default to true if not found (shouldn't happen ideally)
   });
 
   return (
@@ -571,21 +649,23 @@ export default function BookAppointmentPage() {
                <Button
                   type="submit"
                   className="w-full py-6 text-lg"
-                  disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
+                  disabled={isLoading || authLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
                 >
                 <Loader2
                   className={cn(
                     "mr-2 h-5 w-5 animate-spin",
-                    (isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
+                    (isLoading || authLoading ||isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
                   )}
                 />
                 {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
                   'Procesando...'
+                ) : authLoading ? (
+                  'Cargando sesión...'
                 ) : (
                   currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
                 )}
               </Button>
-              {!currentUser && (
+              {!currentUser && !authLoading &&(
                    <p className="text-sm text-center text-muted-foreground">
                       Debes <Link href="/login?redirect=/book" className="underline text-primary hover:text-primary/80">iniciar sesión</Link> o <Link href="/register?redirect=/book" className="underline text-primary hover:text-primary/80">registrarte</Link> para solicitar una cita.
                    </p>
@@ -595,7 +675,12 @@ export default function BookAppointmentPage() {
         </TabsContent>
 
         <TabsContent value="my-appointments" className="mt-6">
-          {!currentUser ? (
+          {authLoading ? (
+             <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="ml-3 text-muted-foreground">Cargando tu sesión...</p>
+            </div>
+          ) :!currentUser ? (
             <Card className="text-center py-10">
               <CardHeader>
                 <UserCircle className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
@@ -607,7 +692,7 @@ export default function BookAppointmentPage() {
                 </p>
               </CardContent>
             </Card>
-          ) : isLoadingMyAppointments || isLoadingServices ? ( // Check isLoadingServices too
+          ) : isLoadingMyAppointments || isLoadingServices ? ( 
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="ml-3 text-muted-foreground">Cargando tus citas...</p>
@@ -652,8 +737,8 @@ export default function BookAppointmentPage() {
                       </div>
                     )}
                   </CardContent>
-                  {appt.status === 'pending' && (
-                    <CardFooter className="pt-3 border-t flex justify-end">
+                  <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
+                    {appt.status === 'pending' && (
                       <Button
                         variant="destructive"
                         size="sm"
@@ -667,8 +752,18 @@ export default function BookAppointmentPage() {
                         )}
                         Cancelar Cita
                       </Button>
-                    </CardFooter>
-                  )}
+                    )}
+                     {appt.status === 'confirmed' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-primary text-primary hover:bg-primary/10"
+                        onClick={() => handleOpenContactAdminDialog(appt)}
+                      >
+                        <Phone className="mr-2 h-4 w-4" /> Contactar Barbero
+                      </Button>
+                    )}
+                  </CardFooter>
                 </Card>
               ))}
             </div>
@@ -704,6 +799,55 @@ export default function BookAppointmentPage() {
           </AlertDialogContent>
         </AlertDialog>
       )}
+
+      {selectedAppointmentForContact && (
+        <Dialog open={contactAdminDialogOpen} onOpenChange={setContactAdminDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <MessageSquare className="h-5 w-5 mr-2 text-primary" />
+                Contactar al Barbero
+              </DialogTitle>
+              <DialogDescription>
+                Selecciona una opción para comunicarte por WhatsApp sobre tu cita del <strong className="text-foreground">{format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es })} a las {selectedAppointmentForContact.preferredTime}</strong>.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 gap-4 py-4">
+              <Button
+                variant="outline"
+                onClick={() => handleWhatsAppRedirect('requestCancellation')}
+                disabled={isProcessingWhatsAppLink}
+                className="justify-start text-left h-auto py-3"
+              >
+                {isProcessingWhatsAppLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-3 h-5 w-5 text-destructive" />}
+                <div>
+                  <p className="font-semibold">Solicitar Cancelación de Cita</p>
+                  <p className="text-xs text-muted-foreground">Enviar un mensaje para pedir la cancelación.</p>
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleWhatsAppRedirect('query')}
+                disabled={isProcessingWhatsAppLink}
+                 className="justify-start text-left h-auto py-3"
+              >
+                 {isProcessingWhatsAppLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <HelpCircle className="mr-3 h-5 w-5 text-blue-500" />}
+                <div>
+                  <p className="font-semibold">Hacer una Consulta sobre esta Cita</p>
+                  <p className="text-xs text-muted-foreground">Enviar un mensaje con tu pregunta.</p>
+                </div>
+              </Button>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="ghost">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
+
+```
