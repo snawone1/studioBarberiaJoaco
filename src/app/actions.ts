@@ -68,14 +68,14 @@ export type MessageTemplate = {
 
 // --- User Management Actions ---
 export async function getUsers(): Promise<UserDetail[]> {
-  console.log("Admin: Attempting to fetch users from Firestore...");
+  // console.log("Admin: Attempting to fetch users from Firestore...");
   try {
     const q = query(usersCollectionRef, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
-    console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
+    // console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
 
     if (querySnapshot.empty) {
-      console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
+      // console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
       return [];
     }
 
@@ -88,7 +88,7 @@ export async function getUsers(): Promise<UserDetail[]> {
       } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
-        console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+        // console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
         createdAtISO = new Date(0).toISOString();
       }
       
@@ -101,7 +101,7 @@ export async function getUsers(): Promise<UserDetail[]> {
       };
       return userDetail;
     });
-    console.log(`Admin: Successfully mapped ${users.length} users.`);
+    // console.log(`Admin: Successfully mapped ${users.length} users.`);
     return users;
 
   } catch (error: any) {
@@ -118,7 +118,7 @@ export async function getUsers(): Promise<UserDetail[]> {
 
 // --- Appointment Actions ---
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
-  console.log("Server Action: submitAppointmentRequest received data:", data);
+  // console.log("Server Action: submitAppointmentRequest received data:", data);
   try {
     const clientPreferredDate = data.preferredDate; 
     
@@ -126,7 +126,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
     normalizedPreferredDateObject.setHours(0, 0, 0, 0); 
     
     const preferredDateTimestamp = Timestamp.fromDate(normalizedPreferredDateObject);
-    console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+    // console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
 
     const qCheck = query(
       appointmentsCollectionRef,
@@ -137,7 +137,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 
     const existingAppointmentsSnap = await getDocs(qCheck);
     if (!existingAppointmentsSnap.empty) {
-      console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
+      // console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
       return { success: false, message: 'Este horario ya no está disponible. Por favor, elige otro.' };
     }
 
@@ -150,9 +150,9 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       status: 'pending', 
       createdAt: Timestamp.now(),
     };
-    console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
+    // console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
     await addDoc(appointmentsCollectionRef, appointmentData);
-    console.log("Server Action: Appointment added successfully.");
+    // console.log("Server Action: Appointment added successfully.");
     revalidatePath('/book'); 
     revalidatePath('/admin'); 
     return { success: true, message: 'Solicitud de cita enviada con éxito. Nos pondremos en contacto contigo pronto para confirmar.' };
@@ -163,20 +163,20 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 }
 
 export async function getAppointments(): Promise<Appointment[]> {
-  console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
+  // console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
   try {
     const qAppointments = query(
       appointmentsCollectionRef, 
       orderBy('preferredDate', 'desc'), 
       orderBy('createdAt', 'desc') 
     );
-    console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
+    // console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
 
     const appointmentSnapshot = await getDocs(qAppointments);
-    console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
+    // console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
     
     if (appointmentSnapshot.empty) {
-      console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
+      // console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
       return [];
     }
 
@@ -204,7 +204,7 @@ export async function getAppointments(): Promise<Appointment[]> {
         });
       }
     }
-    console.log(`Admin: Fetched details for ${usersMap.size} users.`);
+    // console.log(`Admin: Fetched details for ${usersMap.size} users.`);
 
     const appointments = appointmentSnapshot.docs.map(docSnap => {
       const data = docSnap.data();
@@ -214,14 +214,14 @@ export async function getAppointments(): Promise<Appointment[]> {
       if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
         preferredDateISO = data.preferredDate.toDate().toISOString();
       } else {
-        console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
+        // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
         preferredDateISO = new Date(0).toISOString(); 
       }
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
-        console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+        // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
         createdAtISO = new Date(0).toISOString(); 
       }
       
@@ -242,7 +242,7 @@ export async function getAppointments(): Promise<Appointment[]> {
       };
       return appointment;
     });
-    console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
+    // console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
     return appointments; 
 
   } catch (error: any) { 
@@ -257,9 +257,9 @@ export async function getAppointments(): Promise<Appointment[]> {
 }
 
 export async function getUserAppointments(userId: string): Promise<Appointment[]> {
-  console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+  // console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
   if (!userId) {
-    console.warn("Server Action: getUserAppointments called with no userId.");
+    // console.warn("Server Action: getUserAppointments called with no userId.");
     return [];
   }
   try {
@@ -271,7 +271,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     );
 
     const appointmentSnapshot = await getDocs(qUserAppointments);
-    console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+    // console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
 
     if (appointmentSnapshot.empty) {
       return [];
@@ -297,9 +297,6 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
       return {
         id: docSnap.id,
         userId: data.userId,
-        // For user's own appointments, we might not need to fetch their name/email/phone again,
-        // but it's included in the Appointment type for consistency.
-        // These fields can be undefined if not fetched.
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A',
         services: Array.isArray(data.services) ? data.services : [],
@@ -308,7 +305,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
         createdAt: createdAtISO,
       } as Appointment;
     });
-    console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+    // console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
     return appointments;
 
   } catch (error: any) {
@@ -325,7 +322,7 @@ export async function updateAppointmentStatus(
   newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed',
   currentUserId?: string // Optional: for client-side cancellation validation
 ) {
-  console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
+  // console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
   try {
     const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
 
@@ -342,17 +339,14 @@ export async function updateAppointmentStatus(
       if (appointmentData.status !== 'pending') {
         return { success: false, message: 'Solo puedes cancelar citas que estén pendientes.' };
       }
-      // If all checks pass, proceed to update
     } else if (currentUserId && newStatus !== 'cancelled') {
-      // Client is trying to change status to something other than cancelled
       return { success: false, message: 'No tienes permiso para realizar esta acción.' };
     }
-    // If no currentUserId, assume it's an admin action (or client cancellation checks passed)
 
     await updateDoc(appointmentDocRef, { status: newStatus });
-    console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+    // console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
     revalidatePath('/admin');
-    revalidatePath('/book'); // Also revalidate book page for client view
+    revalidatePath('/book'); 
     return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
   } catch (error) {
     console.error(`Server Action: Error updating appointment ${appointmentId} status in Firestore:`, error);
@@ -398,7 +392,7 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
-  console.log('Site Settings Update Received by Server Action:', data);
+  // console.log('Site Settings Update Received by Server Action:', data);
   revalidatePath('/admin/settings'); 
   revalidatePath('/'); 
   return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página o reconstrucción).' };
@@ -415,9 +409,9 @@ export async function getProducts(): Promise<Product[]> {
       if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
         imageSrcVal = data.imageSrc;
       } else if (data.imageSrc && data.imageSrc.trim() !== '') {
-        console.warn(`Product ID ${docSnap.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
+        // console.warn(`Product ID ${docSnap.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
       } else if (!data.imageSrc) {
-         console.warn(`Product ID ${docSnap.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
+         // console.warn(`Product ID ${docSnap.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
       }
       
       return {
@@ -626,6 +620,7 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
       savedSettingsMap.set(docSnap.id, docSnap.data().isActive as boolean);
     });
 
+    // Use ALL_TIME_SLOTS from the imported constants
     const settings = ALL_TIME_SLOTS.map(time => ({
       time,
       isActive: savedSettingsMap.get(time) ?? true, 
@@ -633,6 +628,7 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
     return settings;
   } catch (error) {
     console.error("Error fetching time slot settings:", error);
+    // Fallback to all active if Firestore read fails
     return ALL_TIME_SLOTS.map(time => ({ time, isActive: true }));
   }
 }
