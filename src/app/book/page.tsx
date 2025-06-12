@@ -137,12 +137,13 @@ export default function BookAppointmentPage() {
   };
 
   const fetchUserAppointments = async () => {
-    if (currentUser && !authLoading) { // Ensure auth is not loading
+    if (currentUser && !authLoading) {
       console.log(`BookPage: fetchUserAppointments called. currentUser UID: ${currentUser.uid}`);
       setIsLoadingMyAppointments(true);
       try {
         const userAppointments = await getUserAppointments(currentUser.uid);
-        console.log("BookPage: Fetched user appointments RAW:", userAppointments);
+        // Log para depurar qué datos llegan al cliente
+        console.log("BookPage: Fetched user appointments from server action:", JSON.stringify(userAppointments, null, 2));
         setMyAppointments(userAppointments);
       } catch (error) {
         console.error("BookPage: Error fetching user appointments in client:", error);
@@ -151,9 +152,9 @@ export default function BookAppointmentPage() {
         setIsLoadingMyAppointments(false);
       }
     } else if (!currentUser && !authLoading) {
-      console.log("BookPage: fetchUserAppointments - no current user, clearing appointments.");
+      console.log("BookPage: fetchUserAppointments - no current user or auth is loading, clearing appointments.");
       setMyAppointments([]);
-      setIsLoadingMyAppointments(false);
+      setIsLoadingMyAppointments(false); // Asegúrate de que esto también se establece
     }
   };
 
@@ -162,11 +163,16 @@ export default function BookAppointmentPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'my-appointments' && !authLoading) { // Check authLoading here too
+    if (activeTab === 'my-appointments' && !authLoading && currentUser) {
       fetchUserAppointments();
+    } else if (activeTab === 'my-appointments' && !authLoading && !currentUser) {
+      // Si la pestaña "Mis Citas" está activa, la autenticación ha terminado y no hay usuario,
+      // limpiamos las citas y detenemos la carga.
+      setMyAppointments([]);
+      setIsLoadingMyAppointments(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, activeTab, authLoading]);
+  }, [currentUser, activeTab, authLoading]); // authLoading es dependencia clave
 
 
   const watchedDate = form.watch('preferredDate');
@@ -738,7 +744,7 @@ export default function BookAppointmentPage() {
                     )}
                   </CardContent>
                   <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
-                    {appt.status === 'pending' && ( // Only show direct cancel for 'pending'
+                    {appt.status === 'pending' && (
                       <Button
                         variant="destructive"
                         size="sm"
@@ -753,7 +759,7 @@ export default function BookAppointmentPage() {
                         Cancelar Cita
                       </Button>
                     )}
-                     {appt.status === 'confirmed' && ( // Only show contact for confirmed
+                     {appt.status === 'confirmed' && (
                       <Button
                         variant="outline"
                         size="sm"

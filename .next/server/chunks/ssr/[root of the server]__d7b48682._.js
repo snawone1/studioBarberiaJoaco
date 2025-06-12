@@ -779,8 +779,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
         return [];
     }
     try {
-        console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
-        const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
+        console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' asc, 'createdAt' desc.`);
+        const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'asc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         console.log(`[getUserAppointments] Executing query...`);
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUserAppointments);
         console.log(`[getUserAppointments] Query executed. Found ${appointmentSnapshot.docs.length} appointment documents for user ${userId}.`);
@@ -791,7 +791,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
             if (simpleSnapshot.empty) {
                 console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
             } else {
-                console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' and 'createdAt'. Please verify the index in Firestore.`);
+                console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' (asc) and 'createdAt'. Please verify the index in Firestore.`);
                 simpleSnapshot.docs.forEach((docSnap)=>{
                     console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
                 });
@@ -836,7 +836,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
     } catch (error) {
         console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
         if (error.code === 'failed-precondition') {
-            console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
+            console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (asc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
         } else if (error.code === 'permission-denied') {
             console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
         } else {
