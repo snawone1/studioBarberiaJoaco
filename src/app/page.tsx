@@ -60,10 +60,9 @@ export default function HomePage() {
         <Image
           src="https://www.shutterstock.com/image-vector/barbershop-grunge-seamless-background-mens-600nw-2335839235.jpg"
           alt="Herramientas de barbería con patrón"
-          layout="fill"
-          objectFit="cover"
+          fill={true}
+          className="object-cover brightness-[0.4]"
           priority
-          className="brightness-[0.4]"
           data-ai-hint="barber pattern"
         />
         <div className="relative z-10 p-6">

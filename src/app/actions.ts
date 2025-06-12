@@ -142,7 +142,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
     }
 
     const appointmentData = {
-      userId: data.userId,
+      userId: data.userId, // Ensure this is the Firebase User UID
       preferredDate: preferredDateTimestamp,
       preferredTime: data.preferredTime,
       services: data.services,
@@ -152,7 +152,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
     };
     console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data:", JSON.stringify(appointmentData));
     await addDoc(appointmentsCollectionRef, appointmentData);
-    console.log("[submitAppointmentRequest] Appointment added successfully.");
+    console.log("[submitAppointmentRequest] Appointment added successfully with userId:", data.userId);
     revalidatePath('/book');
     revalidatePath('/admin');
     return { success: true, message: 'Solicitud de cita enviada con éxito. Nos pondremos en contacto contigo pronto para confirmar.' };
@@ -264,7 +264,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     return [];
   }
   try {
-    console.log(`[getUserAppointments] Constructing query for appointments collection, where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
+    console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
     const qUserAppointments = query(
       appointmentsCollectionRef,
       where('userId', '==', userId),
@@ -277,7 +277,17 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     console.log(`[getUserAppointments] Query executed. Found ${appointmentSnapshot.docs.length} appointment documents for user ${userId}.`);
 
     if (appointmentSnapshot.empty) {
-      console.log(`[getUserAppointments] Snapshot is empty. Returning empty array.`);
+      console.log(`[getUserAppointments] Snapshot is empty. Will try querying without orderBy to check for data/index issues.`);
+      const qSimpleUserAppointments = query(appointmentsCollectionRef, where('userId', '==', userId));
+      const simpleSnapshot = await getDocs(qSimpleUserAppointments);
+      if (simpleSnapshot.empty) {
+        console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
+      } else {
+        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' and 'createdAt'. Please verify the index in Firestore.`);
+        simpleSnapshot.docs.forEach(docSnap => {
+           console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
+        });
+      }
       return [];
     }
 
@@ -305,7 +315,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 
       const appointment: Appointment = {
         id: docSnap.id,
-        userId: data.userId,
+        userId: data.userId, // Ensure this userId is what we expect
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A',
         services: Array.isArray(data.services) ? data.services : [],
@@ -313,13 +323,13 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
         status: data.status || 'unknown',
         createdAt: createdAtISO,
       };
-      // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment)); // Log individual mapped appointments if needed
+      // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment));
       return appointment;
     });
 
     const appointments = await Promise.all(appointmentsPromises);
     console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
-    // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); // Avoid logging all data if too large
+    // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); 
     return appointments;
 
   } catch (error: any) {

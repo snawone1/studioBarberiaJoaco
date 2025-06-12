@@ -620,20 +620,20 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
-    console.log("Server Action: submitAppointmentRequest received data with userId:", data.userId);
+    console.log("[submitAppointmentRequest] Received data with userId:", data.userId);
     try {
         const clientPreferredDate = data.preferredDate;
         const normalizedPreferredDateObject = new Date(clientPreferredDate);
         normalizedPreferredDateObject.setHours(0, 0, 0, 0);
         const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(normalizedPreferredDateObject);
-        console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+        console.log("[submitAppointmentRequest] Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
         const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', preferredDateTimestamp), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
         ]));
         const existingAppointmentsSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qCheck);
         if (!existingAppointmentsSnap.empty) {
-            console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
+            console.log("[submitAppointmentRequest] Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
             return {
                 success: false,
                 message: 'Este horario ya no está disponible. Por favor, elige otro.'
@@ -648,9 +648,9 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             status: 'pending',
             createdAt: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].now()
         };
-        console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
+        console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data:", JSON.stringify(appointmentData));
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addDoc"])(appointmentsCollectionRef, appointmentData);
-        console.log("Server Action: Appointment added successfully.");
+        console.log("[submitAppointmentRequest] Appointment added successfully.");
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         return {
@@ -658,7 +658,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             message: 'Solicitud de cita enviada con éxito. Nos pondremos en contacto contigo pronto para confirmar.'
         };
     } catch (error) {
-        console.error("Server Action: Error submitting appointment to Firestore:", error);
+        console.error("[submitAppointmentRequest] Error submitting appointment to Firestore:", error);
         return {
             success: false,
             message: 'Error al enviar la solicitud de cita. Por favor, inténtalo de nuevo.'
@@ -746,33 +746,40 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(userId) {
-    console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+    console.log(`[getUserAppointments] Top: Attempting to fetch appointments for user ID: ${userId}`);
     if (!userId) {
-        console.warn("Server Action: getUserAppointments called with no userId.");
+        console.warn("[getUserAppointments] Called with no userId. Returning empty array.");
         return [];
     }
     try {
+        console.log(`[getUserAppointments] Constructing query for appointments collection, where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
         const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
+        console.log(`[getUserAppointments] Executing query...`);
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUserAppointments);
-        console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+        console.log(`[getUserAppointments] Query executed. Found ${appointmentSnapshot.docs.length} appointment documents for user ${userId}.`);
         if (appointmentSnapshot.empty) {
+            console.log(`[getUserAppointments] Snapshot is empty. Returning empty array.`);
             return [];
         }
-        const appointments = appointmentSnapshot.docs.map((docSnap)=>{
+        console.log(`[getUserAppointments] Mapping ${appointmentSnapshot.docs.length} documents...`);
+        const appointmentsPromises = appointmentSnapshot.docs.map(async (docSnap)=>{
             const data = docSnap.data();
+            console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
             let preferredDateISO;
             let createdAtISO;
             if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
                 preferredDateISO = data.preferredDate.toDate().toISOString();
             } else {
+                console.warn(`[getUserAppointments] Doc ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
                 preferredDateISO = new Date(0).toISOString();
             }
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
             } else {
+                console.warn(`[getUserAppointments] Doc ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
                 createdAtISO = new Date(0).toISOString();
             }
-            return {
+            const appointment = {
                 id: docSnap.id,
                 userId: data.userId,
                 preferredDate: preferredDateISO,
@@ -782,26 +789,33 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
                 status: data.status || 'unknown',
                 createdAt: createdAtISO
             };
+            // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment)); // Log individual mapped appointments if needed
+            return appointment;
         });
-        console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+        const appointments = await Promise.all(appointmentsPromises);
+        console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
+        // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); // Avoid logging all data if too large
         return appointments;
     } catch (error) {
-        console.error(`Server Action: Error fetching appointments for user ${userId}:`, error);
+        console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
         if (error.code === 'failed-precondition') {
-            console.error("IMPORTANT: Firestore 'failed-precondition' error for user appointments query. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions.");
+            console.error("[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console.");
+        } else if (error.code === 'permission-denied') {
+            console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
+        } else {
+            console.error("[getUserAppointments] An unexpected error occurred:", error);
         }
         return [];
     }
 }
-async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId// Optional: for client-side cancellation validation
-) {
-    console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
+async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId) {
+    console.log(`[updateAppointmentStatus] Called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
     try {
         const appointmentDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appointments', appointmentId);
         if (currentUserId && newStatus === 'cancelled') {
-            // Client is trying to cancel their own appointment
             const appointmentSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDoc"])(appointmentDocRef);
             if (!appointmentSnap.exists()) {
+                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found.`);
                 return {
                     success: false,
                     message: 'La cita no fue encontrada.'
@@ -809,19 +823,22 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
             }
             const appointmentData = appointmentSnap.data();
             if (appointmentData.userId !== currentUserId) {
+                console.warn(`[updateAppointmentStatus] User ${currentUserId} does not own appointment ${appointmentId} (owner: ${appointmentData.userId}).`);
                 return {
                     success: false,
                     message: 'No tienes permiso para cancelar esta cita.'
                 };
             }
             if (appointmentData.status !== 'pending') {
+                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' (status: ${appointmentData.status}), cannot be cancelled by user.`);
                 return {
                     success: false,
                     message: 'Solo puedes cancelar citas que estén pendientes.'
                 };
             }
+            console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own pending appointment ${appointmentId}.`);
         } else if (currentUserId && newStatus !== 'cancelled') {
-            // Prevent client from changing status to anything other than 'cancelled'
+            console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed.`);
             return {
                 success: false,
                 message: 'No tienes permiso para realizar esta acción.'
@@ -830,7 +847,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateDoc"])(appointmentDocRef, {
             status: newStatus
         });
-        console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+        console.log(`[updateAppointmentStatus] Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         return {
@@ -838,7 +855,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
             message: `Estado de la cita actualizado a ${newStatus}.`
         };
     } catch (error) {
-        console.error(`Server Action: Error updating appointment ${appointmentId} status in Firestore:`, error);
+        console.error(`[updateAppointmentStatus] Error updating appointment ${appointmentId} status in Firestore:`, error);
         return {
             success: false,
             message: 'Error al actualizar el estado de la cita.'
@@ -1146,7 +1163,6 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getTimeSlotSettings() {
         snapshot.forEach((docSnap)=>{
             savedSettingsMap.set(docSnap.id, docSnap.data().isActive);
         });
-        // Use ALL_TIME_SLOTS from the imported constants
         const settings = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].map((time)=>({
                 time,
                 isActive: savedSettingsMap.get(time) ?? true
@@ -1154,7 +1170,6 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getTimeSlotSettings() {
         return settings;
     } catch (error) {
         console.error("Error fetching time slot settings:", error);
-        // Fallback to all active if Firestore read fails
         return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].map((time)=>({
                 time,
                 isActive: true
