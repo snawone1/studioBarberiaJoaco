@@ -1,20 +1,24 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from "@/components/ui/toaster"
-import { siteConfig } from '@/config/site';
+// import { siteConfig } from '@/config/site'; // Keep for fallback or initial values if needed
 import { AuthProvider } from '@/context/AuthContext';
+import { getSiteDetails } from '@/app/actions'; // Import the new action
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  // Add more metadata here like icons, openGraph, etc.
-};
+// Replaced static metadata with generateMetadata function
+export async function generateMetadata(): Promise<Metadata> {
+  const siteDetails = await getSiteDetails();
+  return {
+    title: {
+      default: siteDetails.name,
+      template: `%s | ${siteDetails.name}`,
+    },
+    description: siteDetails.description,
+    // Add more metadata here like icons, openGraph, etc.
+  };
+}
 
 export default function RootLayout({
   children,

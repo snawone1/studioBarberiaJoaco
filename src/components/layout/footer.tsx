@@ -1,13 +1,35 @@
-import { siteConfig } from '@/config/site';
+'use client';
+
+import { siteConfig } from '@/config/site'; // Keep for fallback or static parts
 import { Mail, MapPin, Phone } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { getSiteDetails } from '@/app/actions';
 
 export function Footer() {
+  const [dynamicSiteName, setDynamicSiteName] = useState(siteConfig.name);
+
+  useEffect(() => {
+    async function fetchSiteName() {
+      try {
+        const details = await getSiteDetails();
+        if (details && details.name) {
+          setDynamicSiteName(details.name);
+        }
+      } catch (error) {
+        console.error("Failed to fetch site name for footer:", error);
+        // Fallback to static config name if there's an error
+        setDynamicSiteName(siteConfig.name);
+      }
+    }
+    fetchSiteName();
+  }, []);
+
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-xl font-headline font-semibold text-primary mb-4">{siteConfig.name}</h3>
+            <h3 className="text-xl font-headline font-semibold text-primary mb-4">{dynamicSiteName}</h3>
             <p className="text-sm">Joaco calidad de servicio</p>
           </div>
           <div>
@@ -37,7 +59,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} {siteConfig.name}.Derechos reservados a snawDEV Studio.</p>
+          <p>&copy; {new Date().getFullYear()} {dynamicSiteName}.Derechos reservados a snawDEV Studio.</p>
         </div>
       </div>
     </footer>

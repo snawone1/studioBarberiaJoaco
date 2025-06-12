@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -10,11 +9,30 @@ import { Button } from '@/components/ui/button';
 import { Scissors, LogOut, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import React, { useEffect, useState } from 'react';
+import { getSiteDetails } from '@/app/actions';
 
 export function Header() {
   const { currentUser, logout, loading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const [dynamicSiteName, setDynamicSiteName] = useState(siteConfig.name);
+
+  useEffect(() => {
+    async function fetchSiteName() {
+      try {
+        const details = await getSiteDetails();
+        if (details && details.name) {
+          setDynamicSiteName(details.name);
+        }
+      } catch (error) {
+        console.error("Failed to fetch site name for header:", error);
+        // Fallback to static config name if there's an error
+        setDynamicSiteName(siteConfig.name);
+      }
+    }
+    fetchSiteName();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -32,7 +50,7 @@ export function Header() {
       <div className="container flex h-20 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Scissors className="h-7 w-7 text-primary" />
-          <span className="font-bold text-2xl font-headline text-primary">{siteConfig.name}</span>
+          <span className="font-bold text-2xl font-headline text-primary">{dynamicSiteName}</span>
         </Link>
         <MobileNav items={siteConfig.mainNav} />
         <div className="flex flex-1 items-center justify-end space-x-2">

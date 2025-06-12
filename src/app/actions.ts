@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues, AdminEditUserFormValues } from '@/lib/schemas';
@@ -64,6 +63,12 @@ export type TimeSlotSetting = {
 export type MessageTemplate = {
   id: string; // e.g., 'confirmation', 'cancellation'
   content: string;
+};
+
+// --- Site Details Type ---
+export type SiteDetails = {
+  name: string;
+  description: string;
 };
 
 
@@ -306,7 +311,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
       if (simpleSnapshot.empty) {
         console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
       } else {
-        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' (asc) and 'createdAt'. Please verify the index in Firestore.`);
+        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'userId' (asc), 'preferredDate' (asc) and 'createdAt' (desc). Please verify the index in Firestore.`);
         simpleSnapshot.docs.forEach(docSnap => {
            console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
         });
@@ -451,11 +456,43 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 }
 
 // --- Site Settings Actions ---
-export async function submitSiteSettings(data: SiteSettingsFormValues) {
-  // console.log('Site Settings Update Received by Server Action:', data);
-  revalidatePath('/admin/settings');
-  revalidatePath('/');
-  return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página o reconstrucción).' };
+export async function getSiteDetails(): Promise<SiteDetails> {
+  try {
+    const siteDetailsDocRef = doc(appSettingsCollectionRef, 'siteDetails');
+    const docSnap = await getDoc(siteDetailsDocRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return {
+        name: data.siteName || siteConfig.name,
+        description: data.siteDescription || siteConfig.description,
+      };
+    }
+    // Return default from config if not found in Firestore
+    return { name: siteConfig.name, description: siteConfig.description };
+  } catch (error) {
+    console.error("Error fetching site details:", error);
+    // Return default in case of error
+    return { name: siteConfig.name, description: siteConfig.description };
+  }
+}
+
+export async function submitSiteSettings(data: SiteSettingsFormValues): Promise<{ success: boolean; message: string }> {
+  try {
+    const siteDetailsDocRef = doc(appSettingsCollectionRef, 'siteDetails');
+    await setDoc(siteDetailsDocRef, {
+      siteName: data.siteName,
+      siteDescription: data.siteDescription,
+    }, { merge: true });
+    
+    revalidatePath('/admin/settings'); // For the settings page itself
+    revalidatePath('/'); // For homepage
+    revalidatePath('/layout'); // To attempt revalidation for layout components (header, footer, metadata)
+
+    return { success: true, message: 'Configuración del sitio guardada con éxito. Los cambios pueden tardar unos momentos en reflejarse completamente.' };
+  } catch (error: any) {
+    console.error("Error saving site settings to Firestore:", error);
+    return { success: false, message: `Error al guardar la configuración del sitio: ${error.message}` };
+  }
 }
 
 

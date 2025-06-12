@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -44,6 +43,7 @@ import {
   getAdminPhoneNumber,
   updateAdminPhoneNumber,
   type MessageTemplateId,
+  getSiteDetails, // Import getSiteDetails
 } from '@/app/actions';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
@@ -91,8 +91,8 @@ export default function AdminSettingsPage() {
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
     defaultValues: {
-      siteName: siteConfig.name,
-      siteDescription: siteConfig.description,
+      siteName: '', // Will be populated from Firestore
+      siteDescription: '', // Will be populated from Firestore
     },
   });
 
@@ -118,12 +118,29 @@ export default function AdminSettingsPage() {
     }
   }, [currentUser, authLoading, router, toast]);
 
+  // Fetch site details and populate form
   useEffect(() => {
-    settingsForm.reset({
-      siteName: siteConfig.name,
-      siteDescription: siteConfig.description,
-    });
-  }, [siteConfig.name, siteConfig.description, settingsForm]);
+    async function fetchAndSetSiteDetails() {
+      if (currentUser?.email === 'joacoadmin@admin.com') {
+        try {
+          const details = await getSiteDetails();
+          settingsForm.reset({
+            siteName: details.name,
+            siteDescription: details.description,
+          });
+        } catch (error) {
+          console.error("Failed to fetch site details for admin settings:", error);
+          toast({ title: 'Error', description: 'No se pudo cargar la configuración actual del sitio.', variant: 'destructive' });
+           settingsForm.reset({
+            siteName: siteConfig.name, // Fallback to static config
+            siteDescription: siteConfig.description,
+          });
+        }
+      }
+    }
+    fetchAndSetSiteDetails();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, settingsForm]);
 
 
   async function fetchAdminServices() {
@@ -208,8 +225,6 @@ export default function AdminSettingsPage() {
     const result = await submitSiteSettings(data);
     if (result.success) {
       toast({ title: '¡Configuración Guardada!', description: result.message });
-      // siteConfig.name = data.siteName; // This won't work as siteConfig is not reactive
-      // siteConfig.description = data.siteDescription; // Update local config if necessary or re-fetch
       settingsForm.reset({ siteName: data.siteName, siteDescription: data.siteDescription });
     } else {
       toast({ title: 'Error', description: result.message || 'No se pudo guardar la configuración.', variant: 'destructive' });
@@ -321,7 +336,7 @@ export default function AdminSettingsPage() {
     setIsSubmittingAdminPhone(false);
   }
   
-  if (authLoading) {
+  if (authLoading || (currentUser && settingsForm.getValues().siteName === '')) { // Also check if form values are not yet populated
     return (
       <div className="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-10rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -745,4 +760,3 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
-    

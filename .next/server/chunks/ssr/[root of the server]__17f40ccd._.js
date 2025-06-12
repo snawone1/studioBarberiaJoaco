@@ -1301,16 +1301,19 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAdminPhoneNumber() {
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAdminPhoneNumber(phoneNumber) {
     try {
         const contactDetailsDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(appSettingsCollectionRef, 'contactDetails');
-        // Validate phone number format if necessary before saving
-        const cleanedPhoneNumber = phoneNumber.replace(/\D/g, ''); // Basic cleaning
-        if (!cleanedPhoneNumber.startsWith('54')) {
-        // return { success: false, message: 'El número de teléfono debe ser un número argentino válido (ej: 54911... o 5411...).' };
+        // Basic cleaning: remove non-digits. Could be more sophisticated.
+        const cleanedPhoneNumber = phoneNumber.replace(/\D/g, '');
+        // Basic validation for Argentinian numbers, e.g., must start with 54 and have a certain length.
+        // This is a very simplified validation.
+        if (!cleanedPhoneNumber.startsWith('54') || cleanedPhoneNumber.length < 11) {
+        // Returning a specific message, but ideally the client-side form should handle this.
+        // return { success: false, message: 'El número de teléfono debe ser un número argentino válido (ej: 54911... o 5411...). Asegúrate de incluir el código de país (54) y el de área.' };
         }
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["setDoc"])(contactDetailsDocRef, {
             adminPhoneNumber: phoneNumber
         }, {
             merge: true
-        });
+        }); // Save the raw number provided by admin
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
         return {
             success: true,
