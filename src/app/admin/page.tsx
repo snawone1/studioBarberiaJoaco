@@ -873,11 +873,11 @@ export default function AdminPage() {
               <AlertDialogTitle>Confirmar Cita</AlertDialogTitle>
               <AlertDialogDescription>
                 Estás a punto de confirmar la siguiente cita:
-                <div className="mt-2 text-sm text-foreground">
-                  <p><strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}</p>
-                  <p><strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}</p>
-                  <p><strong>Hora:</strong> {appointmentToConfirm.preferredTime}</p>
-                  <p><strong>Servicios:</strong> {appointmentToConfirm.services.join(', ')}</p>
+                <div className="mt-2 text-sm text-foreground space-y-1">
+                  <div><strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}</div>
+                  <div><strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}</div>
+                  <div><strong>Hora:</strong> {appointmentToConfirm.preferredTime}</div>
+                  <div><strong>Servicios:</strong> {appointmentToConfirm.services.join(', ')}</div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -925,11 +925,11 @@ export default function AdminPage() {
               <AlertDialogTitle>Confirmar Cancelación</AlertDialogTitle>
               <AlertDialogDescription>
                 Estás a punto de cancelar la siguiente cita:
-                <div className="mt-2 text-sm text-foreground">
-                  <p><strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}</p>
-                  <p><strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}</p>
-                  <p><strong>Hora:</strong> {appointmentToCancel.preferredTime}</p>
-                  <p><strong>Servicios:</strong> {appointmentToCancel.services.join(', ')}</p>
+                <div className="mt-2 text-sm text-foreground space-y-1">
+                  <div><strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}</div>
+                  <div><strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}</div>
+                  <div><strong>Hora:</strong> {appointmentToCancel.preferredTime}</div>
+                  <div><strong>Servicios:</strong> {appointmentToCancel.services.join(', ')}</div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -971,4 +971,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

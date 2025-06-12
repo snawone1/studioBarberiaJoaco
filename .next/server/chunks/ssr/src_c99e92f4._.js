@@ -622,21 +622,24 @@ const serviceSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modul
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ {"0017e9636f89f561cfe7d2adcbae9ec8974b0281f3":"getTimeSlotSettings","0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","008945fd2a69b2f92ca2e307a103b4c75c7dee6185":"getUsers","00e12f5822ed0746140d44f336b07b380a4b412e88":"getServices","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","4054b8264a9d1e80f44742f2f7567713c22e089825":"addService","40857648b9877f2e0a8188dfad6f3147ad4a905c2c":"deleteService","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40b73813f0c82410f254a24b32409f7189a1b1ac0c":"updateService","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40caf416edbb707356716f925239e16c8970013236":"getMessageTemplate","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4":"updateTimeSlotSetting","609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a":"updateMessageTemplate","60df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ {"0017e9636f89f561cfe7d2adcbae9ec8974b0281f3":"getTimeSlotSettings","00341173e521f89c1eccb89137a0c821c5b391297b":"getAdminPhoneNumber","0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","008945fd2a69b2f92ca2e307a103b4c75c7dee6185":"getUsers","00e12f5822ed0746140d44f336b07b380a4b412e88":"getServices","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","4054b8264a9d1e80f44742f2f7567713c22e089825":"addService","40857648b9877f2e0a8188dfad6f3147ad4a905c2c":"deleteService","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40b73813f0c82410f254a24b32409f7189a1b1ac0c":"updateService","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40caf416edbb707356716f925239e16c8970013236":"getMessageTemplate","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40da10036fe76165f7bdab3c65eb3a9e264a1a604e":"getUserAppointments","40e8caa2e4508de437dd356a72f607887f92f6b53b":"updateAdminPhoneNumber","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4":"updateTimeSlotSetting","609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a":"updateMessageTemplate","70df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
     "addProduct": (()=>addProduct),
     "addService": (()=>addService),
     "deleteProduct": (()=>deleteProduct),
     "deleteService": (()=>deleteService),
     "getAIStyleAdvice": (()=>getAIStyleAdvice),
+    "getAdminPhoneNumber": (()=>getAdminPhoneNumber),
     "getAppointments": (()=>getAppointments),
     "getBookedSlotsForDate": (()=>getBookedSlotsForDate),
     "getMessageTemplate": (()=>getMessageTemplate),
     "getProducts": (()=>getProducts),
     "getServices": (()=>getServices),
     "getTimeSlotSettings": (()=>getTimeSlotSettings),
+    "getUserAppointments": (()=>getUserAppointments),
     "getUsers": (()=>getUsers),
     "submitAppointmentRequest": (()=>submitAppointmentRequest),
     "submitSiteSettings": (()=>submitSiteSettings),
+    "updateAdminPhoneNumber": (()=>updateAdminPhoneNumber),
     "updateAppointmentStatus": (()=>updateAppointmentStatus),
     "updateMessageTemplate": (()=>updateMessageTemplate),
     "updateProduct": (()=>updateProduct),
@@ -648,7 +651,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var getUsers = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("008945fd2a69b2f92ca2e307a103b4c75c7dee6185", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getUsers");
 var submitAppointmentRequest = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "submitAppointmentRequest");
 var getAppointments = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("005ce712c32342acd38082636e5dc614daa6adfb4c", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getAppointments");
-var updateAppointmentStatus = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("60df8604b55fb28ca85f574dd721ecefbfd80a9cdf", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "updateAppointmentStatus");
+var getUserAppointments = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("40da10036fe76165f7bdab3c65eb3a9e264a1a604e", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getUserAppointments");
+var updateAppointmentStatus = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("70df8604b55fb28ca85f574dd721ecefbfd80a9cdf", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "updateAppointmentStatus");
 var getBookedSlotsForDate = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("40eac7d4fc402c740264556fcc123d86b3754e3b2b", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getBookedSlotsForDate");
 var getAIStyleAdvice = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("40a7151c7200c725962ec313e9e769b68883d0a7c8", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getAIStyleAdvice");
 var submitSiteSettings = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("408c3740241a917b864710f949e092258b8e366293", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "submitSiteSettings");
@@ -664,6 +668,8 @@ var getTimeSlotSettings = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$p
 var updateTimeSlotSetting = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "updateTimeSlotSetting");
 var getMessageTemplate = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("40caf416edbb707356716f925239e16c8970013236", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getMessageTemplate");
 var updateMessageTemplate = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "updateMessageTemplate");
+var getAdminPhoneNumber = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("00341173e521f89c1eccb89137a0c821c5b391297b", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "getAdminPhoneNumber");
+var updateAdminPhoneNumber = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createServerReference"])("40e8caa2e4508de437dd356a72f607887f92f6b53b", __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["callServer"], void 0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$action$2d$client$2d$wrapper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["findSourceMapURL"], "updateAdminPhoneNumber");
 }}),
 "[project]/src/lib/constants.ts [app-ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
@@ -838,10 +844,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.js [app-ssr] (ecmascript) <export default as X>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$message$2d$square$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MessageSquareIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/message-square.js [app-ssr] (ecmascript) <export default as MessageSquareIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$info$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__InfoIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/info.js [app-ssr] (ecmascript) <export default as InfoIcon>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__PhoneIcon$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/phone.js [app-ssr] (ecmascript) <export default as PhoneIcon>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/scroll-area.tsx [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$switch$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/switch.tsx [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/label.tsx [app-ssr] (ecmascript)"); // This is the generic one
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ui/label.tsx [app-ssr] (ecmascript)");
 'use client';
 ;
 ;
@@ -880,11 +887,16 @@ function AdminSettingsPage() {
     const [timeSlotSettingsList, setTimeSlotSettingsList] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isLoadingTimeSlots, setIsLoadingTimeSlots] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isUpdatingTimeSlot, setIsUpdatingTimeSlot] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    // States for WhatsApp Message Templates
+    // States for WhatsApp Message Templates & Admin Contact
     const [confirmationTemplate, setConfirmationTemplate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [cancellationTemplate, setCancellationTemplate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [adminContactCancellationTemplate, setAdminContactCancellationTemplate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [adminContactQueryTemplate, setAdminContactQueryTemplate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [isLoadingTemplates, setIsLoadingTemplates] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isSubmittingTemplate, setIsSubmittingTemplate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [adminPhoneNumber, setAdminPhoneNumber] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
+    const [isLoadingAdminPhone, setIsLoadingAdminPhone] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isSubmittingAdminPhone, setIsSubmittingAdminPhone] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const availablePlaceholders = [
         '{{clientName}}',
         '{{appointmentDate}}',
@@ -968,15 +980,34 @@ function AdminSettingsPage() {
             setIsLoadingTimeSlots(false);
         }
     }
+    async function fetchAdminContactSettings() {
+        setIsLoadingAdminPhone(true);
+        try {
+            const phone = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getAdminPhoneNumber"])();
+            if (phone) setAdminPhoneNumber(phone);
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: 'No se pudo cargar el número de teléfono del administrador.',
+                variant: 'destructive'
+            });
+        } finally{
+            setIsLoadingAdminPhone(false);
+        }
+    }
     async function fetchMessageTemplates() {
         setIsLoadingTemplates(true);
         try {
-            const [confTemplate, cancTemplate] = await Promise.all([
+            const [confTemplate, cancTemplate, adminCancTemplate, adminQueryTemplate] = await Promise.all([
                 (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getMessageTemplate"])('confirmation'),
-                (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getMessageTemplate"])('cancellation')
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getMessageTemplate"])('cancellation'),
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getMessageTemplate"])('adminContactCancellationRequest'),
+                (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getMessageTemplate"])('adminContactQuery')
             ]);
             setConfirmationTemplate(confTemplate);
             setCancellationTemplate(cancTemplate);
+            setAdminContactCancellationTemplate(adminCancTemplate);
+            setAdminContactQueryTemplate(adminQueryTemplate);
         } catch (error) {
             toast({
                 title: 'Error',
@@ -992,6 +1023,7 @@ function AdminSettingsPage() {
             fetchAdminServices();
             fetchTimeSlotSettingsAdmin();
             fetchMessageTemplates();
+            fetchAdminContactSettings();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
@@ -1005,6 +1037,8 @@ function AdminSettingsPage() {
                 title: '¡Configuración Guardada!',
                 description: result.message
             });
+            // siteConfig.name = data.siteName; // This won't work as siteConfig is not reactive
+            // siteConfig.description = data.siteDescription; // Update local config if necessary or re-fetch
             settingsForm.reset({
                 siteName: data.siteName,
                 siteDescription: data.siteDescription
@@ -1107,7 +1141,21 @@ function AdminSettingsPage() {
     }
     async function handleSaveTemplate(templateId) {
         setIsSubmittingTemplate(templateId);
-        const content = templateId === 'confirmation' ? confirmationTemplate : cancellationTemplate;
+        let content = '';
+        switch(templateId){
+            case 'confirmation':
+                content = confirmationTemplate;
+                break;
+            case 'cancellation':
+                content = cancellationTemplate;
+                break;
+            case 'adminContactCancellationRequest':
+                content = adminContactCancellationTemplate;
+                break;
+            case 'adminContactQuery':
+                content = adminContactQueryTemplate;
+                break;
+        }
         const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["updateMessageTemplate"])(templateId, content);
         if (result.success) {
             toast({
@@ -1123,6 +1171,34 @@ function AdminSettingsPage() {
         }
         setIsSubmittingTemplate(null);
     }
+    async function handleSaveAdminPhoneNumber() {
+        setIsSubmittingAdminPhone(true);
+        // Basic validation for Argentinian numbers (can be improved)
+        const cleanedPhone = adminPhoneNumber.replace(/\D/g, '');
+        if (!cleanedPhone.startsWith('54') || cleanedPhone.length < 11) {
+            toast({
+                title: 'Número Inválido',
+                description: 'El formato debe ser Ej: 5491123456789 o 542211234567.',
+                variant: 'destructive'
+            });
+            setIsSubmittingAdminPhone(false);
+            return;
+        }
+        const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["updateAdminPhoneNumber"])(adminPhoneNumber);
+        if (result.success) {
+            toast({
+                title: 'Número Guardado',
+                description: result.message
+            });
+        } else {
+            toast({
+                title: 'Error',
+                description: result.message || 'No se pudo guardar el número.',
+                variant: 'destructive'
+            });
+        }
+        setIsSubmittingAdminPhone(false);
+    }
     if (authLoading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-10rem)]",
@@ -1130,12 +1206,12 @@ function AdminSettingsPage() {
                 className: "h-12 w-12 animate-spin text-primary"
             }, void 0, false, {
                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                lineNumber: 267,
+                lineNumber: 326,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/admin/settings/page.tsx",
-            lineNumber: 266,
+            lineNumber: 325,
             columnNumber: 7
         }, this);
     }
@@ -1146,12 +1222,12 @@ function AdminSettingsPage() {
                 children: "Redirigiendo..."
             }, void 0, false, {
                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                lineNumber: 275,
+                lineNumber: 334,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/app/admin/settings/page.tsx",
-            lineNumber: 274,
+            lineNumber: 333,
             columnNumber: 7
         }, this);
     }
@@ -1164,7 +1240,7 @@ function AdminSettingsPage() {
                 titleClassName: "font-sans"
             }, void 0, false, {
                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                lineNumber: 282,
+                lineNumber: 341,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1181,27 +1257,27 @@ function AdminSettingsPage() {
                                                 className: "h-5 w-5 mr-2 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 293,
+                                                lineNumber: 352,
                                                 columnNumber: 15
                                             }, this),
                                             "Información General del Sitio"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 292,
+                                        lineNumber: 351,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "Modifica el nombre y la descripción de tu sitio web. Estos cambios se reflejarán globalmente."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 296,
+                                        lineNumber: 355,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 291,
+                                lineNumber: 350,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1220,7 +1296,7 @@ function AdminSettingsPage() {
                                                                 children: "Nombre del Sitio"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 308,
+                                                                lineNumber: 367,
                                                                 columnNumber: 23
                                                             }, void 0),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1229,28 +1305,28 @@ function AdminSettingsPage() {
                                                                     ...field
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                    lineNumber: 309,
+                                                                    lineNumber: 368,
                                                                     columnNumber: 36
                                                                 }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 309,
+                                                                lineNumber: 368,
                                                                 columnNumber: 23
                                                             }, void 0),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 310,
+                                                                lineNumber: 369,
                                                                 columnNumber: 23
                                                             }, void 0)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 307,
+                                                        lineNumber: 366,
                                                         columnNumber: 21
                                                     }, void 0)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 303,
+                                                lineNumber: 362,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1262,7 +1338,7 @@ function AdminSettingsPage() {
                                                                 children: "Descripción del Sitio"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 319,
+                                                                lineNumber: 378,
                                                                 columnNumber: 23
                                                             }, void 0),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1272,28 +1348,28 @@ function AdminSettingsPage() {
                                                                     ...field
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                    lineNumber: 320,
+                                                                    lineNumber: 379,
                                                                     columnNumber: 36
                                                                 }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 320,
+                                                                lineNumber: 379,
                                                                 columnNumber: 23
                                                             }, void 0),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 321,
+                                                                lineNumber: 380,
                                                                 columnNumber: 23
                                                             }, void 0)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 318,
+                                                        lineNumber: 377,
                                                         columnNumber: 21
                                                     }, void 0)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 314,
+                                                lineNumber: 373,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1306,41 +1382,158 @@ function AdminSettingsPage() {
                                                             className: "mr-2 h-4 w-4 animate-spin"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                            lineNumber: 327,
+                                                            lineNumber: 386,
                                                             columnNumber: 46
                                                         }, this),
                                                         "Guardar Cambios"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 326,
+                                                    lineNumber: 385,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 325,
+                                                lineNumber: 384,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 302,
+                                        lineNumber: 361,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                    lineNumber: 301,
+                                    lineNumber: 360,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 300,
+                                lineNumber: 359,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                        lineNumber: 290,
+                        lineNumber: 349,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardHeader"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardTitle"], {
+                                        className: "flex items-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__PhoneIcon$3e$__["PhoneIcon"], {
+                                                className: "h-5 w-5 mr-2 text-primary"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                lineNumber: 399,
+                                                columnNumber: 21
+                                            }, this),
+                                            "Contacto del Administrador (WhatsApp)"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                        lineNumber: 398,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
+                                        children: "Configura el número de teléfono para que los clientes te contacten por WhatsApp."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                        lineNumber: 402,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                lineNumber: 397,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
+                                className: "space-y-4",
+                                children: isLoadingAdminPhone ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex justify-center py-4",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                        className: "h-6 w-6 animate-spin text-primary"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                        lineNumber: 408,
+                                        columnNumber: 63
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/admin/settings/page.tsx",
+                                    lineNumber: 408,
+                                    columnNumber: 21
+                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
+                                            htmlFor: "adminPhoneNumber",
+                                            className: "text-base font-medium",
+                                            children: "Número de WhatsApp del Administrador"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/admin/settings/page.tsx",
+                                            lineNumber: 411,
+                                            columnNumber: 25
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Input"], {
+                                            id: "adminPhoneNumber",
+                                            type: "tel",
+                                            value: adminPhoneNumber,
+                                            onChange: (e)=>setAdminPhoneNumber(e.target.value),
+                                            placeholder: "Ej: 5491123456789 (incluir código de país)",
+                                            className: "mt-1"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/admin/settings/page.tsx",
+                                            lineNumber: 412,
+                                            columnNumber: 25
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-xs text-muted-foreground mt-1",
+                                            children: "Incluir código de país y área sin el '+' ni espacios. Ej: 5491123456789"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/admin/settings/page.tsx",
+                                            lineNumber: 420,
+                                            columnNumber: 26
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                            onClick: handleSaveAdminPhoneNumber,
+                                            disabled: isSubmittingAdminPhone,
+                                            size: "sm",
+                                            className: "mt-3",
+                                            children: [
+                                                isSubmittingAdminPhone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                    className: "mr-2 h-4 w-4 animate-spin"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                    lineNumber: 427,
+                                                    columnNumber: 56
+                                                }, this),
+                                                "Guardar Número"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/app/admin/settings/page.tsx",
+                                            lineNumber: 421,
+                                            columnNumber: 25
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/admin/settings/page.tsx",
+                                    lineNumber: 410,
+                                    columnNumber: 21
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                lineNumber: 406,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                        lineNumber: 396,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1351,20 +1544,20 @@ function AdminSettingsPage() {
                                         children: "Gestión de Servicios"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 339,
+                                        lineNumber: 439,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "Añade, edita o elimina los servicios ofrecidos. Estos servicios se mostrarán en la página de reservas."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 340,
+                                        lineNumber: 440,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 338,
+                                lineNumber: 438,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1377,14 +1570,14 @@ function AdminSettingsPage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 345,
+                                                lineNumber: 445,
                                                 columnNumber: 17
                                             }, this),
                                             " Añadir Nuevo Servicio"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 344,
+                                        lineNumber: 444,
                                         columnNumber: 15
                                     }, this),
                                     showAddEditServiceForm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1397,12 +1590,12 @@ function AdminSettingsPage() {
                                                     children: editingService ? 'Editar Servicio' : 'Nuevo Servicio'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 352,
+                                                    lineNumber: 452,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 351,
+                                                lineNumber: 451,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1422,7 +1615,7 @@ function AdminSettingsPage() {
                                                                                 children: "Nombre del Servicio"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 361,
+                                                                                lineNumber: 461,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1431,28 +1624,28 @@ function AdminSettingsPage() {
                                                                                     ...field
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                    lineNumber: 362,
+                                                                                    lineNumber: 462,
                                                                                     columnNumber: 40
                                                                                 }, void 0)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 362,
+                                                                                lineNumber: 462,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 363,
+                                                                                lineNumber: 463,
                                                                                 columnNumber: 27
                                                                             }, void 0)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 360,
+                                                                        lineNumber: 460,
                                                                         columnNumber: 25
                                                                     }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 359,
+                                                                lineNumber: 459,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1464,7 +1657,7 @@ function AdminSettingsPage() {
                                                                                 children: "Descripción"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 368,
+                                                                                lineNumber: 468,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1474,28 +1667,28 @@ function AdminSettingsPage() {
                                                                                     rows: 3
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                    lineNumber: 369,
+                                                                                    lineNumber: 469,
                                                                                     columnNumber: 40
                                                                                 }, void 0)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 369,
+                                                                                lineNumber: 469,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 370,
+                                                                                lineNumber: 470,
                                                                                 columnNumber: 27
                                                                             }, void 0)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 367,
+                                                                        lineNumber: 467,
                                                                         columnNumber: 25
                                                                     }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 366,
+                                                                lineNumber: 466,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormField"], {
@@ -1507,7 +1700,7 @@ function AdminSettingsPage() {
                                                                                 children: "Precio"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 375,
+                                                                                lineNumber: 475,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormControl"], {
@@ -1516,28 +1709,28 @@ function AdminSettingsPage() {
                                                                                     ...field
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                    lineNumber: 376,
+                                                                                    lineNumber: 476,
                                                                                     columnNumber: 40
                                                                                 }, void 0)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 376,
+                                                                                lineNumber: 476,
                                                                                 columnNumber: 27
                                                                             }, void 0),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$form$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FormMessage"], {}, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 377,
+                                                                                lineNumber: 477,
                                                                                 columnNumber: 27
                                                                             }, void 0)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 374,
+                                                                        lineNumber: 474,
                                                                         columnNumber: 25
                                                                     }, void 0)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 373,
+                                                                lineNumber: 473,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1558,7 +1751,7 @@ function AdminSettingsPage() {
                                                                         children: "Cancelar"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 381,
+                                                                        lineNumber: 481,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -1569,42 +1762,42 @@ function AdminSettingsPage() {
                                                                                 className: "mr-2 h-4 w-4 animate-spin"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 383,
+                                                                                lineNumber: 483,
                                                                                 columnNumber: 51
                                                                             }, this),
                                                                             editingService ? 'Actualizar Servicio' : 'Añadir Servicio'
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 382,
+                                                                        lineNumber: 482,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 380,
+                                                                lineNumber: 480,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 358,
+                                                        lineNumber: 458,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 357,
+                                                    lineNumber: 457,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 356,
+                                                lineNumber: 456,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 350,
+                                        lineNumber: 450,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1612,7 +1805,7 @@ function AdminSettingsPage() {
                                         children: "Servicios Actuales"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 393,
+                                        lineNumber: 493,
                                         columnNumber: 13
                                     }, this),
                                     isLoadingServices ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1621,12 +1814,12 @@ function AdminSettingsPage() {
                                             className: "h-8 w-8 animate-spin text-primary"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 395,
+                                            lineNumber: 495,
                                             columnNumber: 57
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 395,
+                                        lineNumber: 495,
                                         columnNumber: 15
                                     }, this) : services.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-center py-10 text-muted-foreground rounded-md border border-dashed p-8",
@@ -1635,7 +1828,7 @@ function AdminSettingsPage() {
                                                 className: "h-12 w-12 mx-auto mb-3 text-muted-foreground/70"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 398,
+                                                lineNumber: 498,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1643,7 +1836,7 @@ function AdminSettingsPage() {
                                                 children: "No hay servicios configurados."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 399,
+                                                lineNumber: 499,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1651,13 +1844,13 @@ function AdminSettingsPage() {
                                                 children: "Empieza añadiendo uno nuevo para que aparezcan en la página de reservas."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 400,
+                                                lineNumber: 500,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 397,
+                                        lineNumber: 497,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ScrollArea"], {
                                         className: showAddEditServiceForm ? "max-h-[250px] overflow-y-auto border rounded-md p-1" : "max-h-[400px] overflow-y-auto border rounded-md p-1",
@@ -1677,7 +1870,7 @@ function AdminSettingsPage() {
                                                                         children: service.name
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 409,
+                                                                        lineNumber: 509,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1686,7 +1879,7 @@ function AdminSettingsPage() {
                                                                         children: service.description
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 410,
+                                                                        lineNumber: 510,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1694,13 +1887,13 @@ function AdminSettingsPage() {
                                                                         children: service.price
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 411,
+                                                                        lineNumber: 511,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 408,
+                                                                lineNumber: 508,
                                                                 columnNumber: 29
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1716,7 +1909,7 @@ function AdminSettingsPage() {
                                                                                 className: "h-4 w-4 mr-1 sm:mr-0"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 415,
+                                                                                lineNumber: 515,
                                                                                 columnNumber: 33
                                                                             }, this),
                                                                             " ",
@@ -1725,13 +1918,13 @@ function AdminSettingsPage() {
                                                                                 children: "Editar"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 415,
+                                                                                lineNumber: 515,
                                                                                 columnNumber: 76
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 414,
+                                                                        lineNumber: 514,
                                                                         columnNumber: 33
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -1747,7 +1940,7 @@ function AdminSettingsPage() {
                                                                                             className: "h-4 w-4 mr-1 sm:mr-0"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                            lineNumber: 420,
+                                                                                            lineNumber: 520,
                                                                                             columnNumber: 37
                                                                                         }, this),
                                                                                         " ",
@@ -1756,18 +1949,18 @@ function AdminSettingsPage() {
                                                                                             children: "Eliminar"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                            lineNumber: 420,
+                                                                                            lineNumber: 520,
                                                                                             columnNumber: 81
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                    lineNumber: 419,
+                                                                                    lineNumber: 519,
                                                                                     columnNumber: 37
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 418,
+                                                                                lineNumber: 518,
                                                                                 columnNumber: 33
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogContent"], {
@@ -1779,7 +1972,7 @@ function AdminSettingsPage() {
                                                                                                 children: "Confirmar Eliminación"
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                lineNumber: 425,
+                                                                                                lineNumber: 525,
                                                                                                 columnNumber: 37
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogDescription"], {
@@ -1790,13 +1983,13 @@ function AdminSettingsPage() {
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                lineNumber: 426,
+                                                                                                lineNumber: 526,
                                                                                                 columnNumber: 37
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                        lineNumber: 424,
+                                                                                        lineNumber: 524,
                                                                                         columnNumber: 37
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogFooter"], {
@@ -1810,12 +2003,12 @@ function AdminSettingsPage() {
                                                                                                     children: "Cancelar"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                    lineNumber: 432,
+                                                                                                    lineNumber: 532,
                                                                                                     columnNumber: 41
                                                                                                 }, this)
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                lineNumber: 431,
+                                                                                                lineNumber: 531,
                                                                                                 columnNumber: 37
                                                                                             }, this),
                                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["DialogClose"], {
@@ -1827,69 +2020,69 @@ function AdminSettingsPage() {
                                                                                                     children: "Eliminar"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                    lineNumber: 435,
+                                                                                                    lineNumber: 535,
                                                                                                     columnNumber: 41
                                                                                                 }, this)
                                                                                             }, void 0, false, {
                                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                                lineNumber: 434,
+                                                                                                lineNumber: 534,
                                                                                                 columnNumber: 37
                                                                                             }, this)
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                        lineNumber: 430,
+                                                                                        lineNumber: 530,
                                                                                         columnNumber: 37
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                                lineNumber: 423,
+                                                                                lineNumber: 523,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                        lineNumber: 417,
+                                                                        lineNumber: 517,
                                                                         columnNumber: 33
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 413,
+                                                                lineNumber: 513,
                                                                 columnNumber: 29
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 407,
+                                                        lineNumber: 507,
                                                         columnNumber: 25
                                                     }, this)
                                                 }, service.id, false, {
                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 406,
+                                                    lineNumber: 506,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 404,
+                                            lineNumber: 504,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 403,
+                                        lineNumber: 503,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 342,
+                                lineNumber: 442,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                        lineNumber: 337,
+                        lineNumber: 437,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -1903,27 +2096,27 @@ function AdminSettingsPage() {
                                                 className: "h-5 w-5 mr-2 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 454,
+                                                lineNumber: 554,
                                                 columnNumber: 17
                                             }, this),
                                             "Horarios de Atención"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 453,
+                                        lineNumber: 553,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
                                         children: "Define los horarios disponibles para agendar citas. Desactiva los horarios que no estarán disponibles."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 457,
+                                        lineNumber: 557,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 452,
+                                lineNumber: 552,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -1933,12 +2126,12 @@ function AdminSettingsPage() {
                                         className: "h-8 w-8 animate-spin text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 461,
+                                        lineNumber: 561,
                                         columnNumber: 57
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                    lineNumber: 461,
+                                    lineNumber: 561,
                                     columnNumber: 15
                                 }, this) : timeSlotSettingsList.length === 0 && __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "text-center py-10 text-muted-foreground rounded-md border border-dashed p-8",
@@ -1947,7 +2140,7 @@ function AdminSettingsPage() {
                                             className: "h-12 w-12 mx-auto mb-3 text-muted-foreground/70"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 464,
+                                            lineNumber: 564,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1955,7 +2148,7 @@ function AdminSettingsPage() {
                                             children: "No hay horarios configurados en el sistema."
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 465,
+                                            lineNumber: 565,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1963,13 +2156,13 @@ function AdminSettingsPage() {
                                             children: "Contacta a soporte si esto es un error."
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 466,
+                                            lineNumber: 566,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                    lineNumber: 463,
+                                    lineNumber: 563,
                                     columnNumber: 15
                                 }, this) : timeSlotSettingsList.length === 0 && __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ScrollArea"], {
                                     className: "max-h-[400px] overflow-y-auto border rounded-md p-1",
@@ -1984,7 +2177,7 @@ function AdminSettingsPage() {
                                                         children: slotTime
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 473,
+                                                        lineNumber: 573,
                                                         columnNumber: 27
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1994,7 +2187,7 @@ function AdminSettingsPage() {
                                                                 className: "h-5 w-5 animate-spin text-primary"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 478,
+                                                                lineNumber: 578,
                                                                 columnNumber: 31
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$switch$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Switch"], {
                                                                 id: `timeslot-${slotTime.replace(/\s|:/g, '-')}`,
@@ -2003,36 +2196,36 @@ function AdminSettingsPage() {
                                                                 "aria-label": `Activar o desactivar horario ${slotTime}`
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 480,
+                                                                lineNumber: 580,
                                                                 columnNumber: 31
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
                                                                 className: "h-5 w-5 text-green-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 487,
+                                                                lineNumber: 587,
                                                                 columnNumber: 29
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 476,
+                                                        lineNumber: 576,
                                                         columnNumber: 27
                                                     }, this)
                                                 ]
                                             }, slotTime, true, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 472,
+                                                lineNumber: 572,
                                                 columnNumber: 25
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 470,
+                                        lineNumber: 570,
                                         columnNumber: 21
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                    lineNumber: 469,
+                                    lineNumber: 569,
                                     columnNumber: 18
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ScrollArea"], {
                                     className: "max-h-[400px] overflow-y-auto border rounded-md p-1",
@@ -2047,7 +2240,7 @@ function AdminSettingsPage() {
                                                         children: slotSetting.time
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 498,
+                                                        lineNumber: 598,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2057,7 +2250,7 @@ function AdminSettingsPage() {
                                                                 className: "h-5 w-5 animate-spin text-primary"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 503,
+                                                                lineNumber: 603,
                                                                 columnNumber: 27
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$switch$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Switch"], {
                                                                 id: `timeslot-${slotSetting.time.replace(/\s|:/g, '-')}`,
@@ -2066,53 +2259,53 @@ function AdminSettingsPage() {
                                                                 "aria-label": `Activar o desactivar horario ${slotSetting.time}`
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 505,
+                                                                lineNumber: 605,
                                                                 columnNumber: 28
                                                             }, this),
                                                             slotSetting.isActive ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
                                                                 className: "h-5 w-5 text-green-500"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 513,
+                                                                lineNumber: 613,
                                                                 columnNumber: 28
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                                                 className: "h-5 w-5 text-destructive"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 514,
+                                                                lineNumber: 614,
                                                                 columnNumber: 28
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 501,
+                                                        lineNumber: 601,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, slotSetting.time, true, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 497,
+                                                lineNumber: 597,
                                                 columnNumber: 21
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 495,
+                                        lineNumber: 595,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                    lineNumber: 494,
+                                    lineNumber: 594,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 459,
+                                lineNumber: 559,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                        lineNumber: 451,
+                        lineNumber: 551,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Card"], {
@@ -2126,27 +2319,27 @@ function AdminSettingsPage() {
                                                 className: "h-5 w-5 mr-2 text-primary"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 529,
+                                                lineNumber: 629,
                                                 columnNumber: 21
                                             }, this),
-                                            "Mensajes de WhatsApp"
+                                            "Plantillas de Mensajes de WhatsApp"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 528,
+                                        lineNumber: 628,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardDescription"], {
-                                        children: "Personaliza los mensajes de confirmación y cancelación de citas. Utiliza los marcadores de posición disponibles para incluir detalles dinámicos."
+                                        children: "Personaliza los mensajes para diferentes interacciones. Utiliza los marcadores de posición disponibles para incluir detalles dinámicos."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 532,
+                                        lineNumber: 632,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 527,
+                                lineNumber: 627,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
@@ -2158,12 +2351,12 @@ function AdminSettingsPage() {
                                             className: "h-8 w-8 animate-spin text-primary"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                            lineNumber: 539,
+                                            lineNumber: 639,
                                             columnNumber: 64
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 539,
+                                        lineNumber: 639,
                                         columnNumber: 22
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
                                         children: [
@@ -2173,10 +2366,10 @@ function AdminSettingsPage() {
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
                                                         htmlFor: "confirmationTemplate",
                                                         className: "text-base font-medium",
-                                                        children: "Plantilla de Confirmación"
+                                                        children: "Plantilla de Confirmación de Cita (Admin)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 543,
+                                                        lineNumber: 643,
                                                         columnNumber: 29
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -2188,7 +2381,7 @@ function AdminSettingsPage() {
                                                         className: "text-sm"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 544,
+                                                        lineNumber: 644,
                                                         columnNumber: 29
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -2201,20 +2394,20 @@ function AdminSettingsPage() {
                                                                 className: "mr-2 h-4 w-4 animate-spin"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 558,
+                                                                lineNumber: 658,
                                                                 columnNumber: 77
                                                             }, this),
-                                                            "Guardar Confirmación"
+                                                            "Guardar Confirmación (Admin)"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 552,
+                                                        lineNumber: 652,
                                                         columnNumber: 29
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 542,
+                                                lineNumber: 642,
                                                 columnNumber: 25
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2223,10 +2416,10 @@ function AdminSettingsPage() {
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
                                                         htmlFor: "cancellationTemplate",
                                                         className: "text-base font-medium",
-                                                        children: "Plantilla de Cancelación"
+                                                        children: "Plantilla de Cancelación de Cita (Admin)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 564,
+                                                        lineNumber: 664,
                                                         columnNumber: 29
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
@@ -2238,7 +2431,7 @@ function AdminSettingsPage() {
                                                         className: "text-sm"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 565,
+                                                        lineNumber: 665,
                                                         columnNumber: 29
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
@@ -2251,20 +2444,120 @@ function AdminSettingsPage() {
                                                                 className: "mr-2 h-4 w-4 animate-spin"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 579,
+                                                                lineNumber: 679,
                                                                 columnNumber: 77
                                                             }, this),
-                                                            "Guardar Cancelación"
+                                                            "Guardar Cancelación (Admin)"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                        lineNumber: 573,
+                                                        lineNumber: 673,
                                                         columnNumber: 29
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 563,
+                                                lineNumber: 663,
+                                                columnNumber: 25
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "space-y-2",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
+                                                        htmlFor: "adminContactCancellationTemplate",
+                                                        className: "text-base font-medium",
+                                                        children: 'Plantilla para "Solicitar Cancelación" (Cliente a Admin)'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 685,
+                                                        columnNumber: 29
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
+                                                        id: "adminContactCancellationTemplate",
+                                                        value: adminContactCancellationTemplate,
+                                                        onChange: (e)=>setAdminContactCancellationTemplate(e.target.value),
+                                                        placeholder: "Mensaje prellenado cuando el cliente quiere cancelar vía WhatsApp...",
+                                                        rows: 5,
+                                                        className: "text-sm"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 686,
+                                                        columnNumber: 29
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                        onClick: ()=>handleSaveTemplate('adminContactCancellationRequest'),
+                                                        disabled: isSubmittingTemplate === 'adminContactCancellationRequest',
+                                                        size: "sm",
+                                                        className: "mt-2",
+                                                        children: [
+                                                            isSubmittingTemplate === 'adminContactCancellationRequest' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                                className: "mr-2 h-4 w-4 animate-spin"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                                lineNumber: 700,
+                                                                columnNumber: 96
+                                                            }, this),
+                                                            "Guardar Plantilla Cliente-Cancelación"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 694,
+                                                        columnNumber: 29
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                lineNumber: 684,
+                                                columnNumber: 26
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "space-y-2",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Label"], {
+                                                        htmlFor: "adminContactQueryTemplate",
+                                                        className: "text-base font-medium",
+                                                        children: 'Plantilla para "Hacer Consulta" (Cliente a Admin)'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 706,
+                                                        columnNumber: 29
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$textarea$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Textarea"], {
+                                                        id: "adminContactQueryTemplate",
+                                                        value: adminContactQueryTemplate,
+                                                        onChange: (e)=>setAdminContactQueryTemplate(e.target.value),
+                                                        placeholder: "Mensaje prellenado cuando el cliente tiene una consulta vía WhatsApp...",
+                                                        rows: 5,
+                                                        className: "text-sm"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 707,
+                                                        columnNumber: 29
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Button"], {
+                                                        onClick: ()=>handleSaveTemplate('adminContactQuery'),
+                                                        disabled: isSubmittingTemplate === 'adminContactQuery',
+                                                        size: "sm",
+                                                        className: "mt-2",
+                                                        children: [
+                                                            isSubmittingTemplate === 'adminContactQuery' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                                className: "mr-2 h-4 w-4 animate-spin"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                                lineNumber: 721,
+                                                                columnNumber: 82
+                                                            }, this),
+                                                            "Guardar Plantilla Cliente-Consulta"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 715,
+                                                        columnNumber: 29
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                lineNumber: 705,
                                                 columnNumber: 25
                                             }, this)
                                         ]
@@ -2281,76 +2574,86 @@ function AdminSettingsPage() {
                                                             className: "h-4 w-4 mr-2 text-primary"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                            lineNumber: 588,
+                                                            lineNumber: 730,
                                                             columnNumber: 29
                                                         }, this),
                                                         "Marcadores de Posición Disponibles"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 587,
+                                                    lineNumber: 729,
                                                     columnNumber: 25
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 586,
+                                                lineNumber: 728,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["CardContent"], {
                                                 className: "pt-0 pb-3",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-                                                    className: "list-disc list-inside text-xs text-muted-foreground space-y-1",
-                                                    children: availablePlaceholders.map((ph)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
-                                                                children: ph
-                                                            }, void 0, false, {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                                        className: "list-disc list-inside text-xs text-muted-foreground space-y-1",
+                                                        children: availablePlaceholders.map((ph)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
+                                                                    children: ph
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                                    lineNumber: 736,
+                                                                    columnNumber: 75
+                                                                }, this)
+                                                            }, ph, false, {
                                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                                lineNumber: 594,
-                                                                columnNumber: 75
-                                                            }, this)
-                                                        }, ph, false, {
-                                                            fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                            lineNumber: 594,
-                                                            columnNumber: 62
-                                                        }, this))
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                    lineNumber: 593,
-                                                    columnNumber: 25
-                                                }, this)
-                                            }, void 0, false, {
+                                                                lineNumber: 736,
+                                                                columnNumber: 62
+                                                            }, this))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 735,
+                                                        columnNumber: 25
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "text-xs text-muted-foreground mt-2",
+                                                        children: 'Para la plantilla "Hacer Consulta", el cliente deberá añadir manualmente su pregunta donde dice `[ESCRIBE TU CONSULTA AQUÍ]`.'
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/admin/settings/page.tsx",
+                                                        lineNumber: 738,
+                                                        columnNumber: 26
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                                lineNumber: 592,
+                                                lineNumber: 734,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                                        lineNumber: 585,
+                                        lineNumber: 727,
                                         columnNumber: 18
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                                lineNumber: 537,
+                                lineNumber: 637,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/settings/page.tsx",
-                        lineNumber: 526,
+                        lineNumber: 626,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/admin/settings/page.tsx",
-                lineNumber: 288,
+                lineNumber: 347,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/admin/settings/page.tsx",
-        lineNumber: 281,
+        lineNumber: 340,
         columnNumber: 5
     }, this);
 }

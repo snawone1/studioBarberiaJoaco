@@ -530,12 +530,13 @@ const ALL_TIME_SLOTS = [
 
 var { g: global, __dirname } = __turbopack_context__;
 {
-/* __next_internal_action_entry_do_not_use__ {"0017e9636f89f561cfe7d2adcbae9ec8974b0281f3":"getTimeSlotSettings","0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","008945fd2a69b2f92ca2e307a103b4c75c7dee6185":"getUsers","00e12f5822ed0746140d44f336b07b380a4b412e88":"getServices","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","4054b8264a9d1e80f44742f2f7567713c22e089825":"addService","40857648b9877f2e0a8188dfad6f3147ad4a905c2c":"deleteService","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40b73813f0c82410f254a24b32409f7189a1b1ac0c":"updateService","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40caf416edbb707356716f925239e16c8970013236":"getMessageTemplate","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40da10036fe76165f7bdab3c65eb3a9e264a1a604e":"getUserAppointments","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4":"updateTimeSlotSetting","609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a":"updateMessageTemplate","70df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
+/* __next_internal_action_entry_do_not_use__ {"0017e9636f89f561cfe7d2adcbae9ec8974b0281f3":"getTimeSlotSettings","00341173e521f89c1eccb89137a0c821c5b391297b":"getAdminPhoneNumber","0035970fe75c1458b3307dd66a4d7ba82bd85edc12":"getProducts","005ce712c32342acd38082636e5dc614daa6adfb4c":"getAppointments","008945fd2a69b2f92ca2e307a103b4c75c7dee6185":"getUsers","00e12f5822ed0746140d44f336b07b380a4b412e88":"getServices","402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3":"submitAppointmentRequest","402e89c30120e3199bf7b7164003300e5d32c67d2d":"deleteProduct","4054b8264a9d1e80f44742f2f7567713c22e089825":"addService","40857648b9877f2e0a8188dfad6f3147ad4a905c2c":"deleteService","408c3740241a917b864710f949e092258b8e366293":"submitSiteSettings","40a7151c7200c725962ec313e9e769b68883d0a7c8":"getAIStyleAdvice","40b73813f0c82410f254a24b32409f7189a1b1ac0c":"updateService","40bbf7ab092ba0a43385c3b484dd292298891fc1d4":"updateProduct","40caf416edbb707356716f925239e16c8970013236":"getMessageTemplate","40cb18cfde7898d1c1d082dc9266894eb9881f296d":"addProduct","40da10036fe76165f7bdab3c65eb3a9e264a1a604e":"getUserAppointments","40e8caa2e4508de437dd356a72f607887f92f6b53b":"updateAdminPhoneNumber","40eac7d4fc402c740264556fcc123d86b3754e3b2b":"getBookedSlotsForDate","604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4":"updateTimeSlotSetting","609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a":"updateMessageTemplate","70df8604b55fb28ca85f574dd721ecefbfd80a9cdf":"updateAppointmentStatus"} */ __turbopack_context__.s({
     "addProduct": (()=>addProduct),
     "addService": (()=>addService),
     "deleteProduct": (()=>deleteProduct),
     "deleteService": (()=>deleteService),
     "getAIStyleAdvice": (()=>getAIStyleAdvice),
+    "getAdminPhoneNumber": (()=>getAdminPhoneNumber),
     "getAppointments": (()=>getAppointments),
     "getBookedSlotsForDate": (()=>getBookedSlotsForDate),
     "getMessageTemplate": (()=>getMessageTemplate),
@@ -546,6 +547,7 @@ var { g: global, __dirname } = __turbopack_context__;
     "getUsers": (()=>getUsers),
     "submitAppointmentRequest": (()=>submitAppointmentRequest),
     "submitSiteSettings": (()=>submitSiteSettings),
+    "updateAdminPhoneNumber": (()=>updateAdminPhoneNumber),
     "updateAppointmentStatus": (()=>updateAppointmentStatus),
     "updateMessageTemplate": (()=>updateMessageTemplate),
     "updateProduct": (()=>updateProduct),
@@ -577,6 +579,7 @@ const usersCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$n
 const servicesCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'services');
 const timeSlotSettingsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'timeSlotSettings');
 const messageTemplatesCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'messageTemplates');
+const appSettingsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appSettings');
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
     // console.log("Admin: Attempting to fetch users from Firestore...");
     try {
@@ -681,13 +684,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
         ];
         let usersMap = new Map();
         if (userIds.length > 0) {
-            const MAX_USER_IDS_PER_QUERY = 30;
+            const MAX_USER_IDS_PER_QUERY = 30; // Firestore 'in' query limit
             const userBatches = [];
             for(let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY){
                 userBatches.push(userIds.slice(i, i + MAX_USER_IDS_PER_QUERY));
             }
             for (const batchUserIds of userBatches){
-                if (batchUserIds.length === 0) continue;
+                if (batchUserIds.length === 0) continue; // Skip empty batches
+                // Assuming user documents have a 'uid' field that matches the userId from appointments
                 const qUsers = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'users'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('uid', 'in', batchUserIds));
                 const userSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUsers);
                 userSnapshot.docs.forEach((docSnap)=>{
@@ -774,7 +778,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
         console.log(`[getUserAppointments] Mapping ${appointmentSnapshot.docs.length} documents...`);
         const appointmentsPromises = appointmentSnapshot.docs.map(async (docSnap)=>{
             const data = docSnap.data();
-            console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
+            // console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
             let preferredDateISO;
             let createdAtISO;
             if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
@@ -804,12 +808,12 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
         });
         const appointments = await Promise.all(appointmentsPromises);
         console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
-        // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments)); 
+        // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments));
         return appointments;
     } catch (error) {
         console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
         if (error.code === 'failed-precondition') {
-            console.error("[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console.");
+            console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
         } else if (error.code === 'permission-denied') {
             console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
         } else {
@@ -818,14 +822,16 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
         return [];
     }
 }
-async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId) {
+async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId// Optional: Used for client-side cancellation validation
+) {
     console.log(`[updateAppointmentStatus] Called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
     try {
         const appointmentDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appointments', appointmentId);
         if (currentUserId && newStatus === 'cancelled') {
+            // This block handles cancellation attempts by a user (not admin)
             const appointmentSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDoc"])(appointmentDocRef);
             if (!appointmentSnap.exists()) {
-                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found.`);
+                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found for user cancellation.`);
                 return {
                     success: false,
                     message: 'La cita no fue encontrada.'
@@ -839,27 +845,30 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
                     message: 'No tienes permiso para cancelar esta cita.'
                 };
             }
-            if (appointmentData.status !== 'pending') {
-                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' (status: ${appointmentData.status}), cannot be cancelled by user.`);
+            // User can cancel 'pending' or 'confirmed' appointments.
+            if (appointmentData.status !== 'pending' && appointmentData.status !== 'confirmed') {
+                console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' or 'confirmed' (status: ${appointmentData.status}), cannot be cancelled by user.`);
                 return {
                     success: false,
-                    message: 'Solo puedes cancelar citas que estén pendientes.'
+                    message: 'Solo puedes solicitar cancelar citas que estén pendientes o confirmadas. Para otros casos, contacta al administrador.'
                 };
             }
-            console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own pending appointment ${appointmentId}.`);
+            console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own ${appointmentData.status} appointment ${appointmentId}.`);
         } else if (currentUserId && newStatus !== 'cancelled') {
-            console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed.`);
+            // User trying to do something other than cancel their own appointment
+            console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed through this specific user-facing cancel action.`);
             return {
                 success: false,
                 message: 'No tienes permiso para realizar esta acción.'
             };
         }
+        // If no currentUserId, it's an admin action, allow any status change (handled by admin panel logic)
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateDoc"])(appointmentDocRef, {
             status: newStatus
         });
         console.log(`[updateAppointmentStatus] Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin'); // For admin panel
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book'); // For user's "My Appointments" tab
         return {
             success: true,
             message: `Estado de la cita actualizado a ${newStatus}.`
@@ -1207,9 +1216,11 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateTimeSlotSetting(t
         };
     }
 }
-// --- WhatsApp Message Template Actions ---
+// --- WhatsApp Message Template & Admin Contact Actions ---
 const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. ¡Te esperamos!`;
 const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
+const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nGracias.`;
+const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getMessageTemplate(templateId) {
     try {
         const templateDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(messageTemplatesCollectionRef, templateId);
@@ -1217,10 +1228,19 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getMessageTemplate(temp
         if (docSnap.exists()) {
             return docSnap.data().content;
         }
-        return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+        // Default templates
+        if (templateId === 'confirmation') return DEFAULT_CONFIRMATION_TEMPLATE;
+        if (templateId === 'cancellation') return DEFAULT_CANCELLATION_TEMPLATE;
+        if (templateId === 'adminContactCancellationRequest') return DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE;
+        if (templateId === 'adminContactQuery') return DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE;
+        return `Contenido predeterminado para ${templateId} no encontrado.`;
     } catch (error) {
         console.error(`Error fetching message template ${templateId}:`, error);
-        return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
+        if (templateId === 'confirmation') return DEFAULT_CONFIRMATION_TEMPLATE;
+        if (templateId === 'cancellation') return DEFAULT_CANCELLATION_TEMPLATE;
+        if (templateId === 'adminContactCancellationRequest') return DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE;
+        if (templateId === 'adminContactQuery') return DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE;
+        return `Error al cargar la plantilla para ${templateId}.`;
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateMessageTemplate(templateId, content) {
@@ -1239,6 +1259,45 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateMessageTemplate(t
         return {
             success: false,
             message: `Error al actualizar la plantilla de ${templateId}.`
+        };
+    }
+}
+async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAdminPhoneNumber() {
+    try {
+        const contactDetailsDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(appSettingsCollectionRef, 'contactDetails');
+        const docSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDoc"])(contactDetailsDocRef);
+        if (docSnap.exists() && docSnap.data().adminPhoneNumber) {
+            return docSnap.data().adminPhoneNumber;
+        }
+        return null;
+    } catch (error) {
+        console.error("Error fetching admin phone number:", error);
+        return null;
+    }
+}
+async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAdminPhoneNumber(phoneNumber) {
+    try {
+        const contactDetailsDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(appSettingsCollectionRef, 'contactDetails');
+        // Validate phone number format if necessary before saving
+        const cleanedPhoneNumber = phoneNumber.replace(/\D/g, ''); // Basic cleaning
+        if (!cleanedPhoneNumber.startsWith('54')) {
+        // return { success: false, message: 'El número de teléfono debe ser un número argentino válido (ej: 54911... o 5411...).' };
+        }
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["setDoc"])(contactDetailsDocRef, {
+            adminPhoneNumber: phoneNumber
+        }, {
+            merge: true
+        });
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
+        return {
+            success: true,
+            message: 'Número de teléfono del administrador actualizado.'
+        };
+    } catch (error) {
+        console.error("Error updating admin phone number:", error);
+        return {
+            success: false,
+            message: 'Error al actualizar el número de teléfono del administrador.'
         };
     }
 }
@@ -1263,7 +1322,9 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateMessageTemplate(t
     getTimeSlotSettings,
     updateTimeSlotSetting,
     getMessageTemplate,
-    updateMessageTemplate
+    updateMessageTemplate,
+    getAdminPhoneNumber,
+    updateAdminPhoneNumber
 ]);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUsers, "008945fd2a69b2f92ca2e307a103b4c75c7dee6185", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(submitAppointmentRequest, "402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3", null);
@@ -1285,6 +1346,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateMessageTemplate(t
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateTimeSlotSetting, "604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getMessageTemplate, "40caf416edbb707356716f925239e16c8970013236", null);
 (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateMessageTemplate, "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getAdminPhoneNumber, "00341173e521f89c1eccb89137a0c821c5b391297b", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateAdminPhoneNumber, "40e8caa2e4508de437dd356a72f607887f92f6b53b", null);
 }}),
 "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>": ((__turbopack_context__) => {
 "use strict";
@@ -1292,6 +1355,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateMessageTemplate(t
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({});
+;
+;
 ;
 ;
 ;
@@ -1329,6 +1394,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "0017e9636f89f561cfe7d2adcbae9ec8974b0281f3": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getTimeSlotSettings"]),
+    "00341173e521f89c1eccb89137a0c821c5b391297b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAdminPhoneNumber"]),
     "0035970fe75c1458b3307dd66a4d7ba82bd85edc12": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getProducts"]),
     "005ce712c32342acd38082636e5dc614daa6adfb4c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAppointments"]),
     "008945fd2a69b2f92ca2e307a103b4c75c7dee6185": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUsers"]),
@@ -1344,6 +1410,7 @@ __turbopack_context__.s({
     "40caf416edbb707356716f925239e16c8970013236": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getMessageTemplate"]),
     "40cb18cfde7898d1c1d082dc9266894eb9881f296d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addProduct"]),
     "40da10036fe76165f7bdab3c65eb3a9e264a1a604e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUserAppointments"]),
+    "40e8caa2e4508de437dd356a72f607887f92f6b53b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateAdminPhoneNumber"]),
     "40eac7d4fc402c740264556fcc123d86b3754e3b2b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getBookedSlotsForDate"]),
     "604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateTimeSlotSetting"]),
     "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": (()=>__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateMessageTemplate"]),
@@ -1359,6 +1426,7 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "0017e9636f89f561cfe7d2adcbae9ec8974b0281f3": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["0017e9636f89f561cfe7d2adcbae9ec8974b0281f3"]),
+    "00341173e521f89c1eccb89137a0c821c5b391297b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["00341173e521f89c1eccb89137a0c821c5b391297b"]),
     "0035970fe75c1458b3307dd66a4d7ba82bd85edc12": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["0035970fe75c1458b3307dd66a4d7ba82bd85edc12"]),
     "005ce712c32342acd38082636e5dc614daa6adfb4c": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["005ce712c32342acd38082636e5dc614daa6adfb4c"]),
     "008945fd2a69b2f92ca2e307a103b4c75c7dee6185": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["008945fd2a69b2f92ca2e307a103b4c75c7dee6185"]),
@@ -1374,6 +1442,7 @@ __turbopack_context__.s({
     "40caf416edbb707356716f925239e16c8970013236": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40caf416edbb707356716f925239e16c8970013236"]),
     "40cb18cfde7898d1c1d082dc9266894eb9881f296d": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40cb18cfde7898d1c1d082dc9266894eb9881f296d"]),
     "40da10036fe76165f7bdab3c65eb3a9e264a1a604e": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40da10036fe76165f7bdab3c65eb3a9e264a1a604e"]),
+    "40e8caa2e4508de437dd356a72f607887f92f6b53b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40e8caa2e4508de437dd356a72f607887f92f6b53b"]),
     "40eac7d4fc402c740264556fcc123d86b3754e3b2b": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["40eac7d4fc402c740264556fcc123d86b3754e3b2b"]),
     "604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4"]),
     "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": (()=>__TURBOPACK__imported__module__$5b$project$5d2f2e$next$2d$internal$2f$server$2f$app$2f$book$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$src$2f$app$2f$actions$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$exports$3e$__["609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a"]),
