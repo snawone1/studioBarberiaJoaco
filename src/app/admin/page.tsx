@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
@@ -31,13 +31,12 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-// import { Textarea } from '@/components/ui/textarea'; // No longer used here
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Form, FormLabel, FormControl, FormField, FormItem, FormMessage
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea'; // Needed for product form
-import { productSchema, type ProductFormValues } from '@/lib/schemas';
+import { Textarea } from '@/components/ui/textarea';
+import { productSchema, type ProductFormValues, adminEditUserSchema, type AdminEditUserFormValues } from '@/lib/schemas';
 import { 
   getProducts, 
   addProduct, 
@@ -48,8 +47,9 @@ import {
   type Appointment,
   getUsers,
   type UserDetail,
+  updateUserDetail,
   getMessageTemplate,
-  getServices, // Ensure getServices is imported
+  getServices,
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
@@ -87,6 +87,10 @@ export default function AdminPage() {
   const [isUserManagerOpen, setIsUserManagerOpen] = useState(false);
   const [allUsers, setAllUsers] = useState<UserDetail[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserDetail | null>(null);
+  const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isSubmittingUserEdit, setIsSubmittingUserEdit] = useState(false);
+
 
   const [isConfirmAppointmentDialogOpen, setIsConfirmAppointmentDialogOpen] = useState(false);
   const [appointmentToConfirm, setAppointmentToConfirm] = useState<Appointment | null>(null);
@@ -105,6 +109,15 @@ export default function AdminPage() {
       imageSrc: 'https://placehold.co/400x400.png',
       aiHint: '',
       stock: 0,
+    },
+  });
+
+  const userEditForm = useForm<AdminEditUserFormValues>({
+    resolver: zodResolver(adminEditUserSchema),
+    defaultValues: {
+      fullName: '',
+      email: '', // Email will be read-only
+      phoneNumber: '',
     },
   });
 
@@ -139,11 +152,11 @@ export default function AdminPage() {
 
   async function fetchAppointmentsAdmin() {
      if (currentUser?.email === 'joacoadmin@admin.com') {
-      console.log("Admin Page: Calling getAppointments server action.");
+      // console.log("Admin Page: Calling getAppointments server action.");
       setIsLoadingAppointments(true);
       try {
         const fetchedAppointments = await getAppointments();
-        console.log("Admin Page: Fetched appointments from server action:", fetchedAppointments);
+        // console.log("Admin Page: Fetched appointments from server action:", fetchedAppointments);
         setAppointments(fetchedAppointments); 
       } catch (error) {
         toast({ title: 'Error', description: 'No se pudieron cargar las citas.', variant: 'destructive' });
@@ -265,9 +278,9 @@ export default function AdminPage() {
           const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToConfirm.preferredTime;
           
-          const allServices = await getServices();
+          const allServicesData = await getServices();
           const serviceNames = appointmentToConfirm.services.map(serviceId => {
-            const serviceDetail = allServices.find(s => s.id === serviceId);
+            const serviceDetail = allServicesData.find(s => s.id === serviceId);
             return serviceDetail ? serviceDetail.name : serviceId; 
           });
           const servicesText = serviceNames.join(', ') || 'No especificados';
@@ -320,9 +333,9 @@ export default function AdminPage() {
           const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToCancel.preferredTime;
           
-          const allServices = await getServices();
+          const allServicesData = await getServices();
           const serviceNames = appointmentToCancel.services.map(serviceId => {
-            const serviceDetail = allServices.find(s => s.id === serviceId);
+            const serviceDetail = allServicesData.find(s => s.id === serviceId);
             return serviceDetail ? serviceDetail.name : serviceId; 
           });
           const servicesText = serviceNames.join(', ') || 'No especificados';
@@ -384,6 +397,37 @@ export default function AdminPage() {
     const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   };
+
+  const handleEditUserClick = (user: UserDetail) => {
+    setEditingUser(user);
+    userEditForm.reset({
+      fullName: user.fullName,
+      email: user.email, // Email is read-only in form
+      phoneNumber: user.phoneNumber,
+    });
+    setIsEditUserDialogOpen(true);
+  };
+
+  async function onUserEditFormSubmit(data: AdminEditUserFormValues) {
+    if (!editingUser) return;
+    setIsSubmittingUserEdit(true);
+
+    const result = await updateUserDetail({
+      userId: editingUser.id,
+      fullName: data.fullName,
+      phoneNumber: data.phoneNumber,
+    });
+
+    if (result.success) {
+      toast({ title: '¡Usuario Actualizado!', description: result.message });
+      fetchAllUsersAdmin(); // Refresh user list
+      setIsEditUserDialogOpen(false);
+      setEditingUser(null);
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo actualizar el usuario.', variant: 'destructive' });
+    }
+    setIsSubmittingUserEdit(false);
+  }
 
 
   if (loading) {
@@ -639,16 +683,26 @@ export default function AdminPage() {
                           Registrado: {format(new Date(user.createdAt), "PPP 'a las' p", { locale: es })}
                         </div>
                       </CardContent>
-                       <CardFooter className="pt-3 border-t flex justify-end">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          onClick={() => handleWhatsAppRedirect(user)}
-                          disabled={!user.phoneNumber}
-                          className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
-                        >
-                          <MessageSquare className="mr-2 h-4 w-4"/> Enviar WhatsApp
-                        </Button>
+                       <CardFooter className="pt-3 border-t">
+                         <div className="flex justify-end space-x-2 w-full">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditUserClick(user)}
+                              className="border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                            >
+                              <Edit3 className="mr-2 h-4 w-4"/> Editar
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => handleWhatsAppRedirect(user)}
+                              disabled={!user.phoneNumber}
+                              className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                            >
+                              <MessageSquare className="mr-2 h-4 w-4"/> Enviar WhatsApp
+                            </Button>
+                         </div>
                       </CardFooter>
                     </Card>
                   ))}
@@ -967,6 +1021,66 @@ export default function AdminPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      )}
+
+      {/* User Edit Dialog */}
+      {editingUser && (
+        <Dialog open={isEditUserDialogOpen} onOpenChange={setIsEditUserDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-sans">Editar Usuario: {editingUser.fullName}</DialogTitle>
+              <DialogDescription>
+                Modifica los detalles del usuario. El correo electrónico no se puede cambiar.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...userEditForm}>
+              <form onSubmit={userEditForm.handleSubmit(onUserEditFormSubmit)} className="space-y-4 py-4">
+                <FormField
+                  control={userEditForm.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre Completo</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={userEditForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Correo Electrónico (No editable)</FormLabel>
+                      <FormControl><Input {...field} disabled /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={userEditForm.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Teléfono</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">Cancelar</Button>
+                  </DialogClose>
+                  <Button type="submit" disabled={isSubmittingUserEdit}>
+                    {isSubmittingUserEdit && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Guardar Cambios
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
