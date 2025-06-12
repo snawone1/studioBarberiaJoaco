@@ -189,6 +189,7 @@ function PageHeader({ title, description, titleClassName, descriptionClassName, 
 var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
+    "adminEditUserSchema": (()=>adminEditUserSchema),
     "appointmentSchema": (()=>appointmentSchema),
     "clientAppointmentSchema": (()=>clientAppointmentSchema),
     "loginSchema": (()=>loginSchema),
@@ -301,6 +302,17 @@ const serviceSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modul
     }),
     price: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, {
         message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX"
+    })
+});
+const adminEditUserSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].object({
+    fullName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(2, {
+        message: "El nombre completo debe tener al menos 2 caracteres."
+    }),
+    email: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().email({
+        message: "Correo electrónico inválido."
+    }),
+    phoneNumber: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["z"].string().min(8, {
+        message: "El número de teléfono debe tener al menos 8 dígitos."
     })
 });
 }}),

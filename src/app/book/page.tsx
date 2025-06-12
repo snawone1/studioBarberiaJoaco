@@ -30,7 +30,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
@@ -39,7 +38,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,6 +62,7 @@ import {
   type Appointment,
   getAdminPhoneNumber,
   getMessageTemplate,
+  type MessageTemplateId,
 } from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
@@ -311,10 +310,10 @@ export default function BookAppointmentPage() {
     }
   }
 
-  const handleCancelAppointment = async () => {
+  const handleUserCancelAppointment = async () => {
     if (!appointmentToCancel || !currentUser) return;
     setIsCancellingAppointment(true);
-    // Pass currentUserId for ownership verification if user is cancelling their own 'pending' or 'confirmed' appointment.
+    // Pass currentUserId for ownership verification for 'pending' or 'confirmed' appointments by user.
     const result = await updateAppointmentStatus(appointmentToCancel.id, 'cancelled', currentUser.uid);
     setIsCancellingAppointment(false);
     setIsCancelDialogOpen(false);
@@ -333,7 +332,7 @@ export default function BookAppointmentPage() {
     setContactAdminDialogOpen(true);
   };
 
-  const handleWhatsAppRedirect = async (type: 'requestCancellation' | 'query') => {
+  const handleWhatsAppRedirect = async (type: 'adminContactCancellationRequest' | 'adminContactQuery') => {
     if (!selectedAppointmentForContact || !currentUser) {
       toast({ title: 'Error', description: 'No se pudo procesar la solicitud de contacto.', variant: 'destructive' });
       return;
@@ -342,19 +341,21 @@ export default function BookAppointmentPage() {
     try {
       const adminPhoneNumber = await getAdminPhoneNumber();
       if (!adminPhoneNumber) {
-        toast({ title: 'Error', description: 'No se pudo obtener el número de contacto del administrador.', variant: 'destructive' });
+        toast({ title: 'Error', description: 'No se pudo obtener el número de contacto del administrador. Por favor, configura uno en el panel de administración.', variant: 'destructive' });
+        setContactAdminDialogOpen(false); 
         setIsProcessingWhatsAppLink(false);
         return;
       }
 
-      const templateId = type === 'requestCancellation' ? 'adminContactCancellationRequest' : 'adminContactQuery';
-      let messageContent = await getMessageTemplate(templateId);
+      let messageContent = await getMessageTemplate(type);
 
       // Ensure allServices are loaded if not already
       let currentServices = allServices;
-      if (currentServices.length === 0) {
-        currentServices = await getServices(); // Fetch if not already available
+      if (currentServices.length === 0 && !isLoadingServices) {
+        currentServices = await getServices(); // Fetch if not already available and not currently loading
+        setAllServices(currentServices); // Update state if fetched here
       }
+
 
       const serviceNames = selectedAppointmentForContact.services.map(serviceId => {
         const serviceDetail = currentServices.find(s => s.id === serviceId);
@@ -759,7 +760,7 @@ export default function BookAppointmentPage() {
                         Cancelar Cita
                       </Button>
                     )}
-                     {appt.status === 'confirmed' && (
+                     {(appt.status === 'confirmed' || appt.status === 'pending' ) && ( // Show contact button also for pending if user wants to ask before admin confirms
                       <Button
                         variant="outline"
                         size="sm"
@@ -789,14 +790,14 @@ export default function BookAppointmentPage() {
                 Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
                 <br/>
                 {(appointmentToCancel.status === 'pending') && "Esta acción no se puede deshacer."}
-                {(appointmentToCancel.status === 'confirmed') && "Esta acción solicitará la cancelación al administrador. No es una cancelación inmediata."}
+                {(appointmentToCancel.status === 'confirmed') && "Si tu cita ya estaba confirmada, esta acción notificará al barbero tu solicitud de cancelación. No es una cancelación automática."}
 
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setAppointmentToCancel(null)}>Cerrar</AlertDialogCancel>
               <AlertDialogAction
-                onClick={handleCancelAppointment}
+                onClick={handleUserCancelAppointment}
                 disabled={isCancellingAppointment}
                 className={cn(isCancellingAppointment ? "" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground")}
               >
@@ -826,7 +827,7 @@ export default function BookAppointmentPage() {
             <div className="grid grid-cols-1 gap-4 py-4">
               <Button
                 variant="outline"
-                onClick={() => handleWhatsAppRedirect('requestCancellation')}
+                onClick={() => handleWhatsAppRedirect('adminContactCancellationRequest')}
                 disabled={isProcessingWhatsAppLink}
                 className="justify-start text-left h-auto py-3"
               >
@@ -838,7 +839,7 @@ export default function BookAppointmentPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleWhatsAppRedirect('query')}
+                onClick={() => handleWhatsAppRedirect('adminContactQuery')}
                 disabled={isProcessingWhatsAppLink}
                  className="justify-start text-left h-auto py-3"
               >

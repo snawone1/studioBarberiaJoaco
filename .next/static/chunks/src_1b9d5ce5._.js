@@ -231,11 +231,13 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
 __turbopack_context__.s({
+    "adminEditUserSchema": (()=>adminEditUserSchema),
     "appointmentSchema": (()=>appointmentSchema),
     "clientAppointmentSchema": (()=>clientAppointmentSchema),
     "loginSchema": (()=>loginSchema),
     "productSchema": (()=>productSchema),
     "registerSchema": (()=>registerSchema),
+    "serviceSchema": (()=>serviceSchema),
     "siteSettingsSchema": (()=>siteSettingsSchema),
     "styleAdvisorSchema": (()=>styleAdvisorSchema)
 });
@@ -331,6 +333,29 @@ const productSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modul
     stock: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].coerce.number().min(0, {
         message: "El stock no puede ser negativo."
     }).optional().default(0)
+});
+const serviceSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].object({
+    id: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().optional(),
+    name: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(3, {
+        message: "El nombre del servicio debe tener al menos 3 caracteres."
+    }),
+    description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(5, {
+        message: "La descripción debe tener al menos 5 caracteres."
+    }),
+    price: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().regex(/^ARS\$\s?\d+(\.\d{1,2})?$/, {
+        message: "El precio debe estar en formato ARS$ XXXX o ARS$ XXXX.XX"
+    })
+});
+const adminEditUserSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].object({
+    fullName: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(2, {
+        message: "El nombre completo debe tener al menos 2 caracteres."
+    }),
+    email: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().email({
+        message: "Correo electrónico inválido."
+    }),
+    phoneNumber: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$lib$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["z"].string().min(8, {
+        message: "El número de teléfono debe tener al menos 8 dígitos."
+    })
 });
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);

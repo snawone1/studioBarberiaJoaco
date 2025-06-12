@@ -43,6 +43,7 @@ import {
   updateMessageTemplate,
   getAdminPhoneNumber,
   updateAdminPhoneNumber,
+  type MessageTemplateId,
 } from '@/app/actions';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
@@ -77,7 +78,7 @@ export default function AdminSettingsPage() {
   const [adminContactCancellationTemplate, setAdminContactCancellationTemplate] = useState('');
   const [adminContactQueryTemplate, setAdminContactQueryTemplate] = useState('');
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
-  const [isSubmittingTemplate, setIsSubmittingTemplate] = useState<'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery' | null>(null);
+  const [isSubmittingTemplate, setIsSubmittingTemplate] = useState<MessageTemplateId | null>(null);
   
   const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
   const [isLoadingAdminPhone, setIsLoadingAdminPhone] = useState(false);
@@ -283,7 +284,7 @@ export default function AdminSettingsPage() {
     setIsUpdatingTimeSlot(null);
   }
 
-  async function handleSaveTemplate(templateId: 'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery') {
+  async function handleSaveTemplate(templateId: MessageTemplateId) {
     setIsSubmittingTemplate(templateId);
     let content = '';
     switch (templateId) {
@@ -306,7 +307,7 @@ export default function AdminSettingsPage() {
     // Basic validation for Argentinian numbers (can be improved)
     const cleanedPhone = adminPhoneNumber.replace(/\D/g, '');
     if (!cleanedPhone.startsWith('54') || cleanedPhone.length < 11 ) { // e.g. 54911... or 5411...
-         toast({ title: 'Número Inválido', description: 'El formato debe ser Ej: 5491123456789 o 542211234567.', variant: 'destructive'});
+         toast({ title: 'Número Inválido', description: 'El formato debe ser Ej: 5491123456789 o 542211234567. Incluir código de país y área sin "+" ni espacios.', variant: 'destructive'});
          setIsSubmittingAdminPhone(false);
          return;
     }
@@ -640,7 +641,7 @@ export default function AdminSettingsPage() {
                 ) : (
                     <>
                         <div className="space-y-2">
-                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación de Cita (Admin)</UiLabel>
+                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación de Cita (Admin a Cliente)</UiLabel>
                             <Textarea
                                 id="confirmationTemplate"
                                 value={confirmationTemplate}
@@ -661,7 +662,7 @@ export default function AdminSettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación de Cita (Admin)</UiLabel>
+                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación de Cita (Admin a Cliente)</UiLabel>
                             <Textarea
                                 id="cancellationTemplate"
                                 value={cancellationTemplate}
