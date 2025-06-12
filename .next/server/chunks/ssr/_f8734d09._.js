@@ -47,7 +47,7 @@ __turbopack_context__.s({
     "siteConfig": (()=>siteConfig)
 });
 const siteConfig = {
-    name: "JoacoBarber Studio",
+    name: "Barberia Joaco",
     description: "Tu experiencia de barbería elevada. Estilo, precisión y cuidado profesional.",
     mainNav: [
         {
@@ -112,7 +112,7 @@ function Footer() {
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     className: "text-sm",
-                                    children: "Experience luxury grooming and expert styling at JoacoBarber. Your satisfaction is our priority."
+                                    children: "Joaco calidad de servicio"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/footer.tsx",
                                     lineNumber: 11,
@@ -128,7 +128,7 @@ function Footer() {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                     className: "text-lg font-headline font-semibold mb-4",
-                                    children: "Contact Us"
+                                    children: "Contacto"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/footer.tsx",
                                     lineNumber: 14,
@@ -204,7 +204,7 @@ function Footer() {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                     className: "text-lg font-headline font-semibold mb-4",
-                                    children: "Hours"
+                                    children: "Horarios"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/footer.tsx",
                                     lineNumber: 31,
@@ -214,22 +214,20 @@ function Footer() {
                                     className: "space-y-2 text-sm",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                            children: "Monday - Friday: 9:00 AM - 8:00 PM"
+                                            children: "Lunes - Viernes: 9:00 AM - 5:00 PM"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/footer.tsx",
                                             lineNumber: 33,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                            children: "Saturday: 10:00 AM - 6:00 PM"
+                                            children: "Sabado - Domingo: 10:00 AM - 6:00 PM"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/footer.tsx",
                                             lineNumber: 34,
                                             columnNumber: 15
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                            children: "Sunday: Closed"
-                                        }, void 0, false, {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {}, void 0, false, {
                                             fileName: "[project]/src/components/layout/footer.tsx",
                                             lineNumber: 35,
                                             columnNumber: 15
@@ -260,7 +258,7 @@ function Footer() {
                             new Date().getFullYear(),
                             " ",
                             __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name,
-                            ". All rights reserved."
+                            ".Derechos reservados a snawDEV Studio."
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/footer.tsx",

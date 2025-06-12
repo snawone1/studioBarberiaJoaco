@@ -192,7 +192,6 @@ export async function getAppointments(): Promise<Appointment[]> {
 
       for (const batchUserIds of userBatches) {
         if (batchUserIds.length === 0) continue;
-        // Firestore `in` queries are limited to 30 items per query
         const qUsers = query(collection(firestore, 'users'), where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
@@ -257,13 +256,103 @@ export async function getAppointments(): Promise<Appointment[]> {
   }
 }
 
-export async function updateAppointmentStatus(appointmentId: string, newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed') {
-  console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}`);
+export async function getUserAppointments(userId: string): Promise<Appointment[]> {
+  console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+  if (!userId) {
+    console.warn("Server Action: getUserAppointments called with no userId.");
+    return [];
+  }
+  try {
+    const qUserAppointments = query(
+      appointmentsCollectionRef,
+      where('userId', '==', userId),
+      orderBy('preferredDate', 'desc'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const appointmentSnapshot = await getDocs(qUserAppointments);
+    console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+
+    if (appointmentSnapshot.empty) {
+      return [];
+    }
+
+    const appointments = appointmentSnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      let preferredDateISO: string;
+      let createdAtISO: string;
+
+      if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
+        preferredDateISO = data.preferredDate.toDate().toISOString();
+      } else {
+        preferredDateISO = new Date(0).toISOString();
+      }
+
+      if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+        createdAtISO = data.createdAt.toDate().toISOString();
+      } else {
+        createdAtISO = new Date(0).toISOString();
+      }
+      
+      return {
+        id: docSnap.id,
+        userId: data.userId,
+        // For user's own appointments, we might not need to fetch their name/email/phone again,
+        // but it's included in the Appointment type for consistency.
+        // These fields can be undefined if not fetched.
+        preferredDate: preferredDateISO,
+        preferredTime: data.preferredTime || 'N/A',
+        services: Array.isArray(data.services) ? data.services : [],
+        message: data.message || '',
+        status: data.status || 'unknown',
+        createdAt: createdAtISO,
+      } as Appointment;
+    });
+    console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+    return appointments;
+
+  } catch (error: any) {
+    console.error(`Server Action: Error fetching appointments for user ${userId}:`, error);
+    if (error.code === 'failed-precondition') {
+      console.error("IMPORTANT: Firestore 'failed-precondition' error for user appointments query. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions.");
+    }
+    return [];
+  }
+}
+
+export async function updateAppointmentStatus(
+  appointmentId: string, 
+  newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed',
+  currentUserId?: string // Optional: for client-side cancellation validation
+) {
+  console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
   try {
     const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
+
+    if (currentUserId && newStatus === 'cancelled') {
+      // Client is trying to cancel their own appointment
+      const appointmentSnap = await getDoc(appointmentDocRef);
+      if (!appointmentSnap.exists()) {
+        return { success: false, message: 'La cita no fue encontrada.' };
+      }
+      const appointmentData = appointmentSnap.data();
+      if (appointmentData.userId !== currentUserId) {
+        return { success: false, message: 'No tienes permiso para cancelar esta cita.' };
+      }
+      if (appointmentData.status !== 'pending') {
+        return { success: false, message: 'Solo puedes cancelar citas que estén pendientes.' };
+      }
+      // If all checks pass, proceed to update
+    } else if (currentUserId && newStatus !== 'cancelled') {
+      // Client is trying to change status to something other than cancelled
+      return { success: false, message: 'No tienes permiso para realizar esta acción.' };
+    }
+    // If no currentUserId, assume it's an admin action (or client cancellation checks passed)
+
     await updateDoc(appointmentDocRef, { status: newStatus });
     console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
     revalidatePath('/admin');
+    revalidatePath('/book'); // Also revalidate book page for client view
     return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
   } catch (error) {
     console.error(`Server Action: Error updating appointment ${appointmentId} status in Firestore:`, error);
@@ -310,11 +399,8 @@ export async function getAIStyleAdvice(data: StyleAdvisorFormValues) {
 // --- Site Settings Actions ---
 export async function submitSiteSettings(data: SiteSettingsFormValues) {
   console.log('Site Settings Update Received by Server Action:', data);
-  // The actual update to siteConfig.ts is handled by the AI agent's XML response.
-  // This server action primarily serves to receive the form data and trigger revalidation if needed.
-  revalidatePath('/admin/settings'); // Revalidate the settings page
-  // Revalidate other paths if siteName/description are used in their layout/metadata directly and not through siteConfig
-  revalidatePath('/'); // Example: revalidate homepage if it uses siteName in header/footer directly
+  revalidatePath('/admin/settings'); 
+  revalidatePath('/'); 
   return { success: true, message: 'Configuración del sitio procesada. Los cambios en nombre y descripción se reflejarán en breve (puede requerir refrescar la página o reconstrucción).' };
 }
 
@@ -575,11 +661,9 @@ export async function getMessageTemplate(templateId: 'confirmation' | 'cancellat
     if (docSnap.exists()) {
       return docSnap.data().content as string;
     }
-    // Return default if not found
     return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
   } catch (error) {
     console.error(`Error fetching message template ${templateId}:`, error);
-    // Return default on error
     return templateId === 'confirmation' ? DEFAULT_CONFIRMATION_TEMPLATE : DEFAULT_CANCELLATION_TEMPLATE;
   }
 }

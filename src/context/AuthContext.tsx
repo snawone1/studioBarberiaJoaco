@@ -11,8 +11,8 @@ import {
   signInWithEmailAndPassword,
   type AuthError
 } from 'firebase/auth';
-import { auth, firestore } from '@/lib/firebase'; // Import firestore
-import { doc, setDoc } from 'firebase/firestore'; // Import doc and setDoc
+import { auth, firestore } from '@/lib/firebase'; // Importar firestore
+import { doc, setDoc } from 'firebase/firestore'; // Importar doc y setDoc
 import { type LoginFormData, type RegisterFormData } from '@/lib/schemas';
 
 interface AuthContextType {
@@ -37,7 +37,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-// Function to normalize Argentinian phone numbers
+// Normalizacion de numeros de telefono
 function normalizeArgentinianPhoneNumber(phoneNumber: string): string {
   // Remove all non-digit characters except a leading '+'
   let cleaned = phoneNumber.replace(/[^\d+]/g, '');
@@ -106,7 +106,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           uid: user.uid,
           email: user.email,
           fullName: data.fullName,
-          phoneNumber: normalizedPhoneNumber, // Use normalized number
+          phoneNumber: normalizedPhoneNumber, // Usar telefono ya norm,alizado 
           createdAt: new Date().toISOString(), 
         };
 

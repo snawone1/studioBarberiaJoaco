@@ -1,12 +1,10 @@
 
-import type { LucideIcon } from 'lucide-react'; // Keep for potential other uses, or remove if not needed elsewhere
-// Remove direct lucide-react icon imports for mainNav here
-// import { Home, ShoppingBag, CalendarDays, LayoutDashboard } from 'lucide-react'; 
+import type { LucideIcon } from 'lucide-react';
 
 export type NavItem = {
   title: string;
   href: string;
-  iconName?: string; // Changed from icon?: LucideIcon
+  iconName?: string; 
   disabled?: boolean;
   external?: boolean;
 };
@@ -23,7 +21,7 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "JoacoBarber Studio",
+  name: "Barberia Joaco",
   description: "Tu experiencia de barbería elevada. Estilo, precisión y cuidado profesional.",
   mainNav: [
     { title: "Inicio", href: "/", iconName: "Home" },
@@ -32,7 +30,6 @@ export const siteConfig: SiteConfig = {
     { title: "Panel Admin", href: "/admin", iconName: "LayoutDashboard" },
   ],
   links: {
-    // Add social media links here if available
-    // instagram: "https://instagram.com/joacobarber",
+    //instagram: "https://instagram.com/joacobarber",
   }
 };

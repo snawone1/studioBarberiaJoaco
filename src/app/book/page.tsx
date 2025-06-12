@@ -21,17 +21,41 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from '@/components/ui/badge';
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock, ListChecks } from "lucide-react"
+import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Edit, Trash2, AlertCircle } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale'; 
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
-import { submitAppointmentRequest, getBookedSlotsForDate, getServices, type Service, getTimeSlotSettings, type TimeSlotSetting } from '@/app/actions';
+import { 
+  submitAppointmentRequest, 
+  getBookedSlotsForDate, 
+  getServices, 
+  type Service, 
+  getTimeSlotSettings, 
+  type TimeSlotSetting,
+  getUserAppointments,
+  updateAppointmentStatus,
+  type Appointment,
+} from '@/app/actions';
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 
@@ -48,11 +72,19 @@ export default function BookAppointmentPage() {
   const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  const [dynamicServices, setDynamicServices] = useState<Service[]>([]);
+  const [allServices, setAllServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
 
   const [activeTimeSlotSettings, setActiveTimeSlotSettings] = useState<TimeSlotSetting[]>([]);
   const [isLoadingSlotSettings, setIsLoadingSlotSettings] = useState(true);
+
+  // For "My Appointments" tab
+  const [myAppointments, setMyAppointments] = useState<Appointment[]>([]);
+  const [isLoadingMyAppointments, setIsLoadingMyAppointments] = useState(true);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isCancellingAppointment, setIsCancellingAppointment] = useState(false);
+  const [activeTab, setActiveTab] = useState("request");
 
 
   const form = useForm<ClientAppointmentFormValues>({
@@ -65,37 +97,58 @@ export default function BookAppointmentPage() {
     },
   });
 
+  const serviceMap = useMemo(() => {
+    return new Map(allServices.map(service => [service.id, service.name]));
+  }, [allServices]);
+
+  const fetchPageData = async () => {
+    setIsLoadingServices(true);
+    setIsLoadingSlotSettings(true);
+    try {
+      const [fetchedServices, fetchedSlotSettings] = await Promise.all([
+        getServices(),
+        getTimeSlotSettings()
+      ]);
+      setAllServices(fetchedServices);
+      setActiveTimeSlotSettings(fetchedSlotSettings);
+    } catch (error) {
+      console.error("Error fetching page data:", error);
+      toast({ title: 'Error', description: 'No se pudieron cargar los datos necesarios para la reserva.', variant: 'destructive' });
+    } finally {
+      setIsLoadingServices(false);
+      setIsLoadingSlotSettings(false);
+    }
+  };
+
+  const fetchUserAppointments = async () => {
+    if (currentUser) {
+      setIsLoadingMyAppointments(true);
+      try {
+        const userAppointments = await getUserAppointments(currentUser.uid);
+        setMyAppointments(userAppointments);
+      } catch (error) {
+        console.error("Error fetching user appointments:", error);
+        toast({ title: 'Error', description: 'No se pudieron cargar tus citas.', variant: 'destructive' });
+      } finally {
+        setIsLoadingMyAppointments(false);
+      }
+    } else {
+      setMyAppointments([]);
+      setIsLoadingMyAppointments(false);
+    }
+  };
+  
   useEffect(() => {
-    async function fetchPageServices() {
-      setIsLoadingServices(true);
-      try {
-        const fetchedServices = await getServices();
-        setDynamicServices(fetchedServices);
-      } catch (error) {
-        console.error("Error fetching services for booking page:", error);
-        toast({ title: 'Error', description: 'No se pudieron cargar los servicios disponibles.', variant: 'destructive' });
-      } finally {
-        setIsLoadingServices(false);
-      }
-    }
-
-    async function fetchSlotSettings() {
-      setIsLoadingSlotSettings(true);
-      try {
-        const settings = await getTimeSlotSettings();
-        setActiveTimeSlotSettings(settings);
-      } catch (error) {
-        console.error("Error fetching time slot settings from book/page:", error);
-        toast({ title: 'Error', description: 'No se pudieron cargar las configuraciones de horarios.', variant: 'destructive' });
-      } finally {
-        setIsLoadingSlotSettings(false);
-      }
-    }
-
-    fetchPageServices();
-    fetchSlotSettings();
+    fetchPageData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); 
+
+  useEffect(() => {
+    if (activeTab === 'my-appointments') {
+      fetchUserAppointments();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser, activeTab]);
 
 
   const watchedDate = form.watch('preferredDate');
@@ -147,7 +200,7 @@ export default function BookAppointmentPage() {
       isActive = false; 
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedDate, form, toast]);
+  }, [watchedDate]);
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
@@ -200,6 +253,7 @@ export default function BookAppointmentPage() {
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
+            fetchUserAppointments(); // Refresh user appointments
           })
           .catch(fetchError => {
             console.error("Error re-fetching booked slots after submission:", fetchError);
@@ -231,6 +285,32 @@ export default function BookAppointmentPage() {
        }
     }
   }
+  
+  const handleCancelAppointment = async () => {
+    if (!appointmentToCancel || !currentUser) return;
+    setIsCancellingAppointment(true);
+    const result = await updateAppointmentStatus(appointmentToCancel.id, 'cancelled', currentUser.uid);
+    setIsCancellingAppointment(false);
+    setIsCancelDialogOpen(false);
+
+    if (result.success) {
+      toast({ title: 'Cita Cancelada', description: result.message });
+      fetchUserAppointments(); // Refresh the list
+    } else {
+      toast({ title: 'Error al Cancelar', description: result.message, variant: 'destructive' });
+    }
+    setAppointmentToCancel(null);
+  };
+
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'default';
+      case 'confirmed': return 'secondary';
+      case 'completed': return 'secondary';
+      case 'cancelled': return 'destructive';
+      default: return 'outline';
+    }
+  };
 
   const currentlyActiveSlots = ALL_TIME_SLOTS.filter(slot => {
     const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
@@ -241,272 +321,388 @@ export default function BookAppointmentPage() {
     <div className="container mx-auto px-4 py-12">
       <PageHeader
         title="Reservar Tu Cita"
-        description="Completa el siguiente formulario para solicitar una cita. Nos pondremos en contacto contigo pronto para confirmar."
+        description="Gestiona tus citas o solicita una nueva. ¡Te esperamos!"
       />
-      <div className="max-w-2xl mx-auto">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="preferredDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="text-lg font-semibold">Fecha Preferida</FormLabel>
-                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal text-base py-6",
-                            !field.value && "text-muted-foreground"
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-2xl mx-auto">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="request">Solicitar Cita</TabsTrigger>
+          <TabsTrigger value="my-appointments">Mis Citas</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="request" className="mt-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="preferredDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-lg font-semibold">Fecha Preferida</FormLabel>
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal text-base py-6",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: es })
+                            ) : (
+                              <span>Selecciona una fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-5 w-5 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            setIsCalendarOpen(false); 
+                          }}
+                          disabled={(date) =>
+                            date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                          locale={es} 
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="preferredTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg font-semibold flex items-center">
+                      <Clock className="mr-2 h-5 w-5 text-primary" />
+                      Horarios Disponibles
+                    </FormLabel>
+                    <p className="text-sm text-muted-foreground mb-3">{formattedSelectedDate}</p>
+                    
+                    <div className="min-h-[70px] py-2">
+                      {!watchedDate ? (
+                        <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
+                      ) : isLoadingBookedSlots || isLoadingSlotSettings ? (
+                        <div key="loading-slots" className="flex justify-center items-center h-full">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <span className="ml-2">Cargando horarios...</span>
+                        </div>
+                      ) : (
+                        <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                          {currentlyActiveSlots.map((slot) => {
+                              const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
+                              let slotIsTooSoonOrPast = false;
+
+                              if (watchedDate && isToday) {
+                                  const timeParts = slot.split(' ');
+                                  const timeDigits = timeParts[0].split(':');
+                                  let slotHours = parseInt(timeDigits[0]);
+                                  const slotMinutes = parseInt(timeDigits[1]);
+                                  const period = timeParts[1].toUpperCase();
+
+                                  if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                                  else if (period === 'AM' && slotHours === 12) slotHours = 0; 
+
+                                  const slotStartDateTime = new Date(watchedDate); 
+                                  slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                                  
+                                  const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+
+                                  if (slotStartDateTime <= cutoffTime) {
+                                      slotIsTooSoonOrPast = true;
+                                  }
+                              }
+                              
+                              const isSlotBooked = bookedSlots.includes(slot);
+                              const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
+
+                              return (
+                                 <Button
+                                    key={slot}
+                                    type="button"
+                                    variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
+                                    className={cn(
+                                      "w-full py-3 text-sm",
+                                      selectedTimeSlot === slot && !isDisabled
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                        : isDisabled 
+                                          ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed"
+                                          : "text-foreground hover:bg-muted"
+                                    )}
+                                    onClick={() => {
+                                      if (!isDisabled) {
+                                        setSelectedTimeSlot(slot);
+                                        field.onChange(slot);
+                                      }
+                                    }}
+                                    disabled={isDisabled}
+                                  >
+                                    {slot}
+                                  </Button>
+                              );
+                          })}
+                          {currentlyActiveSlots.filter(slot => {
+                              const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
+                              let slotIsTooSoonOrPast = false;
+                              if (watchedDate && isToday) {
+                                  const timeParts = slot.split(' ');
+                                  const timeDigits = timeParts[0].split(':');
+                                  let slotHours = parseInt(timeDigits[0]);
+                                  const slotMinutes = parseInt(timeDigits[1]);
+                                  const period = timeParts[1].toUpperCase();
+                                  if (period === 'PM' && slotHours !== 12) slotHours += 12;
+                                  else if (period === 'AM' && slotHours === 12) slotHours = 0;
+                                  const slotStartDateTime = new Date(watchedDate);
+                                  slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
+                                  const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
+                                  if (slotStartDateTime <= cutoffTime) slotIsTooSoonOrPast = true;
+                              }
+                              return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast;
+                          }).length === 0 && watchedDate && !isLoadingBookedSlots && !isLoadingSlotSettings && (
+                             <p className="text-sm text-muted-foreground text-center col-span-full">
+                               No hay horarios disponibles para esta fecha.
+                             </p>
                           )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: es })
-                          ) : (
-                            <span>Selecciona una fecha</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-5 w-5 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => {
-                          field.onChange(date);
-                          setIsCalendarOpen(false); 
-                        }}
-                        disabled={(date) =>
-                          date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                        locale={es} 
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="preferredTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg font-semibold flex items-center">
-                    <Clock className="mr-2 h-5 w-5 text-primary" />
-                    Horarios Disponibles
-                  </FormLabel>
-                  <p className="text-sm text-muted-foreground mb-3">{formattedSelectedDate}</p>
-                  
-                  <div className="min-h-[70px] py-2">
-                    {!watchedDate ? (
-                      <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
-                    ) : isLoadingBookedSlots || isLoadingSlotSettings ? (
-                      <div key="loading-slots" className="flex justify-center items-center h-full">
+                        </div>
+                      )}
+                    </div>
+                    <FormMessage className="mt-2" />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="services"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-lg font-semibold flex items-center">
+                        <ListChecks className="mr-2 h-5 w-5 text-primary" />
+                        Servicios
+                      </FormLabel>
+                      <FormDescription className="text-sm">
+                        Selecciona el/los servicio(s) que te interesan.
+                      </FormDescription>
+                    </div>
+                    {isLoadingServices ? (
+                      <div className="flex justify-center items-center py-4">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        <span className="ml-2">Cargando horarios...</span>
+                        <span className="ml-2">Cargando servicios...</span>
                       </div>
+                    ) : allServices.length === 0 ? (
+                       <p className="text-sm text-muted-foreground text-center py-4">
+                          No hay servicios disponibles en este momento.
+                       </p>
                     ) : (
-                      <div key="slots-grid" className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                        {currentlyActiveSlots.map((slot) => {
-                            const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
-                            let slotIsTooSoonOrPast = false;
-
-                            if (watchedDate && isToday) {
-                                const timeParts = slot.split(' ');
-                                const timeDigits = timeParts[0].split(':');
-                                let slotHours = parseInt(timeDigits[0]);
-                                const slotMinutes = parseInt(timeDigits[1]);
-                                const period = timeParts[1].toUpperCase();
-
-                                if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                                else if (period === 'AM' && slotHours === 12) slotHours = 0; 
-
-                                const slotStartDateTime = new Date(watchedDate); 
-                                slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                                
-                                const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-
-                                if (slotStartDateTime <= cutoffTime) {
-                                    slotIsTooSoonOrPast = true;
-                                }
-                            }
-                            
-                            const isSlotBooked = bookedSlots.includes(slot);
-                            // Deactivated slots are already filtered out from currentlyActiveSlots
-                            const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
-
-                            return (
-                               <Button
-                                  key={slot}
-                                  type="button"
-                                  variant={selectedTimeSlot === slot && !isDisabled ? "default" : "outline"}
-                                  className={cn(
-                                    "w-full py-3 text-sm",
-                                    selectedTimeSlot === slot && !isDisabled
-                                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                      : isDisabled 
-                                        ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed" // Only booked or past slots get this style
-                                        : "text-foreground hover:bg-muted"
-                                  )}
-                                  onClick={() => {
-                                    if (!isDisabled) {
-                                      setSelectedTimeSlot(slot);
-                                      field.onChange(slot);
-                                    }
-                                  }}
-                                  disabled={isDisabled}
+                      <div className="space-y-2">
+                        {allServices.map((service) => (
+                          <FormField
+                            key={service.id}
+                            control={form.control}
+                            name="services"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
                                 >
-                                  {slot}
-                                </Button>
-                            );
-                        })}
-                        {currentlyActiveSlots.filter(slot => {
-                            const isToday = watchedDate ? format(watchedDate, 'yyyy-MM-dd') === format(now, 'yyyy-MM-dd') : false;
-                            let slotIsTooSoonOrPast = false;
-                            if (watchedDate && isToday) {
-                                const timeParts = slot.split(' ');
-                                const timeDigits = timeParts[0].split(':');
-                                let slotHours = parseInt(timeDigits[0]);
-                                const slotMinutes = parseInt(timeDigits[1]);
-                                const period = timeParts[1].toUpperCase();
-                                if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                                else if (period === 'AM' && slotHours === 12) slotHours = 0;
-                                const slotStartDateTime = new Date(watchedDate);
-                                slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                                const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
-                                if (slotStartDateTime <= cutoffTime) slotIsTooSoonOrPast = true;
-                            }
-                            return !bookedSlots.includes(slot) && !slotIsTooSoonOrPast;
-                        }).length === 0 && watchedDate && !isLoadingBookedSlots && !isLoadingSlotSettings && (
-                           <p className="text-sm text-muted-foreground text-center col-span-full">
-                             No hay horarios disponibles para esta fecha.
-                           </p>
-                        )}
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(service.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...(field.value || []), service.id])
+                                          : field.onChange(
+                                              (field.value || []).filter(
+                                                (value) => value !== service.id
+                                              )
+                                            )
+                                      }}
+                                      className="h-5 w-5"
+                                    />
+                                  </FormControl>
+                                  <div className="flex-grow">
+                                    <FormLabel className="font-normal text-base cursor-pointer flex justify-between items-center w-full">
+                                      <span>{service.name}</span>
+                                      <span className="text-sm text-primary font-medium">{service.price}</span>
+                                    </FormLabel>
+                                    <p className="text-xs text-muted-foreground mt-0.5">{service.description}</p>
+                                  </div>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
                       </div>
                     )}
-                  </div>
-                  <FormMessage className="mt-2" />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="services"
-              render={() => (
-                <FormItem>
-                  <div className="mb-4">
-                    <FormLabel className="text-lg font-semibold flex items-center">
-                      <ListChecks className="mr-2 h-5 w-5 text-primary" />
-                      Servicios
-                    </FormLabel>
-                    <FormDescription className="text-sm">
-                      Selecciona el/los servicio(s) que te interesan.
-                    </FormDescription>
-                  </div>
-                  {isLoadingServices ? (
-                    <div className="flex justify-center items-center py-4">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      <span className="ml-2">Cargando servicios...</span>
-                    </div>
-                  ) : dynamicServices.length === 0 ? (
-                     <p className="text-sm text-muted-foreground text-center py-4">
-                        No hay servicios disponibles en este momento.
-                     </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {dynamicServices.map((service) => (
-                        <FormField
-                          key={service.id}
-                          control={form.control}
-                          name="services"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
-                              >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(service.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...(field.value || []), service.id])
-                                        : field.onChange(
-                                            (field.value || []).filter(
-                                              (value) => value !== service.id
-                                            )
-                                          )
-                                    }}
-                                    className="h-5 w-5"
-                                  />
-                                </FormControl>
-                                <div className="flex-grow">
-                                  <FormLabel className="font-normal text-base cursor-pointer flex justify-between items-center w-full">
-                                    <span>{service.name}</span>
-                                    <span className="text-sm text-primary font-medium">{service.price}</span>
-                                  </FormLabel>
-                                  <p className="text-xs text-muted-foreground mt-0.5">{service.description}</p>
-                                </div>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg font-semibold">Mensaje Adicional (Opcional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="¿Alguna petición específica o nota?"
-                      className="resize-none text-base p-3"
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <Button 
-                type="submit" 
-                className="w-full py-6 text-lg" 
-                disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
-              >
-              <Loader2 
-                className={cn(
-                  "mr-2 h-5 w-5 animate-spin",
-                  (isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
-                )} 
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
-                'Procesando...'
-              ) : (
-                currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg font-semibold">Mensaje Adicional (Opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="¿Alguna petición específica o nota?"
+                        className="resize-none text-base p-3"
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <Button 
+                  type="submit" 
+                  className="w-full py-6 text-lg" 
+                  disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
+                >
+                <Loader2 
+                  className={cn(
+                    "mr-2 h-5 w-5 animate-spin",
+                    (isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
+                  )} 
+                />
+                {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
+                  'Procesando...'
+                ) : (
+                  currentUser ? 'Solicitar Cita' : 'Inicia sesión para reservar'
+                )}
+              </Button>
+              {!currentUser && (
+                   <p className="text-sm text-center text-muted-foreground">
+                      Debes <Link href="/login" className="underline text-primary hover:text-primary/80">iniciar sesión</Link> o <Link href="/register" className="underline text-primary hover:text-primary/80">registrarte</Link> para solicitar una cita.
+                   </p>
               )}
-            </Button>
-            {!currentUser && (
-                 <p className="text-sm text-center text-muted-foreground">
-                    Debes <Link href="/login" className="underline text-primary hover:text-primary/80">iniciar sesión</Link> o <Link href="/register" className="underline text-primary hover:text-primary/80">registrarte</Link> para solicitar una cita.
-                 </p>
-            )}
-          </form>
-        </Form>
-      </div>
+            </form>
+          </Form>
+        </TabsContent>
+
+        <TabsContent value="my-appointments" className="mt-6">
+          {!currentUser ? (
+            <Card className="text-center py-10">
+              <CardHeader>
+                <UserCircle className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <CardTitle>Mis Citas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  <Link href="/login?redirect=/book" className="text-primary underline">Inicia sesión</Link> o <Link href="/register?redirect=/book" className="text-primary underline">regístrate</Link> para ver y gestionar tus citas.
+                </p>
+              </CardContent>
+            </Card>
+          ) : isLoadingMyAppointments || isLoadingServices ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="ml-3 text-muted-foreground">Cargando tus citas...</p>
+            </div>
+          ) : myAppointments.length === 0 ? (
+            <Card className="text-center py-10">
+               <CardHeader>
+                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                <CardTitle>No Tienes Citas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Aún no has solicitado ninguna cita.</p>
+                <Button className="mt-4" onClick={() => setActiveTab("request")}>Solicitar una Cita</Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {myAppointments.map((appt) => (
+                <Card key={appt.id} className="shadow-md">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg font-sans">
+                          {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
+                        </CardTitle>
+                        <CardDescription className="text-xs pt-1">
+                          Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
+                        </CardDescription>
+                      </div>
+                      <Badge variant={getStatusVariant(appt.status)} className="capitalize text-xs px-2 py-0.5">{appt.status}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pb-4 space-y-2 text-sm">
+                    <div>
+                      <span className="font-semibold">Servicios: </span>
+                      {appt.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}
+                    </div>
+                    {appt.message && (
+                      <div>
+                        <span className="font-semibold">Tu Mensaje: </span>
+                        {appt.message}
+                      </div>
+                    )}
+                  </CardContent>
+                  {appt.status === 'pending' && (
+                    <CardFooter className="pt-3 border-t flex justify-end">
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => { setAppointmentToCancel(appt); setIsCancelDialogOpen(true); }}
+                        disabled={isCancellingAppointment && appointmentToCancel?.id === appt.id}
+                      >
+                        {isCancellingAppointment && appointmentToCancel?.id === appt.id ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="mr-2 h-4 w-4" />
+                        )}
+                        Cancelar Cita
+                      </Button>
+                    </CardFooter>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {appointmentToCancel && (
+        <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center"><AlertCircle className="h-5 w-5 mr-2 text-destructive"/>¿Confirmar Cancelación?</AlertDialogTitle>
+              <AlertDialogDescription>
+                ¿Estás seguro de que quieres cancelar tu cita para el 
+                <strong className="text-foreground"> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })} a las {appointmentToCancel.preferredTime}</strong>?
+                <br/>
+                Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
+                <br/>
+                Esta acción no se puede deshacer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setAppointmentToCancel(null)}>Cerrar</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleCancelAppointment} 
+                disabled={isCancellingAppointment}
+                className={cn(isCancellingAppointment ? "" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground")}
+              >
+                {isCancellingAppointment ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Sí, Cancelar Cita
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }
