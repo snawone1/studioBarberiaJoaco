@@ -260,7 +260,7 @@ export default function BookAppointmentPage() {
       });
       form.reset({
         services: [],
-        preferredDate: watchedDate, 
+        preferredDate: watchedDate,
         preferredTime: '',
         message: ''
       });
@@ -270,7 +270,7 @@ export default function BookAppointmentPage() {
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
             setBookedSlots(newSlots);
-            fetchUserAppointments(); 
+            fetchUserAppointments();
           })
           .catch(fetchError => {
             console.error("Error re-fetching booked slots after submission:", fetchError);
@@ -279,7 +279,7 @@ export default function BookAppointmentPage() {
             setIsLoadingBookedSlots(false);
           });
       } else {
-         fetchUserAppointments(); 
+         fetchUserAppointments();
       }
     } else {
       toast({
@@ -343,7 +343,7 @@ export default function BookAppointmentPage() {
 
       const templateId = type === 'requestCancellation' ? 'adminContactCancellationRequest' : 'adminContactQuery';
       let messageContent = await getMessageTemplate(templateId);
-      
+
       // Ensure allServices are loaded if not already
       let currentServices = allServices;
       if (currentServices.length === 0) {
@@ -352,10 +352,10 @@ export default function BookAppointmentPage() {
 
       const serviceNames = selectedAppointmentForContact.services.map(serviceId => {
         const serviceDetail = currentServices.find(s => s.id === serviceId);
-        return serviceDetail ? serviceDetail.name : serviceId; 
+        return serviceDetail ? serviceDetail.name : serviceId;
       });
       const servicesText = serviceNames.join(', ') || 'No especificados';
-      const clientName = currentUser.displayName || currentUser.email || 'Cliente'; 
+      const clientName = currentUser.displayName || currentUser.email || 'Cliente';
       const apptDate = format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es });
       const apptTime = selectedAppointmentForContact.preferredTime;
 
@@ -365,10 +365,10 @@ export default function BookAppointmentPage() {
         .replace(/\{\{appointmentTime\}\}/g, apptTime)
         .replace(/\{\{siteName\}\}/g, siteConfig.name)
         .replace(/\{\{servicesList\}\}/g, servicesText);
-      
+
       const cleanedAdminPhoneNumber = adminPhoneNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanedAdminPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
-      
+
       window.open(whatsappUrl, '_blank');
       setContactAdminDialogOpen(false);
 
@@ -692,7 +692,7 @@ export default function BookAppointmentPage() {
                 </p>
               </CardContent>
             </Card>
-          ) : isLoadingMyAppointments || isLoadingServices ? ( 
+          ) : isLoadingMyAppointments || isLoadingServices ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="ml-3 text-muted-foreground">Cargando tus citas...</p>
@@ -738,7 +738,7 @@ export default function BookAppointmentPage() {
                     )}
                   </CardContent>
                   <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
-                    {appt.status === 'pending' && (
+                    {(appt.status === 'pending' || appt.status === 'confirmed') && ( // Allow cancel for pending or confirmed
                       <Button
                         variant="destructive"
                         size="sm"
@@ -753,7 +753,7 @@ export default function BookAppointmentPage() {
                         Cancelar Cita
                       </Button>
                     )}
-                     {appt.status === 'confirmed' && (
+                     {appt.status === 'confirmed' && ( // Only show contact for confirmed
                       <Button
                         variant="outline"
                         size="sm"
@@ -782,7 +782,9 @@ export default function BookAppointmentPage() {
                 <br/>
                 Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
                 <br/>
-                Esta acción no se puede deshacer.
+                {(appointmentToCancel.status === 'pending') && "Esta acción no se puede deshacer."}
+                {(appointmentToCancel.status === 'confirmed') && "Esta acción solicitará la cancelación al administrador. No es una cancelación inmediata."}
+
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -801,7 +803,10 @@ export default function BookAppointmentPage() {
       )}
 
       {selectedAppointmentForContact && (
-        <Dialog open={contactAdminDialogOpen} onOpenChange={setContactAdminDialogOpen}>
+        <Dialog open={contactAdminDialogOpen} onOpenChange={(isOpen) => {
+            setContactAdminDialogOpen(isOpen);
+            if (!isOpen) setSelectedAppointmentForContact(null); // Clear selection on close
+        }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center">
@@ -849,5 +854,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-```
