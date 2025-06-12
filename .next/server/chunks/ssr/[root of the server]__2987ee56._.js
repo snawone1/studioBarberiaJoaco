@@ -620,20 +620,20 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
-    // console.log("Server Action: submitAppointmentRequest received data:", data);
+    console.log("Server Action: submitAppointmentRequest received data with userId:", data.userId);
     try {
         const clientPreferredDate = data.preferredDate;
         const normalizedPreferredDateObject = new Date(clientPreferredDate);
         normalizedPreferredDateObject.setHours(0, 0, 0, 0);
         const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(normalizedPreferredDateObject);
-        // console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+        console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
         const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', preferredDateTimestamp), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
         ]));
         const existingAppointmentsSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qCheck);
         if (!existingAppointmentsSnap.empty) {
-            // console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
+            console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
             return {
                 success: false,
                 message: 'Este horario ya no está disponible. Por favor, elige otro.'
@@ -648,9 +648,9 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             status: 'pending',
             createdAt: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].now()
         };
-        // console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
+        console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addDoc"])(appointmentsCollectionRef, appointmentData);
-        // console.log("Server Action: Appointment added successfully.");
+        console.log("Server Action: Appointment added successfully.");
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         return {
@@ -738,23 +738,23 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
     } catch (error) {
         console.error("Admin: Error fetching or mapping appointments from Firestore:", error);
         if (error.code === 'failed-precondition') {
-            console.error("IMPORTANT: Firestore 'failed-precondition' error. This OFTEN means a composite index is required for your query (e.g., for orderBy clauses). Check the DETAILED error message in the Firebase/Next.js server console. It usually provides a link to create the missing index if you haven't already or if it's still building.");
+            console.error("IMPORTANT: Firestore 'failed-precondition' error for admin appointments query. This OFTEN means a composite index is required for your query (e.g., for orderBy clauses on 'preferredDate' and 'createdAt'). Check the DETAILED error message in the Firebase/Next.js server console. It usually provides a link to create the missing index.");
         } else {
-            console.error("An unexpected error occurred while fetching appointments:", error.message, error.stack);
+            console.error("An unexpected error occurred while fetching admin appointments:", error.message, error.stack);
         }
         return [];
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(userId) {
-    // console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+    console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
     if (!userId) {
-        // console.warn("Server Action: getUserAppointments called with no userId.");
+        console.warn("Server Action: getUserAppointments called with no userId.");
         return [];
     }
     try {
         const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUserAppointments);
-        // console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+        console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
         if (appointmentSnapshot.empty) {
             return [];
         }
@@ -783,7 +783,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
                 createdAt: createdAtISO
             };
         });
-        // console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+        console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
         return appointments;
     } catch (error) {
         console.error(`Server Action: Error fetching appointments for user ${userId}:`, error);
@@ -795,7 +795,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId// Optional: for client-side cancellation validation
 ) {
-    // console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
+    console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
     try {
         const appointmentDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appointments', appointmentId);
         if (currentUserId && newStatus === 'cancelled') {
@@ -821,6 +821,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
                 };
             }
         } else if (currentUserId && newStatus !== 'cancelled') {
+            // Prevent client from changing status to anything other than 'cancelled'
             return {
                 success: false,
                 message: 'No tienes permiso para realizar esta acción.'
@@ -829,7 +830,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateDoc"])(appointmentDocRef, {
             status: newStatus
         });
-        // console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+        console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         return {

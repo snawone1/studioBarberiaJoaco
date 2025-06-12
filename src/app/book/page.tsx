@@ -30,24 +30,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Edit, Trash2, AlertCircle } from "lucide-react"
+import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle } from "lucide-react" // Removed Edit icon
 import { format } from "date-fns"
-import { es } from 'date-fns/locale'; 
+import { es } from 'date-fns/locale';
 import Link from 'next/link';
 
 import { PageHeader } from '@/components/page-header';
-import { 
-  submitAppointmentRequest, 
-  getBookedSlotsForDate, 
-  getServices, 
-  type Service, 
-  getTimeSlotSettings, 
+import {
+  submitAppointmentRequest,
+  getBookedSlotsForDate,
+  getServices,
+  type Service,
+  getTimeSlotSettings,
   type TimeSlotSetting,
   getUserAppointments,
   updateAppointmentStatus,
@@ -61,11 +60,11 @@ import { ALL_TIME_SLOTS } from '@/lib/constants';
 
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
-const now = new Date(); 
+const now = new Date();
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
-  const { currentUser } = useAuth(); 
+  const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string | undefined>(undefined);
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
@@ -78,7 +77,6 @@ export default function BookAppointmentPage() {
   const [activeTimeSlotSettings, setActiveTimeSlotSettings] = useState<TimeSlotSetting[]>([]);
   const [isLoadingSlotSettings, setIsLoadingSlotSettings] = useState(true);
 
-  // For "My Appointments" tab
   const [myAppointments, setMyAppointments] = useState<Appointment[]>([]);
   const [isLoadingMyAppointments, setIsLoadingMyAppointments] = useState(true);
   const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
@@ -122,26 +120,28 @@ export default function BookAppointmentPage() {
 
   const fetchUserAppointments = async () => {
     if (currentUser) {
+      console.log(`BookPage: fetchUserAppointments called. currentUser UID: ${currentUser.uid}`);
       setIsLoadingMyAppointments(true);
       try {
         const userAppointments = await getUserAppointments(currentUser.uid);
+        console.log("BookPage: Fetched user appointments RAW:", userAppointments);
         setMyAppointments(userAppointments);
       } catch (error) {
-        console.error("Error fetching user appointments:", error);
+        console.error("BookPage: Error fetching user appointments in client:", error);
         toast({ title: 'Error', description: 'No se pudieron cargar tus citas.', variant: 'destructive' });
       } finally {
         setIsLoadingMyAppointments(false);
       }
     } else {
+      console.log("BookPage: fetchUserAppointments - no current user, clearing appointments.");
       setMyAppointments([]);
       setIsLoadingMyAppointments(false);
     }
   };
-  
+
   useEffect(() => {
     fetchPageData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'my-appointments') {
@@ -152,8 +152,8 @@ export default function BookAppointmentPage() {
 
 
   const watchedDate = form.watch('preferredDate');
-  const formattedSelectedDate = watchedDate 
-    ? format(watchedDate, "'Para el' EEEE, d 'de' MMMM 'de' yyyy", { locale: es }) 
+  const formattedSelectedDate = watchedDate
+    ? format(watchedDate, "'Para el' EEEE, d 'de' MMMM 'de' yyyy", { locale: es })
     : "Selecciona una fecha primero";
 
   useEffect(() => {
@@ -165,27 +165,27 @@ export default function BookAppointmentPage() {
           setBookedSlots([]);
           setSelectedTimeSlot(undefined);
           form.setValue('preferredTime', '');
-          setIsLoadingBookedSlots(false); 
+          setIsLoadingBookedSlots(false);
         }
         return;
       }
 
       if (isActive) {
-        setSelectedTimeSlot(undefined); 
-        form.setValue('preferredTime', ''); 
-        setIsLoadingBookedSlots(true); 
+        setSelectedTimeSlot(undefined);
+        form.setValue('preferredTime', '');
+        setIsLoadingBookedSlots(true);
       }
 
       try {
         const slots = await getBookedSlotsForDate(watchedDate);
         if (isActive) {
-          setBookedSlots(slots); 
+          setBookedSlots(slots);
         }
       } catch (error) {
         if (isActive) {
           console.error("Error fetching booked slots:", error);
           toast({ title: 'Error', description: 'No se pudieron cargar los horarios ocupados.', variant: 'destructive' });
-          setBookedSlots([]); 
+          setBookedSlots([]);
         }
       } finally {
         if (isActive) {
@@ -197,14 +197,13 @@ export default function BookAppointmentPage() {
     fetchBookedSlots();
 
     return () => {
-      isActive = false; 
+      isActive = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedDate]);
 
 
   async function onSubmit(data: ClientAppointmentFormValues) {
-    console.log("Submitting appointment with payload:", data);
     if (!currentUser) {
       toast({
         title: 'Error de Autenticación',
@@ -216,7 +215,7 @@ export default function BookAppointmentPage() {
 
     setIsLoading(true);
     let result;
-    
+
     try {
       const payloadForServer: AppointmentFormValues = {
         ...data,
@@ -233,7 +232,7 @@ export default function BookAppointmentPage() {
       setIsLoading(false);
       return;
     }
-    
+
     setIsLoading(false);
 
     if (result.success) {
@@ -241,14 +240,14 @@ export default function BookAppointmentPage() {
         title: '¡Éxito!',
         description: result.message,
       });
-      form.reset({ 
-        services: [], 
-        preferredDate: watchedDate,
-        preferredTime: '', 
-        message: '' 
+      form.reset({
+        services: [],
+        preferredDate: watchedDate, // Keep the date so slots refresh
+        preferredTime: '',
+        message: ''
       });
       setSelectedTimeSlot(undefined);
-      if (watchedDate) { 
+      if (watchedDate) {
         setIsLoadingBookedSlots(true);
         getBookedSlotsForDate(watchedDate)
           .then(newSlots => {
@@ -261,6 +260,8 @@ export default function BookAppointmentPage() {
           .finally(() => {
             setIsLoadingBookedSlots(false);
           });
+      } else {
+         fetchUserAppointments(); // Refresh user appointments even if date wasn't set (edge case)
       }
     } else {
       toast({
@@ -285,7 +286,7 @@ export default function BookAppointmentPage() {
        }
     }
   }
-  
+
   const handleCancelAppointment = async () => {
     if (!appointmentToCancel || !currentUser) return;
     setIsCancellingAppointment(true);
@@ -295,7 +296,7 @@ export default function BookAppointmentPage() {
 
     if (result.success) {
       toast({ title: 'Cita Cancelada', description: result.message });
-      fetchUserAppointments(); // Refresh the list
+      fetchUserAppointments();
     } else {
       toast({ title: 'Error al Cancelar', description: result.message, variant: 'destructive' });
     }
@@ -314,9 +315,9 @@ export default function BookAppointmentPage() {
 
   const currentlyActiveSlots = ALL_TIME_SLOTS.filter(slot => {
     const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
-    return slotSetting ? slotSetting.isActive : true; // Default to active if not found
+    return slotSetting ? slotSetting.isActive : true;
   });
-  
+
   return (
     <div className="container mx-auto px-4 py-12">
       <PageHeader
@@ -328,7 +329,7 @@ export default function BookAppointmentPage() {
           <TabsTrigger value="request">Solicitar Cita</TabsTrigger>
           <TabsTrigger value="my-appointments">Mis Citas</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="request" className="mt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -363,13 +364,13 @@ export default function BookAppointmentPage() {
                           selected={field.value}
                           onSelect={(date) => {
                             field.onChange(date);
-                            setIsCalendarOpen(false); 
+                            setIsCalendarOpen(false);
                           }}
                           disabled={(date) =>
                             date < new Date(new Date().setDate(new Date().getDate() -1)) || date < new Date("1900-01-01")
                           }
                           initialFocus
-                          locale={es} 
+                          locale={es}
                         />
                       </PopoverContent>
                     </Popover>
@@ -377,7 +378,7 @@ export default function BookAppointmentPage() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="preferredTime"
@@ -388,7 +389,7 @@ export default function BookAppointmentPage() {
                       Horarios Disponibles
                     </FormLabel>
                     <p className="text-sm text-muted-foreground mb-3">{formattedSelectedDate}</p>
-                    
+
                     <div className="min-h-[70px] py-2">
                       {!watchedDate ? (
                         <p key="no-date" className="text-sm text-muted-foreground text-center">Por favor, selecciona una fecha para ver los horarios.</p>
@@ -411,18 +412,18 @@ export default function BookAppointmentPage() {
                                   const period = timeParts[1].toUpperCase();
 
                                   if (period === 'PM' && slotHours !== 12) slotHours += 12;
-                                  else if (period === 'AM' && slotHours === 12) slotHours = 0; 
+                                  else if (period === 'AM' && slotHours === 12) slotHours = 0;
 
-                                  const slotStartDateTime = new Date(watchedDate); 
+                                  const slotStartDateTime = new Date(watchedDate);
                                   slotStartDateTime.setHours(slotHours, slotMinutes, 0, 0);
-                                  
+
                                   const cutoffTime = new Date(new Date().getTime() + MIN_ADVANCE_BOOKING_MINUTES * 60 * 1000);
 
                                   if (slotStartDateTime <= cutoffTime) {
                                       slotIsTooSoonOrPast = true;
                                   }
                               }
-                              
+
                               const isSlotBooked = bookedSlots.includes(slot);
                               const isDisabled = isSlotBooked || slotIsTooSoonOrPast;
 
@@ -434,8 +435,8 @@ export default function BookAppointmentPage() {
                                     className={cn(
                                       "w-full py-3 text-sm",
                                       selectedTimeSlot === slot && !isDisabled
-                                        ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                        : isDisabled 
+                                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        : isDisabled
                                           ? "text-muted-foreground bg-muted hover:bg-muted cursor-not-allowed"
                                           : "text-foreground hover:bg-muted"
                                     )}
@@ -480,7 +481,7 @@ export default function BookAppointmentPage() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="services"
@@ -567,16 +568,16 @@ export default function BookAppointmentPage() {
                   </FormItem>
                 )}
               />
-               <Button 
-                  type="submit" 
-                  className="w-full py-6 text-lg" 
+               <Button
+                  type="submit"
+                  className="w-full py-6 text-lg"
                   disabled={isLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
                 >
-                <Loader2 
+                <Loader2
                   className={cn(
                     "mr-2 h-5 w-5 animate-spin",
                     (isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
-                  )} 
+                  )}
                 />
                 {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
                   'Procesando...'
@@ -586,7 +587,7 @@ export default function BookAppointmentPage() {
               </Button>
               {!currentUser && (
                    <p className="text-sm text-center text-muted-foreground">
-                      Debes <Link href="/login" className="underline text-primary hover:text-primary/80">iniciar sesión</Link> o <Link href="/register" className="underline text-primary hover:text-primary/80">registrarte</Link> para solicitar una cita.
+                      Debes <Link href="/login?redirect=/book" className="underline text-primary hover:text-primary/80">iniciar sesión</Link> o <Link href="/register?redirect=/book" className="underline text-primary hover:text-primary/80">registrarte</Link> para solicitar una cita.
                    </p>
               )}
             </form>
@@ -606,7 +607,7 @@ export default function BookAppointmentPage() {
                 </p>
               </CardContent>
             </Card>
-          ) : isLoadingMyAppointments || isLoadingServices ? (
+          ) : isLoadingMyAppointments || isLoadingServices ? ( // Check isLoadingServices too
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="ml-3 text-muted-foreground">Cargando tus citas...</p>
@@ -653,9 +654,9 @@ export default function BookAppointmentPage() {
                   </CardContent>
                   {appt.status === 'pending' && (
                     <CardFooter className="pt-3 border-t flex justify-end">
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
+                      <Button
+                        variant="destructive"
+                        size="sm"
                         onClick={() => { setAppointmentToCancel(appt); setIsCancelDialogOpen(true); }}
                         disabled={isCancellingAppointment && appointmentToCancel?.id === appt.id}
                       >
@@ -681,7 +682,7 @@ export default function BookAppointmentPage() {
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center"><AlertCircle className="h-5 w-5 mr-2 text-destructive"/>¿Confirmar Cancelación?</AlertDialogTitle>
               <AlertDialogDescription>
-                ¿Estás seguro de que quieres cancelar tu cita para el 
+                ¿Estás seguro de que quieres cancelar tu cita para el
                 <strong className="text-foreground"> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })} a las {appointmentToCancel.preferredTime}</strong>?
                 <br/>
                 Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
@@ -691,8 +692,8 @@ export default function BookAppointmentPage() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setAppointmentToCancel(null)}>Cerrar</AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={handleCancelAppointment} 
+              <AlertDialogAction
+                onClick={handleCancelAppointment}
                 disabled={isCancellingAppointment}
                 className={cn(isCancellingAppointment ? "" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground")}
               >
@@ -706,4 +707,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-

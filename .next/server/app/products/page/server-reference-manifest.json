@@ -143,7 +143,29 @@
         "app/products/page": "action-browser"
       }
     },
+    "40caf416edbb707356716f925239e16c8970013236": {
+      "workers": {
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/products/page": "action-browser"
+      }
+    },
     "40cb18cfde7898d1c1d082dc9266894eb9881f296d": {
+      "workers": {
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/products/page": "action-browser"
+      }
+    },
+    "40da10036fe76165f7bdab3c65eb3a9e264a1a604e": {
       "workers": {
         "app/products/page": {
           "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -176,7 +198,18 @@
         "app/products/page": "action-browser"
       }
     },
-    "60df8604b55fb28ca85f574dd721ecefbfd80a9cdf": {
+    "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": {
+      "workers": {
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/products/page": "action-browser"
+      }
+    },
+    "70df8604b55fb28ca85f574dd721ecefbfd80a9cdf": {
       "workers": {
         "app/products/page": {
           "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
