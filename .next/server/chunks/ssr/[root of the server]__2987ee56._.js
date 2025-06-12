@@ -578,13 +578,13 @@ const servicesCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2
 const timeSlotSettingsCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'timeSlotSettings');
 const messageTemplatesCollectionRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["collection"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'messageTemplates');
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
-    console.log("Admin: Attempting to fetch users from Firestore...");
+    // console.log("Admin: Attempting to fetch users from Firestore...");
     try {
         const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(usersCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
-        console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
+        // console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
         if (querySnapshot.empty) {
-            console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
+            // console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
             return [];
         }
         const users = querySnapshot.docs.map((docSnap)=>{
@@ -595,7 +595,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
             } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
             } else {
-                console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+                // console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
                 createdAtISO = new Date(0).toISOString();
             }
             const userDetail = {
@@ -607,7 +607,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
             };
             return userDetail;
         });
-        console.log(`Admin: Successfully mapped ${users.length} users.`);
+        // console.log(`Admin: Successfully mapped ${users.length} users.`);
         return users;
     } catch (error) {
         console.error("Admin: Error fetching or mapping users from Firestore:", error);
@@ -620,20 +620,20 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
-    console.log("Server Action: submitAppointmentRequest received data:", data);
+    // console.log("Server Action: submitAppointmentRequest received data:", data);
     try {
         const clientPreferredDate = data.preferredDate;
         const normalizedPreferredDateObject = new Date(clientPreferredDate);
         normalizedPreferredDateObject.setHours(0, 0, 0, 0);
         const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(normalizedPreferredDateObject);
-        console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+        // console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
         const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', preferredDateTimestamp), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
         ]));
         const existingAppointmentsSnap = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qCheck);
         if (!existingAppointmentsSnap.empty) {
-            console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
+            // console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
             return {
                 success: false,
                 message: 'Este horario ya no está disponible. Por favor, elige otro.'
@@ -648,9 +648,9 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             status: 'pending',
             createdAt: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].now()
         };
-        console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
+        // console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addDoc"])(appointmentsCollectionRef, appointmentData);
-        console.log("Server Action: Appointment added successfully.");
+        // console.log("Server Action: Appointment added successfully.");
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
         return {
@@ -666,14 +666,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
-    console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
+    // console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
     try {
         const qAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
-        console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
+        // console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qAppointments);
-        console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
+        // console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
         if (appointmentSnapshot.empty) {
-            console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
+            // console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
             return [];
         }
         const userIds = [
@@ -700,7 +700,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
                 });
             }
         }
-        console.log(`Admin: Fetched details for ${usersMap.size} users.`);
+        // console.log(`Admin: Fetched details for ${usersMap.size} users.`);
         const appointments = appointmentSnapshot.docs.map((docSnap)=>{
             const data = docSnap.data();
             let preferredDateISO;
@@ -708,13 +708,13 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
             if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
                 preferredDateISO = data.preferredDate.toDate().toISOString();
             } else {
-                console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
+                // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
                 preferredDateISO = new Date(0).toISOString();
             }
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
             } else {
-                console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
+                // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
                 createdAtISO = new Date(0).toISOString();
             }
             const userDetails = usersMap.get(data.userId) || {};
@@ -733,7 +733,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
             };
             return appointment;
         });
-        console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
+        // console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
         return appointments;
     } catch (error) {
         console.error("Admin: Error fetching or mapping appointments from Firestore:", error);
@@ -746,15 +746,15 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(userId) {
-    console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+    // console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
     if (!userId) {
-        console.warn("Server Action: getUserAppointments called with no userId.");
+        // console.warn("Server Action: getUserAppointments called with no userId.");
         return [];
     }
     try {
         const qUserAppointments = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('userId', '==', userId), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('preferredDate', 'desc'), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["orderBy"])('createdAt', 'desc'));
         const appointmentSnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(qUserAppointments);
-        console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+        // console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
         if (appointmentSnapshot.empty) {
             return [];
         }
@@ -775,9 +775,6 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
             return {
                 id: docSnap.id,
                 userId: data.userId,
-                // For user's own appointments, we might not need to fetch their name/email/phone again,
-                // but it's included in the Appointment type for consistency.
-                // These fields can be undefined if not fetched.
                 preferredDate: preferredDateISO,
                 preferredTime: data.preferredTime || 'N/A',
                 services: Array.isArray(data.services) ? data.services : [],
@@ -786,7 +783,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
                 createdAt: createdAtISO
             };
         });
-        console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+        // console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
         return appointments;
     } catch (error) {
         console.error(`Server Action: Error fetching appointments for user ${userId}:`, error);
@@ -798,7 +795,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus(appointmentId, newStatus, currentUserId// Optional: for client-side cancellation validation
 ) {
-    console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
+    // console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
     try {
         const appointmentDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$firebase$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["firestore"], 'appointments', appointmentId);
         if (currentUserId && newStatus === 'cancelled') {
@@ -823,21 +820,18 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
                     message: 'Solo puedes cancelar citas que estén pendientes.'
                 };
             }
-        // If all checks pass, proceed to update
         } else if (currentUserId && newStatus !== 'cancelled') {
-            // Client is trying to change status to something other than cancelled
             return {
                 success: false,
                 message: 'No tienes permiso para realizar esta acción.'
             };
         }
-        // If no currentUserId, assume it's an admin action (or client cancellation checks passed)
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["updateDoc"])(appointmentDocRef, {
             status: newStatus
         });
-        console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+        // console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin');
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book'); // Also revalidate book page for client view
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
         return {
             success: true,
             message: `Estado de la cita actualizado a ${newStatus}.`
@@ -886,7 +880,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAIStyleAdvice(data) 
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitSiteSettings(data) {
-    console.log('Site Settings Update Received by Server Action:', data);
+    // console.log('Site Settings Update Received by Server Action:', data);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/');
     return {
@@ -903,9 +897,9 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getProducts() {
             if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
                 imageSrcVal = data.imageSrc;
             } else if (data.imageSrc && data.imageSrc.trim() !== '') {
-                console.warn(`Product ID ${docSnap.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
+            // console.warn(`Product ID ${docSnap.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
             } else if (!data.imageSrc) {
-                console.warn(`Product ID ${docSnap.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
+            // console.warn(`Product ID ${docSnap.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
             }
             return {
                 id: docSnap.id,
@@ -1151,6 +1145,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getTimeSlotSettings() {
         snapshot.forEach((docSnap)=>{
             savedSettingsMap.set(docSnap.id, docSnap.data().isActive);
         });
+        // Use ALL_TIME_SLOTS from the imported constants
         const settings = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].map((time)=>({
                 time,
                 isActive: savedSettingsMap.get(time) ?? true
@@ -1158,6 +1153,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getTimeSlotSettings() {
         return settings;
     } catch (error) {
         console.error("Error fetching time slot settings:", error);
+        // Fallback to all active if Firestore read fails
         return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$constants$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["ALL_TIME_SLOTS"].map((time)=>({
                 time,
                 isActive: true

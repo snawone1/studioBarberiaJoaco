@@ -118,7 +118,7 @@ export async function getUsers(): Promise<UserDetail[]> {
 
 // --- Appointment Actions ---
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
-  // console.log("Server Action: submitAppointmentRequest received data:", data);
+  console.log("Server Action: submitAppointmentRequest received data with userId:", data.userId);
   try {
     const clientPreferredDate = data.preferredDate; 
     
@@ -126,7 +126,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
     normalizedPreferredDateObject.setHours(0, 0, 0, 0); 
     
     const preferredDateTimestamp = Timestamp.fromDate(normalizedPreferredDateObject);
-    // console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+    console.log("Server Action: Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
 
     const qCheck = query(
       appointmentsCollectionRef,
@@ -137,7 +137,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 
     const existingAppointmentsSnap = await getDocs(qCheck);
     if (!existingAppointmentsSnap.empty) {
-      // console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
+      console.log("Server Action: Double booking detected for", preferredDateTimestamp.toDate().toISOString(), data.preferredTime);
       return { success: false, message: 'Este horario ya no está disponible. Por favor, elige otro.' };
     }
 
@@ -150,13 +150,14 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       status: 'pending', 
       createdAt: Timestamp.now(),
     };
-    // console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
+    console.log("Server Action: Attempting to add appointment to Firestore with data:", appointmentData);
     await addDoc(appointmentsCollectionRef, appointmentData);
-    // console.log("Server Action: Appointment added successfully.");
+    console.log("Server Action: Appointment added successfully.");
     revalidatePath('/book'); 
     revalidatePath('/admin'); 
     return { success: true, message: 'Solicitud de cita enviada con éxito. Nos pondremos en contacto contigo pronto para confirmar.' };
-  } catch (error) {
+  } catch (error)
+{
     console.error("Server Action: Error submitting appointment to Firestore:", error);
     return { success: false, message: 'Error al enviar la solicitud de cita. Por favor, inténtalo de nuevo.' };
   }
@@ -248,18 +249,18 @@ export async function getAppointments(): Promise<Appointment[]> {
   } catch (error: any) { 
     console.error("Admin: Error fetching or mapping appointments from Firestore:", error);
      if (error.code === 'failed-precondition') { 
-        console.error("IMPORTANT: Firestore 'failed-precondition' error. This OFTEN means a composite index is required for your query (e.g., for orderBy clauses). Check the DETAILED error message in the Firebase/Next.js server console. It usually provides a link to create the missing index if you haven't already or if it's still building.");
+        console.error("IMPORTANT: Firestore 'failed-precondition' error for admin appointments query. This OFTEN means a composite index is required for your query (e.g., for orderBy clauses on 'preferredDate' and 'createdAt'). Check the DETAILED error message in the Firebase/Next.js server console. It usually provides a link to create the missing index.");
     } else {
-        console.error("An unexpected error occurred while fetching appointments:", error.message, error.stack);
+        console.error("An unexpected error occurred while fetching admin appointments:", error.message, error.stack);
     }
     return [];
   }
 }
 
 export async function getUserAppointments(userId: string): Promise<Appointment[]> {
-  // console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
+  console.log(`Server Action: Attempting to fetch appointments for user ID: ${userId}`);
   if (!userId) {
-    // console.warn("Server Action: getUserAppointments called with no userId.");
+    console.warn("Server Action: getUserAppointments called with no userId.");
     return [];
   }
   try {
@@ -271,7 +272,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     );
 
     const appointmentSnapshot = await getDocs(qUserAppointments);
-    // console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
+    console.log(`Server Action: Found ${appointmentSnapshot.docs.length} appointments for user ${userId}.`);
 
     if (appointmentSnapshot.empty) {
       return [];
@@ -305,7 +306,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
         createdAt: createdAtISO,
       } as Appointment;
     });
-    // console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
+    console.log(`Server Action: Successfully mapped ${appointments.length} appointments for user ${userId}.`);
     return appointments;
 
   } catch (error: any) {
@@ -322,7 +323,7 @@ export async function updateAppointmentStatus(
   newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed',
   currentUserId?: string // Optional: for client-side cancellation validation
 ) {
-  // console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
+  console.log(`Server Action: updateAppointmentStatus called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
   try {
     const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
 
@@ -340,11 +341,12 @@ export async function updateAppointmentStatus(
         return { success: false, message: 'Solo puedes cancelar citas que estén pendientes.' };
       }
     } else if (currentUserId && newStatus !== 'cancelled') {
+      // Prevent client from changing status to anything other than 'cancelled'
       return { success: false, message: 'No tienes permiso para realizar esta acción.' };
     }
 
     await updateDoc(appointmentDocRef, { status: newStatus });
-    // console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
+    console.log(`Server Action: Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
     revalidatePath('/admin');
     revalidatePath('/book'); 
     return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
@@ -675,4 +677,6 @@ export async function updateMessageTemplate(templateId: 'confirmation' | 'cancel
     return { success: false, message: `Error al actualizar la plantilla de ${templateId}.` };
   }
 }
+    
+
     
