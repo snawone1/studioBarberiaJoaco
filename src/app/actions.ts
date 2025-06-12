@@ -351,16 +351,17 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 export async function updateAppointmentStatus(
   appointmentId: string,
   newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed',
-  currentUserId?: string
+  currentUserId?: string // Optional: Used for client-side cancellation validation
 ) {
   console.log(`[updateAppointmentStatus] Called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
   try {
     const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
 
     if (currentUserId && newStatus === 'cancelled') {
+      // This block handles cancellation attempts by a user (not admin)
       const appointmentSnap = await getDoc(appointmentDocRef);
       if (!appointmentSnap.exists()) {
-        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found.`);
+        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found for user cancellation.`);
         return { success: false, message: 'La cita no fue encontrada.' };
       }
       const appointmentData = appointmentSnap.data();
@@ -368,11 +369,10 @@ export async function updateAppointmentStatus(
         console.warn(`[updateAppointmentStatus] User ${currentUserId} does not own appointment ${appointmentId} (owner: ${appointmentData.userId}).`);
         return { success: false, message: 'No tienes permiso para cancelar esta cita.' };
       }
+      // User can cancel 'pending' or 'confirmed' appointments.
       if (appointmentData.status !== 'pending' && appointmentData.status !== 'confirmed') {
-        // Allow user to cancel 'pending' or 'confirmed' citas, but admin can cancel any.
-        // This logic is for when currentUserId is present (i.e., user is cancelling)
-        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' or 'confirmed' (status: ${appointmentData.status}), cannot be cancelled by user via this route.`);
-        return { success: false, message: 'Solo puedes solicitar cancelar citas que estén pendientes o confirmadas. Contacta al administrador para otros casos.' };
+        console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' or 'confirmed' (status: ${appointmentData.status}), cannot be cancelled by user.`);
+        return { success: false, message: 'Solo puedes solicitar cancelar citas que estén pendientes o confirmadas. Para otros casos, contacta al administrador.' };
       }
       console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own ${appointmentData.status} appointment ${appointmentId}.`);
     } else if (currentUserId && newStatus !== 'cancelled') {
@@ -380,12 +380,12 @@ export async function updateAppointmentStatus(
       console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed through this specific user-facing cancel action.`);
       return { success: false, message: 'No tienes permiso para realizar esta acción.' };
     }
-    // If no currentUserId, it's an admin action, allow any status change.
+    // If no currentUserId, it's an admin action, allow any status change (handled by admin panel logic)
 
     await updateDoc(appointmentDocRef, { status: newStatus });
     console.log(`[updateAppointmentStatus] Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
-    revalidatePath('/admin');
-    revalidatePath('/book');
+    revalidatePath('/admin'); // For admin panel
+    revalidatePath('/book');  // For user's "My Appointments" tab
     return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
   } catch (error) {
     console.error(`[updateAppointmentStatus] Error updating appointment ${appointmentId} status in Firestore:`, error);
@@ -757,5 +757,3 @@ export async function updateAdminPhoneNumber(phoneNumber: string) {
     return { success: false, message: 'Error al actualizar el número de teléfono del administrador.' };
   }
 }
-
-```
