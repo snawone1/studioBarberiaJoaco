@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues, AdminEditUserFormValues } from '@/lib/schemas';
@@ -74,14 +75,11 @@ export type SiteDetails = {
 
 // --- User Management Actions ---
 export async function getUsers(): Promise<UserDetail[]> {
-  // console.log("Admin: Attempting to fetch users from Firestore...");
   try {
     const q = query(usersCollectionRef, orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
-    // console.log(`Admin: Found ${querySnapshot.docs.length} user documents.`);
 
     if (querySnapshot.empty) {
-      // console.warn("Admin: No users found in the 'users' collection or access denied by Firestore security rules.");
       return [];
     }
 
@@ -94,7 +92,6 @@ export async function getUsers(): Promise<UserDetail[]> {
       } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
-        // console.warn(`Admin: User ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
         createdAtISO = new Date(0).toISOString();
       }
 
@@ -107,7 +104,6 @@ export async function getUsers(): Promise<UserDetail[]> {
       };
       return userDetail;
     });
-    // console.log(`Admin: Successfully mapped ${users.length} users.`);
     return users;
 
   } catch (error: any) {
@@ -130,11 +126,9 @@ export async function updateUserDetail(
     await updateDoc(userDocRef, {
       fullName: data.fullName,
       phoneNumber: data.phoneNumber,
-      // Consider adding an 'updatedAt' timestamp if needed
-      // updatedAt: Timestamp.now(),
     });
     console.log(`[updateUserDetail] User ${data.userId} details updated successfully.`);
-    revalidatePath('/admin'); // For admin panel user list
+    revalidatePath('/admin');
     return { success: true, message: 'Detalles del usuario actualizados con éxito.' };
   } catch (error: any) {
     console.error(`[updateUserDetail] Error updating user ${data.userId} details:`, error);
@@ -169,7 +163,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
     }
 
     const appointmentData = {
-      userId: data.userId, // Ensure this is the Firebase User UID
+      userId: data.userId, 
       preferredDate: preferredDateTimestamp,
       preferredTime: data.preferredTime,
       services: data.services,
@@ -191,20 +185,16 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
 }
 
 export async function getAppointments(): Promise<Appointment[]> {
-  // console.log("Admin: Attempting to fetch appointments from Firestore (with orderBy)...");
   try {
     const qAppointments = query(
       appointmentsCollectionRef,
       orderBy('preferredDate', 'desc'),
       orderBy('createdAt', 'desc')
     );
-    // console.log("Admin: Using query with orderBy('preferredDate', 'desc'), orderBy('createdAt', 'desc').");
 
     const appointmentSnapshot = await getDocs(qAppointments);
-    // console.log(`Admin: Found ${appointmentSnapshot.docs.length} appointment documents in total.`);
 
     if (appointmentSnapshot.empty) {
-      // console.warn("Admin: No appointments matched the query. This could be due to Firestore security rules or no appointments existing.");
       return [];
     }
 
@@ -212,20 +202,19 @@ export async function getAppointments(): Promise<Appointment[]> {
     let usersMap: Map<string, { fullName?: string; email?: string; phoneNumber?: string }> = new Map();
 
     if (userIds.length > 0) {
-      const MAX_USER_IDS_PER_QUERY = 30; // Firestore 'in' query limit
+      const MAX_USER_IDS_PER_QUERY = 30; 
       const userBatches: string[][] = [];
       for (let i = 0; i < userIds.length; i += MAX_USER_IDS_PER_QUERY) {
         userBatches.push(userIds.slice(i, i + MAX_USER_IDS_PER_QUERY));
       }
 
       for (const batchUserIds of userBatches) {
-        if (batchUserIds.length === 0) continue; // Skip empty batches
-        // Assuming user documents have a 'uid' field that matches the userId from appointments
+        if (batchUserIds.length === 0) continue; 
         const qUsers = query(collection(firestore, 'users'), where('uid', 'in', batchUserIds));
         const userSnapshot = await getDocs(qUsers);
         userSnapshot.docs.forEach(docSnap => {
           const userData = docSnap.data();
-          usersMap.set(userData.uid, { // Ensure you are mapping by the correct field (e.g. docSnap.id or userData.uid)
+          usersMap.set(userData.uid, { 
             fullName: userData.fullName,
             email: userData.email,
             phoneNumber: userData.phoneNumber
@@ -233,7 +222,6 @@ export async function getAppointments(): Promise<Appointment[]> {
         });
       }
     }
-    // console.log(`Admin: Fetched details for ${usersMap.size} users.`);
 
     const appointments = appointmentSnapshot.docs.map(docSnap => {
       const data = docSnap.data();
@@ -243,14 +231,12 @@ export async function getAppointments(): Promise<Appointment[]> {
       if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
         preferredDateISO = data.preferredDate.toDate().toISOString();
       } else {
-        // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
         preferredDateISO = new Date(0).toISOString();
       }
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
-        // console.warn(`Admin: Appointment ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
         createdAtISO = new Date(0).toISOString();
       }
 
@@ -271,7 +257,6 @@ export async function getAppointments(): Promise<Appointment[]> {
       };
       return appointment;
     });
-    // console.log(`Admin: Successfully mapped ${appointments.length} appointments.`);
     return appointments;
 
   } catch (error: any) {
@@ -311,7 +296,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
       if (simpleSnapshot.empty) {
         console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
       } else {
-        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'userId' (asc), 'preferredDate' (asc) and 'createdAt' (desc). Please verify the index in Firestore.`);
+        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'userId' (asc), 'preferredDate' (asc) and 'createdAt' (desc). Please verify the index in Firestore, or check the server logs for a link to create it.`);
         simpleSnapshot.docs.forEach(docSnap => {
            console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
         });
@@ -322,7 +307,6 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     console.log(`[getUserAppointments] Mapping ${appointmentSnapshot.docs.length} documents...`);
     const appointmentsPromises = appointmentSnapshot.docs.map(async (docSnap) => {
       const data = docSnap.data();
-      // console.log(`[getUserAppointments] Raw data for doc ${docSnap.id}:`, JSON.stringify(data));
 
       let preferredDateISO: string;
       let createdAtISO: string;
@@ -330,14 +314,12 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
       if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
         preferredDateISO = data.preferredDate.toDate().toISOString();
       } else {
-        console.warn(`[getUserAppointments] Doc ${docSnap.id} has invalid or missing preferredDate. Firestore data:`, data.preferredDate);
         preferredDateISO = new Date(0).toISOString();
       }
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else {
-        console.warn(`[getUserAppointments] Doc ${docSnap.id} has invalid or missing createdAt. Firestore data:`, data.createdAt);
         createdAtISO = new Date(0).toISOString();
       }
 
@@ -351,19 +333,17 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
         status: data.status || 'unknown',
         createdAt: createdAtISO,
       };
-      // console.log(`[getUserAppointments] Mapped appointment ${docSnap.id}:`, JSON.stringify(appointment));
       return appointment;
     });
 
     const appointments = await Promise.all(appointmentsPromises);
     console.log(`[getUserAppointments] Successfully mapped ${appointments.length} appointments for user ${userId}. Final appointments count: ${appointments.length}`);
-    // console.log(`[getUserAppointments] Final appointments data:`, JSON.stringify(appointments));
     return appointments;
 
   } catch (error: any) {
     console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
     if (error.code === 'failed-precondition') {
-      console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (asc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
+      console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (asc), 'createdAt' (desc) is likely required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
     } else if (error.code === 'permission-denied') {
       console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
     } else {
@@ -377,14 +357,13 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 export async function updateAppointmentStatus(
   appointmentId: string,
   newStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed',
-  currentUserId?: string // Optional: Used for client-side cancellation validation
+  currentUserId?: string 
 ) {
   console.log(`[updateAppointmentStatus] Called for ID: ${appointmentId} to status: ${newStatus}. CurrentUserID: ${currentUserId}`);
   try {
     const appointmentDocRef = doc(firestore, 'appointments', appointmentId);
 
     if (currentUserId && newStatus === 'cancelled') {
-      // This block handles cancellation attempts by a user (not admin)
       const appointmentSnap = await getDoc(appointmentDocRef);
       if (!appointmentSnap.exists()) {
         console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} not found for user cancellation.`);
@@ -395,23 +374,20 @@ export async function updateAppointmentStatus(
         console.warn(`[updateAppointmentStatus] User ${currentUserId} does not own appointment ${appointmentId} (owner: ${appointmentData.userId}).`);
         return { success: false, message: 'No tienes permiso para cancelar esta cita.' };
       }
-      // User can cancel 'pending' or 'confirmed' appointments.
       if (appointmentData.status !== 'pending' && appointmentData.status !== 'confirmed') {
         console.warn(`[updateAppointmentStatus] Appointment ${appointmentId} is not 'pending' or 'confirmed' (status: ${appointmentData.status}), cannot be cancelled by user.`);
         return { success: false, message: 'Solo puedes solicitar cancelar citas que estén pendientes o confirmadas. Para otros casos, contacta al administrador.' };
       }
       console.log(`[updateAppointmentStatus] User ${currentUserId} is cancelling their own ${appointmentData.status} appointment ${appointmentId}.`);
     } else if (currentUserId && newStatus !== 'cancelled') {
-      // User trying to do something other than cancel their own appointment
       console.warn(`[updateAppointmentStatus] User ${currentUserId} attempted to change status to ${newStatus} for appointment ${appointmentId}. Not allowed through this specific user-facing cancel action.`);
       return { success: false, message: 'No tienes permiso para realizar esta acción.' };
     }
-    // If no currentUserId, it's an admin action, allow any status change (handled by admin panel logic)
 
     await updateDoc(appointmentDocRef, { status: newStatus });
     console.log(`[updateAppointmentStatus] Appointment ${appointmentId} status updated to ${newStatus} in Firestore.`);
-    revalidatePath('/admin'); // For admin panel
-    revalidatePath('/book');  // For user's "My Appointments" tab
+    revalidatePath('/admin'); 
+    revalidatePath('/book');  
     return { success: true, message: `Estado de la cita actualizado a ${newStatus}.` };
   } catch (error) {
     console.error(`[updateAppointmentStatus] Error updating appointment ${appointmentId} status in Firestore:`, error);
@@ -467,11 +443,9 @@ export async function getSiteDetails(): Promise<SiteDetails> {
         description: data.siteDescription || siteConfig.description,
       };
     }
-    // Return default from config if not found in Firestore
     return { name: siteConfig.name, description: siteConfig.description };
   } catch (error) {
     console.error("Error fetching site details:", error);
-    // Return default in case of error
     return { name: siteConfig.name, description: siteConfig.description };
   }
 }
@@ -484,9 +458,9 @@ export async function submitSiteSettings(data: SiteSettingsFormValues): Promise<
       siteDescription: data.siteDescription,
     }, { merge: true });
     
-    revalidatePath('/admin/settings'); // For the settings page itself
-    revalidatePath('/'); // For homepage
-    revalidatePath('/layout'); // To attempt revalidation for layout components (header, footer, metadata)
+    revalidatePath('/admin/settings'); 
+    revalidatePath('/'); 
+    revalidatePath('/layout'); 
 
     return { success: true, message: 'Configuración del sitio guardada con éxito. Los cambios pueden tardar unos momentos en reflejarse completamente.' };
   } catch (error: any) {
@@ -505,10 +479,6 @@ export async function getProducts(): Promise<Product[]> {
       let imageSrcVal = 'https://placehold.co/400x400.png';
       if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
         imageSrcVal = data.imageSrc;
-      } else if (data.imageSrc && data.imageSrc.trim() !== '') {
-        // console.warn(`Product ID ${docSnap.id} has an imageSrc in Firestore that is not a valid http/https URL or is empty: "${data.imageSrc}". Defaulting to placeholder.`);
-      } else if (!data.imageSrc) {
-         // console.warn(`Product ID ${docSnap.id} is missing imageSrc in Firestore. Defaulting to placeholder.`);
       }
 
       return {
@@ -719,12 +689,12 @@ export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
 
     const settings = ALL_TIME_SLOTS.map(time => ({
       time,
-      isActive: savedSettingsMap.get(time) ?? true,
+      isActive: savedSettingsMap.get(time) ?? true, // Default to true if not in Firestore
     }));
     return settings;
   } catch (error) {
     console.error("Error fetching time slot settings:", error);
-    return ALL_TIME_SLOTS.map(time => ({ time, isActive: true }));
+    return ALL_TIME_SLOTS.map(time => ({ time, isActive: true })); // Fallback on error
   }
 }
 
@@ -802,17 +772,7 @@ export async function getAdminPhoneNumber(): Promise<string | null> {
 export async function updateAdminPhoneNumber(phoneNumber: string) {
   try {
     const contactDetailsDocRef = doc(appSettingsCollectionRef, 'contactDetails');
-    // Basic cleaning: remove non-digits. Could be more sophisticated.
-    const cleanedPhoneNumber = phoneNumber.replace(/\D/g, ''); 
-    
-    // Basic validation for Argentinian numbers, e.g., must start with 54 and have a certain length.
-    // This is a very simplified validation.
-    if (!cleanedPhoneNumber.startsWith('54') || cleanedPhoneNumber.length < 11 ) { // e.g. 5491123456789 (12 digits) or 542211234567 (11 digits)
-        // Returning a specific message, but ideally the client-side form should handle this.
-        // return { success: false, message: 'El número de teléfono debe ser un número argentino válido (ej: 54911... o 5411...). Asegúrate de incluir el código de país (54) y el de área.' };
-    }
-
-    await setDoc(contactDetailsDocRef, { adminPhoneNumber: phoneNumber }, { merge: true }); // Save the raw number provided by admin
+    await setDoc(contactDetailsDocRef, { adminPhoneNumber: phoneNumber }, { merge: true });
     revalidatePath('/admin/settings');
     return { success: true, message: 'Número de teléfono del administrador actualizado.' };
   } catch (error) {
@@ -820,3 +780,4 @@ export async function updateAdminPhoneNumber(phoneNumber: string) {
     return { success: false, message: 'Error al actualizar el número de teléfono del administrador.' };
   }
 }
+    

@@ -416,6 +416,10 @@ h1, h2, h3, h4, h5, h6 {
   visibility: hidden;
 }
 
+.static {
+  position: static;
+}
+
 .fixed {
   position: fixed;
 }
