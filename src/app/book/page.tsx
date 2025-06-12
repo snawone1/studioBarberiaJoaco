@@ -738,7 +738,7 @@ export default function BookAppointmentPage() {
                     )}
                   </CardContent>
                   <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
-                    {(appt.status === 'pending' || appt.status === 'confirmed') && ( // Allow cancel for pending or confirmed
+                    {appt.status === 'pending' && ( // Only show direct cancel for 'pending'
                       <Button
                         variant="destructive"
                         size="sm"

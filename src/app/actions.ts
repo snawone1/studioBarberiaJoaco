@@ -287,11 +287,11 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
     return [];
   }
   try {
-    console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' desc, 'createdAt' desc.`);
+    console.log(`[getUserAppointments] Constructing query for 'appointments', where 'userId' == '${userId}', orderBy 'preferredDate' asc, 'createdAt' desc.`);
     const qUserAppointments = query(
       appointmentsCollectionRef,
       where('userId', '==', userId),
-      orderBy('preferredDate', 'desc'),
+      orderBy('preferredDate', 'asc'), // Changed to 'asc' for "Mis Citas"
       orderBy('createdAt', 'desc')
     );
 
@@ -306,7 +306,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
       if (simpleSnapshot.empty) {
         console.log(`[getUserAppointments] Simple query (no orderBy) also found 0 documents for user ${userId}. This suggests no data or userId mismatch.`);
       } else {
-        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' and 'createdAt'. Please verify the index in Firestore.`);
+        console.warn(`[getUserAppointments] SIMPLE query (no orderBy) FOUND ${simpleSnapshot.docs.length} documents for user ${userId}. This STRONGLY SUGGESTS an issue with the COMPOSITE INDEX for 'preferredDate' (asc) and 'createdAt'. Please verify the index in Firestore.`);
         simpleSnapshot.docs.forEach(docSnap => {
            console.log(`[getUserAppointments] Raw data from SIMPLE query for doc ${docSnap.id}:`, JSON.stringify(docSnap.data()));
         });
@@ -358,7 +358,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
   } catch (error: any) {
     console.error(`[getUserAppointments] Error fetching appointments for user ${userId}:`, error.message);
     if (error.code === 'failed-precondition') {
-      console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (desc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
+      console.error(`[getUserAppointments] Firestore 'failed-precondition' error. A composite index on 'userId' (asc), 'preferredDate' (asc), 'createdAt' (desc) might be required in the 'appointments' collection. Check Firestore console for index suggestions, or the link usually provided in the detailed error message in the Firebase/Next.js server console. Error details: ${error.toString()}`);
     } else if (error.code === 'permission-denied') {
       console.error("[getUserAppointments] Firestore 'permission-denied' error. Check your Firestore security rules to ensure the authenticated user has read access to their appointments.");
     } else {
