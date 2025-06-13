@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -52,34 +53,37 @@ export function Header() {
           <Scissors className="h-7 w-7 text-primary" />
           <span className="font-bold text-2xl font-headline text-primary">{dynamicSiteName}</span>
         </Link>
-        <MobileNav items={siteConfig.mainNav} />
+        <MobileNav items={siteConfig.mainNav} /> {/* Pass auth state and functions to MobileNav */}
         <div className="flex flex-1 items-center justify-end space-x-2">
           <MainNav items={siteConfig.mainNav} />
-          {loading ? (
-            <Button variant="outline" className="border-primary text-primary" disabled>
-              Cargando...
-            </Button>
-          ) : currentUser ? (
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Cerrar Sesión
-            </Button>
-          ) : (
-            <>
-              <Button variant="ghost" className="text-foreground/80" asChild>
-                <Link href="/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Iniciar Sesión
-                </Link>
+          {/* Auth buttons for desktop, hidden on small screens */}
+          <div className="hidden md:flex items-center space-x-2">
+            {loading ? (
+              <Button variant="outline" className="border-primary text-primary" disabled>
+                Cargando...
               </Button>
-              <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
-                <Link href="/register">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Registrarse
-                </Link>
+            ) : currentUser ? (
+              <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Cerrar Sesión
               </Button>
-            </>
-          )}
+            ) : (
+              <>
+                <Button variant="ghost" className="text-foreground/80" asChild>
+                  <Link href="/login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Iniciar Sesión
+                  </Link>
+                </Button>
+                <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
+                  <Link href="/register">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Registrarse
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </header>
