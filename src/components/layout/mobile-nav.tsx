@@ -8,7 +8,7 @@ import { Menu, Scissors, Home, ShoppingBag, CalendarDays, LayoutDashboard, LogIn
 import { siteConfig, type NavItem } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added SheetHeader and SheetTitle
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -62,18 +62,18 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
       </SheetTrigger>
       <SheetContent side="left" className="pr-0 bg-background text-foreground flex flex-col">
         <SheetHeader>
-          <SheetTitle className="sr-only">Navegación Principal</SheetTitle> {/* Visually hidden title for accessibility */}
+          <SheetTitle className="sr-only">Navegación Principal</SheetTitle>
         </SheetHeader>
         <MobileLink
           href="/"
-          className="flex items-center mb-4 pl-6 pt-2"  /* Added pt-2 to give space if SheetHeader takes any */
+          className="flex items-center mb-4 pl-8 pt-2"
           onOpenChange={setOpen}
         >
           <Scissors className="mr-2 h-6 w-6 text-primary" />
           <span className="font-bold text-xl font-headline">{siteConfig.name}</span>
         </MobileLink>
         
-        <div className="flex-grow overflow-y-auto pb-10 pl-6 space-y-2">
+        <div className="flex-grow overflow-y-auto pb-10 pl-8 space-y-2">
             {filteredItems?.map(
               (item) => {
                 const IconComponent = item.iconName ? iconComponents[item.iconName] : null;
@@ -99,8 +99,8 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
             )}
         </div>
 
-        <div className="mt-auto border-t border-border pt-4 pl-6 pr-4 pb-4 space-y-2">
-          <Separator className="my-2 bg-border/50 -ml-6" />
+        <div className="mt-auto border-t border-border pt-4 pl-8 pr-4 pb-4 space-y-2">
+          <Separator className="my-2 bg-border/50 -ml-8" />
           {loading ? (
             <Button variant="ghost" disabled className="w-full justify-start text-lg px-3 py-2 text-muted-foreground">
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
