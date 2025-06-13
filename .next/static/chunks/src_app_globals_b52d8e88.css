@@ -573,14 +573,18 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: .25rem;
 }
 
+.my-2 {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
-.my-2 {
-  margin-top: .5rem;
-  margin-bottom: .5rem;
+.-ml-6 {
+  margin-left: -1.5rem;
 }
 
 .-mr-1 {
@@ -689,10 +693,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.-ml-6 {
-  margin-left: -1.5rem;
 }
 
 .block {
@@ -804,10 +804,6 @@ h1, h2, h3, h4, h5, h6 {
   height: 60vh;
 }
 
-.h-\[calc\(100vh-8rem\)\] {
-  height: calc(100vh - 8rem);
-}
-
 .h-\[var\(--radix-select-trigger-height\)\] {
   height: var(--radix-select-trigger-height);
 }
@@ -826,6 +822,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .h-svh {
   height: 100svh;
+}
+
+.max-h-72 {
+  max-height: 18rem;
 }
 
 .max-h-96 {
@@ -858,10 +858,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .max-h-screen {
   max-height: 100vh;
-}
-
-.max-h-72 {
-  max-height: 18rem;
 }
 
 .min-h-0 {
@@ -980,20 +976,16 @@ h1, h2, h3, h4, h5, h6 {
   width: 1px;
 }
 
+.w-\[var\(--radix-popover-trigger-width\)\] {
+  width: var(--radix-popover-trigger-width);
+}
+
 .w-auto {
   width: auto;
 }
 
 .w-full {
   width: 100%;
-}
-
-.w-\[--radix-popover-trigger-width\] {
-  width: var(--radix-popover-trigger-width);
-}
-
-.w-\[var\(--radix-popover-trigger-width\)\] {
-  width: var(--radix-popover-trigger-width);
 }
 
 .min-w-0 {
@@ -1529,8 +1521,20 @@ h1, h2, h3, h4, h5, h6 {
   background-color: hsl(var(--border));
 }
 
+.bg-border\/50 {
+  background-color: hsl(var(--border) / .5);
+}
+
 .bg-card {
   background-color: hsl(var(--card));
+}
+
+.bg-card\/30 {
+  background-color: hsl(var(--card) / .3);
+}
+
+.bg-card\/50 {
+  background-color: hsl(var(--card) / .5);
 }
 
 .bg-destructive {
@@ -1544,6 +1548,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-muted {
   background-color: hsl(var(--muted));
+}
+
+.bg-muted\/20 {
+  background-color: hsl(var(--muted) / .2);
+}
+
+.bg-muted\/30 {
+  background-color: hsl(var(--muted) / .3);
 }
 
 .bg-muted\/50 {
@@ -1562,10 +1574,6 @@ h1, h2, h3, h4, h5, h6 {
   background-color: hsl(var(--secondary));
 }
 
-.bg-secondary\/30 {
-  background-color: hsl(var(--secondary) / .3);
-}
-
 .bg-sidebar {
   background-color: hsl(var(--background));
 }
@@ -1576,26 +1584,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-transparent {
   background-color: #0000;
-}
-
-.bg-card\/30 {
-  background-color: hsl(var(--card) / .3);
-}
-
-.bg-card\/50 {
-  background-color: hsl(var(--card) / .5);
-}
-
-.bg-muted\/20 {
-  background-color: hsl(var(--muted) / .2);
-}
-
-.bg-muted\/30 {
-  background-color: hsl(var(--muted) / .3);
-}
-
-.bg-border\/50 {
-  background-color: hsl(var(--border) / .5);
 }
 
 .fill-current {
@@ -1749,6 +1737,10 @@ h1, h2, h3, h4, h5, h6 {
   padding-bottom: 1rem;
 }
 
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+
 .pl-3 {
   padding-left: .75rem;
 }
@@ -1771,6 +1763,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .pr-2 {
   padding-right: .5rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .pr-8 {
@@ -1799,14 +1795,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .pt-8 {
   padding-top: 2rem;
-}
-
-.pb-6 {
-  padding-bottom: 1.5rem;
-}
-
-.pr-4 {
-  padding-right: 1rem;
 }
 
 .text-left {
@@ -1967,10 +1955,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-foreground\/80 {
   color: hsl(var(--foreground) / .8);
-}
-
-.text-foreground\/90 {
-  color: hsl(var(--foreground) / .9);
 }
 
 .text-green-500 {
@@ -2385,14 +2369,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .hover\:bg-muted:hover {
   background-color: hsl(var(--muted));
-}
-
-.hover\:bg-muted\/20:hover {
-  background-color: hsl(var(--muted) / .2);
-}
-
-.hover\:bg-muted\/30:hover {
-  background-color: hsl(var(--muted) / .3);
 }
 
 .hover\:bg-muted\/50:hover {
@@ -3237,10 +3213,6 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .sm\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .sm\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -3361,10 +3333,6 @@ h1, h2, h3, h4, h5, h6 {
 
   .md\:grid-cols-5 {
     grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  .md\:justify-center {
-    justify-content: center;
   }
 
   .md\:gap-8 {

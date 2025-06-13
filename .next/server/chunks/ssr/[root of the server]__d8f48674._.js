@@ -794,10 +794,10 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUsers() {
         const users = querySnapshot.docs.map((docSnap)=>{
             const data = docSnap.data();
             let createdAtISO;
-            if (data.createdAt && typeof data.createdAt === 'string') {
-                createdAtISO = data.createdAt;
-            } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtISO = data.createdAt;
             } else {
                 createdAtISO = new Date(0).toISOString();
             }
@@ -932,6 +932,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
             }
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtISO = data.createdAt;
             } else {
                 createdAtISO = new Date(0).toISOString();
             }
@@ -1001,6 +1003,8 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
             }
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtISO = data.createdAt;
             } else {
                 createdAtISO = new Date(0).toISOString();
             }
@@ -1178,6 +1182,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getProducts() {
             if (typeof data.imageSrc === 'string' && (data.imageSrc.startsWith('http://') || data.imageSrc.startsWith('https://'))) {
                 imageSrcVal = data.imageSrc;
             }
+            let createdAtValue;
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAtValue = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtValue = data.createdAt;
+            } else {
+                createdAtValue = new Date(0).toISOString(); // Fallback consistent with Product type
+            }
             return {
                 id: docSnap.id,
                 name: data.name || 'Unnamed Product',
@@ -1186,7 +1198,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getProducts() {
                 imageSrc: imageSrcVal,
                 aiHint: data.aiHint || '',
                 stock: typeof data.stock === 'number' ? data.stock : 0,
-                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date(0).toISOString()
+                createdAt: createdAtValue
             };
         });
         return products;
@@ -1258,6 +1270,12 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateProduct(data) {
         if (typeof updatedData.imageSrc === 'string' && (updatedData.imageSrc.startsWith('http://') || updatedData.imageSrc.startsWith('https://'))) {
             imageSrcVal = updatedData.imageSrc;
         }
+        let createdAtValue = undefined;
+        if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+            createdAtValue = updatedData.createdAt.toDate().toISOString();
+        } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+            createdAtValue = updatedData.createdAt;
+        }
         const updatedProduct = {
             id: updatedDocSnap.id,
             name: updatedData.name,
@@ -1266,7 +1284,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateProduct(data) {
             imageSrc: imageSrcVal,
             aiHint: updatedData.aiHint,
             stock: updatedData.stock,
-            createdAt: updatedData.createdAt ? updatedData.createdAt.toDate().toISOString() : undefined
+            createdAt: createdAtValue
         };
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/products');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
@@ -1309,12 +1327,18 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getServices() {
         const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
         const services = querySnapshot.docs.map((docSnap)=>{
             const data = docSnap.data();
+            let createdAtValue = undefined;
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAtValue = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtValue = data.createdAt;
+            }
             return {
                 id: docSnap.id,
                 name: data.name || 'Unnamed Service',
                 description: data.description || '',
                 price: data.price || 'ARS$ 0',
-                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : undefined
+                createdAt: createdAtValue
             };
         });
         return services;
@@ -1375,12 +1399,18 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateService(data) {
             };
         }
         const updatedData = updatedDocSnap.data();
+        let createdAtValue = undefined;
+        if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+            createdAtValue = updatedData.createdAt.toDate().toISOString();
+        } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+            createdAtValue = updatedData.createdAt;
+        }
         const updatedService = {
             id: updatedDocSnap.id,
             name: updatedData.name,
             description: updatedData.description,
             price: updatedData.price,
-            createdAt: updatedData.createdAt ? updatedData.createdAt.toDate().toISOString() : undefined
+            createdAt: createdAtValue
         };
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
@@ -1421,6 +1451,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getHomePageServices() {
         const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
         const homeServices = querySnapshot.docs.map((docSnap)=>{
             const data = docSnap.data();
+            let createdAtValue;
+            if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+                createdAtValue = data.createdAt.toDate().toISOString();
+            } else if (data.createdAt && typeof data.createdAt === 'string') {
+                createdAtValue = data.createdAt;
+            } else {
+                createdAtValue = new Date(0).toISOString();
+            }
             return {
                 id: docSnap.id,
                 name: data.name || 'Unnamed Service',
@@ -1428,7 +1466,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getHomePageServices() {
                 iconName: data.iconName || 'Scissors',
                 dataAiHint: data.dataAiHint || 'service',
                 order: typeof data.order === 'number' ? data.order : 0,
-                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date(0).toISOString()
+                createdAt: createdAtValue
             };
         });
         return homeServices;
@@ -1496,6 +1534,14 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateHomePageService(d
             };
         }
         const updatedData = updatedDocSnap.data();
+        let createdAtValue;
+        if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+            createdAtValue = updatedData.createdAt.toDate().toISOString();
+        } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+            createdAtValue = updatedData.createdAt;
+        } else {
+            createdAtValue = new Date(0).toISOString();
+        }
         const updatedService = {
             id: updatedDocSnap.id,
             name: updatedData.name,
@@ -1503,7 +1549,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateHomePageService(d
             iconName: updatedData.iconName,
             dataAiHint: updatedData.dataAiHint,
             order: updatedData.order,
-            createdAt: updatedData.createdAt ? updatedData.createdAt.toDate().toISOString() : undefined
+            createdAt: createdAtValue
         };
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/');
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/admin/settings');
