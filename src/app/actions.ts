@@ -64,7 +64,7 @@ export type HomePageService = {
   iconName: string;
   dataAiHint: string;
   order: number;
-  createdAt?: string;
+  createdAt: string;
 };
 
 
@@ -101,10 +101,10 @@ export async function getUsers(): Promise<UserDetail[]> {
       const data = docSnap.data();
       let createdAtISO: string;
 
-      if (data.createdAt && typeof data.createdAt === 'string') {
-        createdAtISO = data.createdAt;
-      } else if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+      if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtISO = data.createdAt;
       } else {
         createdAtISO = new Date(0).toISOString();
       }
@@ -251,6 +251,8 @@ export async function getAppointments(): Promise<Appointment[]> {
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtISO = data.createdAt;
       } else {
         createdAtISO = new Date(0).toISOString();
       }
@@ -335,6 +337,8 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtISO = data.createdAt;
       } else {
         createdAtISO = new Date(0).toISOString();
       }
@@ -499,6 +503,15 @@ export async function getProducts(): Promise<Product[]> {
         imageSrcVal = data.imageSrc;
       }
 
+      let createdAtValue: string;
+      if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+        createdAtValue = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtValue = data.createdAt;
+      } else {
+        createdAtValue = new Date(0).toISOString(); // Fallback consistent with Product type
+      }
+
       return {
         id: docSnap.id,
         name: data.name || 'Unnamed Product',
@@ -507,7 +520,7 @@ export async function getProducts(): Promise<Product[]> {
         imageSrc: imageSrcVal,
         aiHint: data.aiHint || '',
         stock: typeof data.stock === 'number' ? data.stock : 0,
-        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : new Date(0).toISOString(),
+        createdAt: createdAtValue,
       } as Product;
     });
     return products;
@@ -568,6 +581,15 @@ export async function updateProduct(data: ProductFormValues) {
     if (typeof updatedData.imageSrc === 'string' && (updatedData.imageSrc.startsWith('http://') || updatedData.imageSrc.startsWith('https://'))) {
         imageSrcVal = updatedData.imageSrc;
     }
+    
+    let createdAtValue: string | undefined = undefined;
+    if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+      createdAtValue = updatedData.createdAt.toDate().toISOString();
+    } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+      createdAtValue = updatedData.createdAt;
+    }
+
+
     const updatedProduct: Product = {
       id: updatedDocSnap.id,
       name: updatedData.name,
@@ -576,7 +598,7 @@ export async function updateProduct(data: ProductFormValues) {
       imageSrc: imageSrcVal,
       aiHint: updatedData.aiHint,
       stock: updatedData.stock,
-      createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
+      createdAt: createdAtValue,
     };
     revalidatePath('/products');
     revalidatePath('/admin/settings');
@@ -610,12 +632,18 @@ export async function getServices(): Promise<Service[]> {
     const querySnapshot = await getDocs(q);
     const services = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
+      let createdAtValue: string | undefined = undefined;
+      if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+        createdAtValue = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtValue = data.createdAt;
+      }
       return {
         id: docSnap.id,
         name: data.name || 'Unnamed Service',
         description: data.description || '',
         price: data.price || 'ARS$ 0',
-        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined,
+        createdAt: createdAtValue,
       } as Service;
     });
     return services;
@@ -666,12 +694,18 @@ export async function updateService(data: ServiceFormValues) {
         return { success: false, message: 'Failed to retrieve updated service.' };
     }
     const updatedData = updatedDocSnap.data();
+    let createdAtValue: string | undefined = undefined;
+    if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+      createdAtValue = updatedData.createdAt.toDate().toISOString();
+    } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+      createdAtValue = updatedData.createdAt;
+    }
     const updatedService: Service = {
       id: updatedDocSnap.id,
       name: updatedData.name,
       description: updatedData.description,
       price: updatedData.price,
-      createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
+      createdAt: createdAtValue,
     };
 
     revalidatePath('/admin/settings');
@@ -703,14 +737,22 @@ export async function getHomePageServices(): Promise<HomePageService[]> {
     const querySnapshot = await getDocs(q);
     const homeServices = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
+      let createdAtValue: string;
+      if (data.createdAt && typeof data.createdAt.toDate === 'function') {
+        createdAtValue = data.createdAt.toDate().toISOString();
+      } else if (data.createdAt && typeof data.createdAt === 'string') {
+        createdAtValue = data.createdAt;
+      } else {
+        createdAtValue = new Date(0).toISOString(); 
+      }
       return {
         id: docSnap.id,
         name: data.name || 'Unnamed Service',
         description: data.description || '',
-        iconName: data.iconName || 'Scissors', // Default icon if not set
+        iconName: data.iconName || 'Scissors', 
         dataAiHint: data.dataAiHint || 'service',
         order: typeof data.order === 'number' ? data.order : 0,
-        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : new Date(0).toISOString(),
+        createdAt: createdAtValue,
       } as HomePageService;
     });
     return homeServices;
@@ -768,6 +810,15 @@ export async function updateHomePageService(data: HomePageServiceFormValues) {
         return { success: false, message: 'Failed to retrieve updated home page service.' };
     }
     const updatedData = updatedDocSnap.data();
+    let createdAtValue: string;
+    if (updatedData.createdAt && typeof updatedData.createdAt.toDate === 'function') {
+        createdAtValue = updatedData.createdAt.toDate().toISOString();
+    } else if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
+        createdAtValue = updatedData.createdAt;
+    } else {
+        createdAtValue = new Date(0).toISOString(); 
+    }
+
     const updatedService: HomePageService = {
       id: updatedDocSnap.id,
       name: updatedData.name,
@@ -775,7 +826,7 @@ export async function updateHomePageService(data: HomePageServiceFormValues) {
       iconName: updatedData.iconName,
       dataAiHint: updatedData.dataAiHint,
       order: updatedData.order,
-      createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
+      createdAt: createdAtValue,
     };
 
     revalidatePath('/');
