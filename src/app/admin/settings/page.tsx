@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  DialogDescription as DialogPrimitiveDescription, // Renamed to avoid conflict if FormDescription is also used
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -23,8 +23,9 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel, 
+  FormLabel,
   FormMessage,
+  FormDescription, // Added FormDescription here
 } from '@/components/ui/form';
 import { PageHeader } from '@/components/page-header';
 import { useAuth } from '@/context/AuthContext';
@@ -618,9 +619,9 @@ export default function AdminSettingsPage() {
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
                                     <DialogTitle>Confirmar Eliminación</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogPrimitiveDescription>
                                         ¿Estás seguro de que quieres eliminar el servicio destacado "{service.name}"?
-                                    </DialogDescription>
+                                    </DialogPrimitiveDescription>
                                     </DialogHeader>
                                     <DialogFooter className="sm:justify-end">
                                     <DialogClose asChild>
@@ -773,9 +774,9 @@ export default function AdminSettingsPage() {
                                 <DialogContent className="sm:max-w-md">
                                     <DialogHeader>
                                     <DialogTitle>Confirmar Eliminación</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogPrimitiveDescription>
                                         ¿Estás seguro de que quieres eliminar el servicio "{service.name}"? Esta acción no se puede deshacer.
-                                    </DialogDescription>
+                                    </DialogPrimitiveDescription>
                                     </DialogHeader>
                                     <DialogFooter className="sm:justify-end">
                                     <DialogClose asChild>
@@ -994,3 +995,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+
