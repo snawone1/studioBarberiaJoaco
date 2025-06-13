@@ -155,13 +155,20 @@ export async function updateUserDetail(
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
   console.log("[submitAppointmentRequest] Received data with userId:", data.userId, "and products:", data.selectedProducts);
   try {
-    const clientPreferredDate = data.preferredDate;
+    const clientDate = new Date(data.preferredDate); // data.preferredDate is a Date object from client
 
-    const normalizedPreferredDateObject = new Date(clientPreferredDate);
-    normalizedPreferredDateObject.setHours(0, 0, 0, 0);
-
-    const preferredDateTimestamp = Timestamp.fromDate(normalizedPreferredDateObject);
-    console.log("[submitAppointmentRequest] Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+    // Construct a new Date object representing midnight UTC of the client's selected date.
+    // We use UTC methods to avoid local server timezone interference.
+    const preferredDateAtUTCMidnight = new Date(
+      Date.UTC(
+        clientDate.getUTCFullYear(),
+        clientDate.getUTCMonth(),
+        clientDate.getUTCDate(),
+        0, 0, 0, 0
+      )
+    );
+    const preferredDateTimestamp = Timestamp.fromDate(preferredDateAtUTCMidnight);
+    console.log("[submitAppointmentRequest] Normalized preferredDate to Timestamp (ISO):", preferredDateTimestamp.toDate().toISOString());
 
     const qCheck = query(
       appointmentsCollectionRef,
@@ -186,7 +193,9 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       status: 'pending',
       createdAt: Timestamp.now(),
     };
-    console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data:", JSON.stringify(appointmentData));
+    console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data (preferredDate will be a Timestamp object):", 
+      {...appointmentData, preferredDate: `Timestamp(seconds=${preferredDateTimestamp.seconds}, nanoseconds=${preferredDateTimestamp.nanoseconds})` }
+    );
     await addDoc(appointmentsCollectionRef, appointmentData);
     console.log("[submitAppointmentRequest] Appointment added successfully with userId:", data.userId);
     revalidatePath('/book');
@@ -246,13 +255,15 @@ export async function getAppointments(): Promise<Appointment[]> {
       if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
         preferredDateISO = data.preferredDate.toDate().toISOString();
       } else {
-        preferredDateISO = new Date(0).toISOString();
+        // This case should ideally not happen if data is saved correctly as Timestamp
+        preferredDateISO = new Date(0).toISOString(); 
       }
 
       if (data.createdAt && typeof data.createdAt.toDate === 'function') {
         createdAtISO = data.createdAt.toDate().toISOString();
       } else if (data.createdAt && typeof data.createdAt === 'string') {
-        createdAtISO = data.createdAt;
+        // Fallback for potentially incorrectly saved string dates
+        createdAtISO = data.createdAt; 
       } else {
         createdAtISO = new Date(0).toISOString();
       }
@@ -419,16 +430,25 @@ export async function updateAppointmentStatus(
 
 export async function getBookedSlotsForDate(date: Date): Promise<string[]> {
   try {
-    const targetDay = new Date(date);
-    targetDay.setHours(0,0,0,0);
+    // date parameter is a JS Date object from the client's calendar selection
+    // Ensure we are comparing against midnight UTC of the selected date
+    const targetDateAtUTCMidnight = new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        0, 0, 0, 0
+      )
+    );
 
     const q = query(
       appointmentsCollectionRef,
-      where('preferredDate', '==', Timestamp.fromDate(targetDay)),
+      where('preferredDate', '==', Timestamp.fromDate(targetDateAtUTCMidnight)),
       where('status', 'in', ['pending', 'confirmed'])
     );
     const querySnapshot = await getDocs(q);
     const bookedSlots = querySnapshot.docs.map(docSnap => docSnap.data().preferredTime as string);
+    // console.log(`[getBookedSlotsForDate] Date: ${date.toISOString()}, UTC Midnight: ${targetDateAtUTCMidnight.toISOString()}, Booked Slots:`, bookedSlots);
     return bookedSlots;
   } catch (error) {
     console.error("Error fetching booked slots:", error);
@@ -509,7 +529,7 @@ export async function getProducts(): Promise<Product[]> {
       } else if (data.createdAt && typeof data.createdAt === 'string') {
         createdAtValue = data.createdAt;
       } else {
-        createdAtValue = new Date(0).toISOString(); // Fallback consistent with Product type
+        createdAtValue = new Date(0).toISOString(); 
       }
 
       return {
@@ -955,3 +975,5 @@ export async function updateAdminPhoneNumber(phoneNumber: string) {
   }
 }
 
+
+    

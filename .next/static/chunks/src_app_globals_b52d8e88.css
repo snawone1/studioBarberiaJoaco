@@ -583,8 +583,8 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1rem;
 }
 
-.-ml-6 {
-  margin-left: -1.5rem;
+.-ml-8 {
+  margin-left: -2rem;
 }
 
 .-mr-1 {
@@ -693,10 +693,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.-ml-8 {
-  margin-left: -2rem;
 }
 
 .block {
@@ -1747,10 +1743,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .pl-3 {
   padding-left: .75rem;
-}
-
-.pl-6 {
-  padding-left: 1.5rem;
 }
 
 .pl-8 {

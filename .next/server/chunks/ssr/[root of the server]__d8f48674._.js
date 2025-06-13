@@ -846,11 +846,12 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateUserDetail(data) 
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
     console.log("[submitAppointmentRequest] Received data with userId:", data.userId, "and products:", data.selectedProducts);
     try {
-        const clientPreferredDate = data.preferredDate;
-        const normalizedPreferredDateObject = new Date(clientPreferredDate);
-        normalizedPreferredDateObject.setHours(0, 0, 0, 0);
-        const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(normalizedPreferredDateObject);
-        console.log("[submitAppointmentRequest] Normalized preferredDate to Timestamp:", preferredDateTimestamp.toDate().toISOString());
+        const clientDate = new Date(data.preferredDate); // data.preferredDate is a Date object from client
+        // Construct a new Date object representing midnight UTC of the client's selected date.
+        // We use UTC methods to avoid local server timezone interference.
+        const preferredDateAtUTCMidnight = new Date(Date.UTC(clientDate.getUTCFullYear(), clientDate.getUTCMonth(), clientDate.getUTCDate(), 0, 0, 0, 0));
+        const preferredDateTimestamp = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(preferredDateAtUTCMidnight);
+        console.log("[submitAppointmentRequest] Normalized preferredDate to Timestamp (ISO):", preferredDateTimestamp.toDate().toISOString());
         const qCheck = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', preferredDateTimestamp), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredTime', '==', data.preferredTime), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
@@ -873,7 +874,10 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             status: 'pending',
             createdAt: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].now()
         };
-        console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data:", JSON.stringify(appointmentData));
+        console.log("[submitAppointmentRequest] Attempting to add appointment to Firestore with data (preferredDate will be a Timestamp object):", {
+            ...appointmentData,
+            preferredDate: `Timestamp(seconds=${preferredDateTimestamp.seconds}, nanoseconds=${preferredDateTimestamp.nanoseconds})`
+        });
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["addDoc"])(appointmentsCollectionRef, appointmentData);
         console.log("[submitAppointmentRequest] Appointment added successfully with userId:", data.userId);
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$cache$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["revalidatePath"])('/book');
@@ -928,11 +932,13 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
             if (data.preferredDate && typeof data.preferredDate.toDate === 'function') {
                 preferredDateISO = data.preferredDate.toDate().toISOString();
             } else {
+                // This case should ideally not happen if data is saved correctly as Timestamp
                 preferredDateISO = new Date(0).toISOString();
             }
             if (data.createdAt && typeof data.createdAt.toDate === 'function') {
                 createdAtISO = data.createdAt.toDate().toISOString();
             } else if (data.createdAt && typeof data.createdAt === 'string') {
+                // Fallback for potentially incorrectly saved string dates
                 createdAtISO = data.createdAt;
             } else {
                 createdAtISO = new Date(0).toISOString();
@@ -1092,14 +1098,16 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateAppointmentStatus
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getBookedSlotsForDate(date) {
     try {
-        const targetDay = new Date(date);
-        targetDay.setHours(0, 0, 0, 0);
-        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(targetDay)), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
+        // date parameter is a JS Date object from the client's calendar selection
+        // Ensure we are comparing against midnight UTC of the selected date
+        const targetDateAtUTCMidnight = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0));
+        const q = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["query"])(appointmentsCollectionRef, (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('preferredDate', '==', __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].fromDate(targetDateAtUTCMidnight)), (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["where"])('status', 'in', [
             'pending',
             'confirmed'
         ]));
         const querySnapshot = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDocs"])(q);
         const bookedSlots = querySnapshot.docs.map((docSnap)=>docSnap.data().preferredTime);
+        // console.log(`[getBookedSlotsForDate] Date: ${date.toISOString()}, UTC Midnight: ${targetDateAtUTCMidnight.toISOString()}, Booked Slots:`, bookedSlots);
         return bookedSlots;
     } catch (error) {
         console.error("Error fetching booked slots:", error);
@@ -1188,7 +1196,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getProducts() {
             } else if (data.createdAt && typeof data.createdAt === 'string') {
                 createdAtValue = data.createdAt;
             } else {
-                createdAtValue = new Date(0).toISOString(); // Fallback consistent with Product type
+                createdAtValue = new Date(0).toISOString();
             }
             return {
                 id: docSnap.id,
