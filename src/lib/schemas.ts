@@ -6,6 +6,7 @@ export const clientAppointmentSchema = z.object({
   preferredDate: z.date({ required_error: "Por favor, selecciona una fecha."}),
   preferredTime: z.string().min(1, { message: "Por favor, selecciona un horario."}),
   services: z.array(z.string()).min(1, { message: "Por favor, selecciona al menos un servicio."}),
+  selectedProducts: z.array(z.string()).optional(), // New field for selected products
   message: z.string().optional(),
 });
 export type ClientAppointmentFormValues = z.infer<typeof clientAppointmentSchema>;

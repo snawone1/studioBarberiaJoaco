@@ -41,6 +41,7 @@ export type Appointment = {
   preferredDate: string;
   preferredTime: string;
   services: string[]; // These are IDs from the 'services' collection
+  selectedProducts?: string[]; // New: IDs from the 'products' collection
   message?: string;
   status: string;
   createdAt: string;
@@ -152,7 +153,7 @@ export async function updateUserDetail(
 
 // --- Appointment Actions ---
 export async function submitAppointmentRequest(data: AppointmentFormValues) {
-  console.log("[submitAppointmentRequest] Received data with userId:", data.userId);
+  console.log("[submitAppointmentRequest] Received data with userId:", data.userId, "and products:", data.selectedProducts);
   try {
     const clientPreferredDate = data.preferredDate;
 
@@ -180,6 +181,7 @@ export async function submitAppointmentRequest(data: AppointmentFormValues) {
       preferredDate: preferredDateTimestamp,
       preferredTime: data.preferredTime,
       services: data.services,
+      selectedProducts: data.selectedProducts || [], // Add selected products
       message: data.message || '',
       status: 'pending',
       createdAt: Timestamp.now(),
@@ -264,6 +266,7 @@ export async function getAppointments(): Promise<Appointment[]> {
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A',
         services: Array.isArray(data.services) ? data.services : [],
+        selectedProducts: Array.isArray(data.selectedProducts) ? data.selectedProducts : [],
         message: data.message || '',
         status: data.status || 'unknown',
         createdAt: createdAtISO,
@@ -342,6 +345,7 @@ export async function getUserAppointments(userId: string): Promise<Appointment[]
         preferredDate: preferredDateISO,
         preferredTime: data.preferredTime || 'N/A',
         services: Array.isArray(data.services) ? data.services : [],
+        selectedProducts: Array.isArray(data.selectedProducts) ? data.selectedProducts : [],
         message: data.message || '',
         status: data.status || 'unknown',
         createdAt: createdAtISO,
@@ -831,10 +835,10 @@ export async function updateTimeSlotSetting(time: string, isActive: boolean) {
 }
 
 // --- WhatsApp Message Template & Admin Contact Actions ---
-const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. ¡Te esperamos!`;
-const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
-const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${siteConfig.name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nGracias.`;
-const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${siteConfig.name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
+const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. Productos: {{productsList}}. ¡Te esperamos!`;
+const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${siteConfig.name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}, Productos: {{productsList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
+const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${siteConfig.name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nProductos: {{productsList}}\nGracias.`;
+const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${siteConfig.name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nProductos: {{productsList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
 
 export type MessageTemplateId = 'confirmation' | 'cancellation' | 'adminContactCancellationRequest' | 'adminContactQuery';
 
@@ -899,3 +903,4 @@ export async function updateAdminPhoneNumber(phoneNumber: string) {
     return { success: false, message: 'Error al actualizar el número de teléfono del administrador.' };
   }
 }
+

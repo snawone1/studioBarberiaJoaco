@@ -53,7 +53,7 @@ import {
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, MessageSquare } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, MessageSquare, ShoppingBag } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -63,6 +63,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form'; 
 import { zodResolver } from '@hookform/resolvers/zod'; 
+import type { Service } from '@/app/actions';
+
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
@@ -100,6 +102,11 @@ export default function AdminPage() {
   const [appointmentToCancel, setAppointmentToCancel] = useState<Appointment | null>(null);
   const [sendCancelWhatsAppNotification, setSendCancelWhatsAppNotification] = useState(true);
 
+  // For mapping service and product IDs to names in appointment cards
+  const [serviceMap, setServiceMap] = useState<Map<string, string>>(new Map());
+  const [productMapAdmin, setProductMapAdmin] = useState<Map<string, string>>(new Map());
+
+
   const productForm = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -116,7 +123,7 @@ export default function AdminPage() {
     resolver: zodResolver(adminEditUserSchema),
     defaultValues: {
       fullName: '',
-      email: '', // Email will be read-only
+      email: '', 
       phoneNumber: '',
     },
   });
@@ -150,17 +157,29 @@ export default function AdminPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProductManagerOpen]);
 
-  async function fetchAppointmentsAdmin() {
+  async function fetchAppointmentsAndRelatedDataAdmin() {
      if (currentUser?.email === 'joacoadmin@admin.com') {
-      // console.log("Admin Page: Calling getAppointments server action.");
       setIsLoadingAppointments(true);
       try {
-        const fetchedAppointments = await getAppointments();
-        // console.log("Admin Page: Fetched appointments from server action:", fetchedAppointments);
+        const [fetchedAppointments, fetchedServices, fetchedProductsList] = await Promise.all([
+          getAppointments(),
+          getServices(),
+          getProducts()
+        ]);
+        
         setAppointments(fetchedAppointments); 
+
+        const newServiceMap = new Map<string, string>();
+        fetchedServices.forEach(service => newServiceMap.set(service.id, service.name));
+        setServiceMap(newServiceMap);
+
+        const newProductMap = new Map<string, string>();
+        fetchedProductsList.forEach(product => newProductMap.set(product.id, product.name));
+        setProductMapAdmin(newProductMap);
+
       } catch (error) {
-        toast({ title: 'Error', description: 'No se pudieron cargar las citas.', variant: 'destructive' });
-        console.error("Admin Page: Error fetching appointments:", error);
+        toast({ title: 'Error', description: 'No se pudieron cargar las citas o datos relacionados.', variant: 'destructive' });
+        console.error("Admin Page: Error fetching appointments or related data:", error);
       } finally {
         setIsLoadingAppointments(false);
       }
@@ -168,8 +187,8 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (currentUser?.email === 'joacoadmin@admin.com' && (isAppointmentManagerOpen || (appointments.length === 0 && currentUser))) {
-        fetchAppointmentsAdmin();
+    if (currentUser?.email === 'joacoadmin@admin.com' && isAppointmentManagerOpen) {
+        fetchAppointmentsAndRelatedDataAdmin();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAppointmentManagerOpen, currentUser]);
@@ -269,7 +288,7 @@ export default function AdminPage() {
     
     if (result.success) {
       toast({ title: 'Éxito', description: 'Cita confirmada con éxito.' });
-      fetchAppointmentsAdmin(); 
+      fetchAppointmentsAndRelatedDataAdmin(); 
 
       if (sendWhatsAppNotification && appointmentToConfirm.userPhone && appointmentToConfirm.userName) {
         try {
@@ -278,19 +297,19 @@ export default function AdminPage() {
           const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToConfirm.preferredTime;
           
-          const allServicesData = await getServices();
-          const serviceNames = appointmentToConfirm.services.map(serviceId => {
-            const serviceDetail = allServicesData.find(s => s.id === serviceId);
-            return serviceDetail ? serviceDetail.name : serviceId; 
-          });
+          const serviceNames = appointmentToConfirm.services.map(serviceId => serviceMap.get(serviceId) || serviceId);
           const servicesText = serviceNames.join(', ') || 'No especificados';
+
+          const productNames = (appointmentToConfirm.selectedProducts || []).map(productId => productMapAdmin.get(productId) || productId);
+          const productsText = productNames.join(', ') || 'Ninguno';
           
           messageContent = messageContent
             .replace(/\{\{clientName\}\}/g, clientName)
             .replace(/\{\{appointmentDate\}\}/g, apptDate)
             .replace(/\{\{appointmentTime\}\}/g, apptTime)
             .replace(/\{\{siteName\}\}/g, siteConfig.name)
-            .replace(/\{\{servicesList\}\}/g, servicesText);
+            .replace(/\{\{servicesList\}\}/g, servicesText)
+            .replace(/\{\{productsList\}\}/g, productsText);
 
           const cleanedPhoneNumber = appointmentToConfirm.userPhone.replace(/\D/g, '');
           const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
@@ -324,7 +343,7 @@ export default function AdminPage() {
 
     if (result.success) {
       toast({ title: 'Éxito', description: 'Cita cancelada con éxito.'});
-      fetchAppointmentsAdmin();
+      fetchAppointmentsAndRelatedDataAdmin();
 
       if (sendCancelWhatsAppNotification && appointmentToCancel.userPhone && appointmentToCancel.userName) {
         try {
@@ -333,19 +352,19 @@ export default function AdminPage() {
           const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToCancel.preferredTime;
           
-          const allServicesData = await getServices();
-          const serviceNames = appointmentToCancel.services.map(serviceId => {
-            const serviceDetail = allServicesData.find(s => s.id === serviceId);
-            return serviceDetail ? serviceDetail.name : serviceId; 
-          });
+          const serviceNames = appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId);
           const servicesText = serviceNames.join(', ') || 'No especificados';
+
+          const productNames = (appointmentToCancel.selectedProducts || []).map(productId => productMapAdmin.get(productId) || productId);
+          const productsText = productNames.join(', ') || 'Ninguno';
 
           messageContent = messageContent
             .replace(/\{\{clientName\}\}/g, clientName)
             .replace(/\{\{appointmentDate\}\}/g, apptDate)
             .replace(/\{\{appointmentTime\}\}/g, apptTime)
             .replace(/\{\{siteName\}\}/g, siteConfig.name)
-            .replace(/\{\{servicesList\}\}/g, servicesText);
+            .replace(/\{\{servicesList\}\}/g, servicesText)
+            .replace(/\{\{productsList\}\}/g, productsText);
           
           const cleanedPhoneNumber = appointmentToCancel.userPhone.replace(/\D/g, '');
           const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
@@ -379,7 +398,7 @@ export default function AdminPage() {
       const result = await updateAppointmentStatus(appointmentId, newStatus);
       if (result.success) {
         toast({ title: 'Éxito', description: result.message });
-        fetchAppointmentsAdmin(); 
+        fetchAppointmentsAndRelatedDataAdmin(); 
       } else {
         toast({ title: 'Error', description: result.message, variant: 'destructive' });
       }
@@ -402,7 +421,7 @@ export default function AdminPage() {
     setEditingUser(user);
     userEditForm.reset({
       fullName: user.fullName,
-      email: user.email, // Email is read-only in form
+      email: user.email, 
       phoneNumber: user.phoneNumber,
     });
     setIsEditUserDialogOpen(true);
@@ -420,7 +439,7 @@ export default function AdminPage() {
 
     if (result.success) {
       toast({ title: '¡Usuario Actualizado!', description: result.message });
-      fetchAllUsersAdmin(); // Refresh user list
+      fetchAllUsersAdmin(); 
       setIsEditUserDialogOpen(false);
       setEditingUser(null);
     } else {
@@ -573,8 +592,14 @@ export default function AdminPage() {
                         <CardContent className="pb-3 space-y-1 text-sm">
                           <div>
                             <span className="font-semibold">Servicios: </span>
-                            {appt.services.join(', ')}
+                            {appt.services.map(id => serviceMap.get(id) || id).join(', ')}
                           </div>
+                           {appt.selectedProducts && appt.selectedProducts.length > 0 && (
+                            <div>
+                              <span className="font-semibold">Productos: </span>
+                               {appt.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}
+                            </div>
+                          )}
                           {appt.message && (
                             <div>
                               <span className="font-semibold">Mensaje: </span>
@@ -683,8 +708,8 @@ export default function AdminPage() {
                           Registrado: {format(new Date(user.createdAt), "PPP 'a las' p", { locale: es })}
                         </div>
                       </CardContent>
-                       <CardFooter className="pt-3 border-t">
-                         <div className="flex justify-end space-x-2 w-full">
+                      <CardFooter className="pt-3 border-t">
+                        <div className="flex justify-end space-x-2 w-full">
                             <Button
                               size="sm"
                               variant="outline"
@@ -702,7 +727,7 @@ export default function AdminPage() {
                             >
                               <MessageSquare className="mr-2 h-4 w-4"/> Enviar WhatsApp
                             </Button>
-                         </div>
+                        </div>
                       </CardFooter>
                     </Card>
                   ))}
@@ -717,7 +742,6 @@ export default function AdminPage() {
           </DialogContent>
         </Dialog>
         
-        {/* Site Settings Card - Now a Link */}
         <Link href="/admin/settings" passHref>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -734,7 +758,6 @@ export default function AdminPage() {
             </Card>
         </Link>
 
-        {/* Product Manager Dialog & Trigger */}
         <Dialog open={isProductManagerOpen} onOpenChange={(isOpen) => { setIsProductManagerOpen(isOpen); if (!isOpen) { setShowAddEditProductForm(false); setEditingProduct(null); productForm.reset({name: '', description: '', price: 'ARS$ ', imageSrc: 'https://placehold.co/400x400.png', aiHint: '', stock: 0,}); }}}>
           <DialogTrigger asChild>
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
@@ -916,7 +939,6 @@ export default function AdminPage() {
         </Dialog>
       </div>
 
-      {/* Appointment Confirmation Dialog */}
       {appointmentToConfirm && (
         <AlertDialog open={isConfirmAppointmentDialogOpen} onOpenChange={(isOpen) => {
           setIsConfirmAppointmentDialogOpen(isOpen);
@@ -931,7 +953,10 @@ export default function AdminPage() {
                   <div><strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}</div>
                   <div><strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}</div>
                   <div><strong>Hora:</strong> {appointmentToConfirm.preferredTime}</div>
-                  <div><strong>Servicios:</strong> {appointmentToConfirm.services.join(', ')}</div>
+                  <div><strong>Servicios:</strong> {appointmentToConfirm.services.map(id => serviceMap.get(id) || id).join(', ')}</div>
+                  {appointmentToConfirm.selectedProducts && appointmentToConfirm.selectedProducts.length > 0 && (
+                    <div><strong>Productos:</strong> {appointmentToConfirm.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}</div>
+                  )}
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -965,7 +990,6 @@ export default function AdminPage() {
         </AlertDialog>
       )}
 
-      {/* Appointment Cancellation Dialog */}
       {appointmentToCancel && (
         <AlertDialog 
           open={isCancelAppointmentDialogOpen} 
@@ -983,7 +1007,10 @@ export default function AdminPage() {
                   <div><strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}</div>
                   <div><strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}</div>
                   <div><strong>Hora:</strong> {appointmentToCancel.preferredTime}</div>
-                  <div><strong>Servicios:</strong> {appointmentToCancel.services.join(', ')}</div>
+                  <div><strong>Servicios:</strong> {appointmentToCancel.services.map(id => serviceMap.get(id) || id).join(', ')}</div>
+                  {appointmentToCancel.selectedProducts && appointmentToCancel.selectedProducts.length > 0 && (
+                    <div><strong>Productos:</strong> {appointmentToCancel.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}</div>
+                  )}
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -1023,7 +1050,6 @@ export default function AdminPage() {
         </AlertDialog>
       )}
 
-      {/* User Edit Dialog */}
       {editingUser && (
         <Dialog open={isEditUserDialogOpen} onOpenChange={setIsEditUserDialogOpen}>
           <DialogContent className="sm:max-w-md">

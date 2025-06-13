@@ -9,9 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
   Dialog,
   DialogContent,
-  DialogDescription as DialogPrimitiveDescription, // Renamed to avoid conflict if FormDescription is also used
+  DialogDescription as DialogPrimitiveDescription, 
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,7 +31,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription, // Added FormDescription here
+  FormDescription, 
 } from '@/components/ui/form';
 import { PageHeader } from '@/components/page-header';
 import { useAuth } from '@/context/AuthContext';
@@ -59,13 +65,14 @@ import {
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon, HomeIcon, Image as ImageIcon } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon, HomeIcon, Image as ImageIcon, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label as UiLabel } from '@/components/ui/label'; 
 
 const validIconNames = ["Scissors", "StraightRazorIcon", "BeardTrimIcon", "Smile", "Gem", "FacialMassageIcon"];
+const availablePlaceholders = ['{{clientName}}', '{{appointmentDate}}', '{{appointmentTime}}', '{{siteName}}', '{{servicesList}}', '{{productsList}}'];
 
 
 export default function AdminSettingsPage() {
@@ -74,27 +81,22 @@ export default function AdminSettingsPage() {
   const { toast } = useToast();
   const [isSubmittingSettings, setIsSubmittingSettings] = useState(false);
 
-  // States for Service Management (booking page)
   const [services, setServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isSubmittingService, setIsSubmittingService] = useState(false);
   const [showAddEditServiceForm, setShowAddEditServiceForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
 
-  // States for Home Page Service Card Management
   const [homePageServices, setHomePageServices] = useState<HomePageService[]>([]);
   const [isLoadingHomePageServices, setIsLoadingHomePageServices] = useState(false);
   const [isSubmittingHomePageService, setIsSubmittingHomePageService] = useState(false);
   const [showAddEditHomePageServiceForm, setShowAddEditHomePageServiceForm] = useState(false);
   const [editingHomePageService, setEditingHomePageService] = useState<HomePageService | null>(null);
 
-
-  // States for Time Slot Management
   const [timeSlotSettingsList, setTimeSlotSettingsList] = useState<TimeSlotSetting[]>([]);
   const [isLoadingTimeSlots, setIsLoadingTimeSlots] = useState(false);
   const [isUpdatingTimeSlot, setIsUpdatingTimeSlot] = useState<string | null>(null);
 
-  // States for WhatsApp Message Templates & Admin Contact
   const [confirmationTemplate, setConfirmationTemplate] = useState('');
   const [cancellationTemplate, setCancellationTemplate] = useState('');
   const [adminContactCancellationTemplate, setAdminContactCancellationTemplate] = useState('');
@@ -105,10 +107,6 @@ export default function AdminSettingsPage() {
   const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
   const [isLoadingAdminPhone, setIsLoadingAdminPhone] = useState(false);
   const [isSubmittingAdminPhone, setIsSubmittingAdminPhone] = useState(false);
-
-
-  const availablePlaceholders = ['{{clientName}}', '{{appointmentDate}}', '{{appointmentTime}}', '{{siteName}}', '{{servicesList}}'];
-
 
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
@@ -329,7 +327,6 @@ export default function AdminSettingsPage() {
     }
   }
 
-  // Home Page Service Handlers
   const handleAddNewHomePageServiceClick = () => {
     setEditingHomePageService(null);
     homePageServiceForm.reset({
@@ -462,203 +459,198 @@ export default function AdminSettingsPage() {
         titleClassName="font-sans"
       />
 
-      <div className="max-w-2xl mx-auto space-y-8">
-        {/* General Site Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <SettingsIcon className="h-5 w-5 mr-2 text-primary" />
-              Información General del Sitio
-            </CardTitle>
-            <CardDescription>
-              Modifica el nombre y la descripción de tu sitio web. Estos cambios se reflejarán globalmente.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...settingsForm}>
-              <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-6">
-                <FormField
-                  control={settingsForm.control}
-                  name="siteName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nombre del Sitio</FormLabel>
-                      <FormControl><Input placeholder="Ej: JoacoBarber" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={settingsForm.control}
-                  name="siteDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descripción del Sitio</FormLabel>
-                      <FormControl><Textarea placeholder="Ej: La mejor barbería de la ciudad." className="resize-none" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-end">
-                  <Button type="submit" disabled={isSubmittingSettings}>
-                    {isSubmittingSettings && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Guardar Cambios
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        {/* Home Page Services Configuration */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <HomeIcon className="h-5 w-5 mr-2 text-primary" />
-              Servicios Destacados (Página de Inicio)
-            </CardTitle>
-            <CardDescription>Gestiona las tarjetas de servicios que aparecen en la página principal.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!showAddEditHomePageServiceForm && (
-              <Button onClick={handleAddNewHomePageServiceClick} className="mb-6 w-full sm:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio Destacado
-              </Button>
-            )}
-
-            {showAddEditHomePageServiceForm && (
-              <Card className="mb-6 bg-secondary/30 p-0">
-                <CardHeader className="p-4">
-                  <CardTitle className="font-sans text-lg">
-                    {editingHomePageService ? 'Editar Servicio Destacado' : 'Nuevo Servicio Destacado'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <Form {...homePageServiceForm}>
-                    <form onSubmit={homePageServiceForm.handleSubmit(onHomePageServiceFormSubmit)} className="space-y-4">
-                      <FormField control={homePageServiceForm.control} name="name" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre del Servicio</FormLabel>
-                          <FormControl><Input placeholder="Ej: Corte de Pelo" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={homePageServiceForm.control} name="description" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descripción Breve</FormLabel>
-                          <FormControl><Textarea placeholder="Estilos clásicos y modernos." {...field} rows={2} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={homePageServiceForm.control} name="iconName" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre del Ícono</FormLabel>
-                          <FormControl><Input placeholder="Ej: Scissors" {...field} /></FormControl>
-                          <FormDescription className="text-xs">Nombres válidos: {validIconNames.join(", ")}</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                       <FormField control={homePageServiceForm.control} name="dataAiHint" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pista para IA (Imagen)</FormLabel>
-                          <FormControl><Input placeholder="Ej: haircut barber" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={homePageServiceForm.control} name="order" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Orden de Visualización</FormLabel>
-                          <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                          <FormDescription className="text-xs">Menor número aparece primero.</FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <div className="flex justify-end space-x-2 pt-2">
-                        <Button type="button" variant="outline" onClick={() => { setShowAddEditHomePageServiceForm(false); setEditingHomePageService(null); homePageServiceForm.reset(); }}>Cancelar</Button>
-                        <Button type="submit" disabled={isSubmittingHomePageService}>
-                          {isSubmittingHomePageService && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          {editingHomePageService ? 'Actualizar' : 'Añadir'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            )}
-            
-            <h3 className="text-lg font-semibold mb-3 mt-4 text-foreground/90">Servicios Destacados Actuales</h3>
-            {isLoadingHomePageServices ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : homePageServices.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
-                <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
-                <p className="font-medium">No hay servicios destacados configurados.</p>
-                <p className="text-sm">Añade algunos para que aparezcan en la página de inicio.</p>
+      <div className="max-w-3xl mx-auto">
+       <Accordion type="single" collapsible className="w-full space-y-4">
+          {/* General Site Info Accordion Item */}
+          <AccordionItem value="site-info">
+            <AccordionTrigger className="hover:no-underline">
+              <div className="flex items-center text-xl font-semibold w-full">
+                <SettingsIcon className="h-6 w-6 mr-3 text-primary" />
+                Información General del Sitio
               </div>
-            ) : (
-              <ScrollArea className={showAddEditHomePageServiceForm ? "max-h-[250px] overflow-y-auto border rounded-md p-1" : "max-h-[400px] overflow-y-auto border rounded-md p-1"}>
-                <div className="space-y-3 p-3">
-                  {homePageServices.map(service => (
-                    <Card key={service.id} className="p-4 shadow-sm bg-card hover:bg-muted/20">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                            <div className="flex-grow min-w-0 mb-2 sm:mb-0">
-                                <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name} (Orden: {service.order})</p>
-                                <p className="text-xs text-muted-foreground truncate" title={service.description}>{service.description}</p>
-                                <p className="text-xs text-muted-foreground/80">Ícono: {service.iconName}, Pista IA: {service.dataAiHint}</p>
-                            </div>
-                            <div className="flex-shrink-0 space-x-2 flex mt-2 sm:mt-0">
-                                <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 px-2 py-1 h-auto" onClick={() => handleEditHomePageServiceClick(service)}>
-                                <Edit3 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Editar</span>
-                                </Button> 
-                                <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-red-500/10 px-2 py-1 h-auto">
-                                    <Trash2 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Eliminar</span>
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-md">
-                                    <DialogHeader>
-                                    <DialogTitle>Confirmar Eliminación</DialogTitle>
-                                    <DialogPrimitiveDescription>
-                                        ¿Estás seguro de que quieres eliminar el servicio destacado "{service.name}"?
-                                    </DialogPrimitiveDescription>
-                                    </DialogHeader>
-                                    <DialogFooter className="sm:justify-end">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="outline">Cancelar</Button>
-                                    </DialogClose>
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="destructive" onClick={() => handleDeleteHomePageService(service.id)}>Eliminar</Button>
-                                    </DialogClose>
-                                    </DialogFooter>
-                                </DialogContent>
-                                </Dialog>
-                            </div>
-                        </div>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-6 px-1">
+                Modifica el nombre y la descripción de tu sitio web. Estos cambios se reflejarán globalmente.
+              </p>
+              <Form {...settingsForm}>
+                <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-6 p-1">
+                  <FormField
+                    control={settingsForm.control}
+                    name="siteName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre del Sitio</FormLabel>
+                        <FormControl><Input placeholder="Ej: JoacoBarber" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={settingsForm.control}
+                    name="siteDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descripción del Sitio</FormLabel>
+                        <FormControl><Textarea placeholder="Ej: La mejor barbería de la ciudad." className="resize-none" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end pt-2">
+                    <Button type="submit" disabled={isSubmittingSettings}>
+                      {isSubmittingSettings && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Guardar Cambios Generales
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </AccordionContent>
+          </AccordionItem>
 
-        {/* Admin Contact Configuration */}
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center">
-                    <PhoneIcon className="h-5 w-5 mr-2 text-primary" />
+          {/* Home Page Services Accordion Item */}
+          <AccordionItem value="home-page-services">
+            <AccordionTrigger className="hover:no-underline">
+               <div className="flex items-center text-xl font-semibold w-full">
+                <HomeIcon className="h-6 w-6 mr-3 text-primary" />
+                Servicios Destacados (Página de Inicio)
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-4 px-1">Gestiona las tarjetas de servicios que aparecen en la página principal.</p>
+              {!showAddEditHomePageServiceForm && (
+                <Button onClick={handleAddNewHomePageServiceClick} className="mb-6 w-full sm:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio Destacado
+                </Button>
+              )}
+
+              {showAddEditHomePageServiceForm && (
+                <Card className="mb-6 bg-secondary/30 p-0">
+                  <CardHeader className="p-4 py-3">
+                    <CardTitle className="font-sans text-lg">
+                      {editingHomePageService ? 'Editar Servicio Destacado' : 'Nuevo Servicio Destacado'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <Form {...homePageServiceForm}>
+                      <form onSubmit={homePageServiceForm.handleSubmit(onHomePageServiceFormSubmit)} className="space-y-4">
+                        <FormField control={homePageServiceForm.control} name="name" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre del Servicio</FormLabel>
+                            <FormControl><Input placeholder="Ej: Corte de Pelo" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={homePageServiceForm.control} name="description" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descripción Breve</FormLabel>
+                            <FormControl><Textarea placeholder="Estilos clásicos y modernos." {...field} rows={2} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={homePageServiceForm.control} name="iconName" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nombre del Ícono</FormLabel>
+                            <FormControl><Input placeholder="Ej: Scissors" {...field} /></FormControl>
+                            <FormDescription className="text-xs">Nombres válidos: {validIconNames.join(", ")}</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={homePageServiceForm.control} name="dataAiHint" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pista para IA (Imagen)</FormLabel>
+                            <FormControl><Input placeholder="Ej: haircut barber" {...field} /></FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={homePageServiceForm.control} name="order" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Orden de Visualización</FormLabel>
+                            <FormControl><Input type="number" placeholder="0" {...field} 
+                              onChange={event => field.onChange(+event.target.value)}
+                            /></FormControl>
+                            <FormDescription className="text-xs">Menor número aparece primero.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                        <div className="flex justify-end space-x-2 pt-2">
+                          <Button type="button" variant="outline" onClick={() => { setShowAddEditHomePageServiceForm(false); setEditingHomePageService(null); homePageServiceForm.reset({name: '', description: '', iconName: 'Scissors', dataAiHint: '', order: 0}); }}>Cancelar</Button>
+                          <Button type="submit" disabled={isSubmittingHomePageService}>
+                            {isSubmittingHomePageService && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {editingHomePageService ? 'Actualizar Destacado' : 'Añadir Destacado'}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              )}
+              
+              <h3 className="text-md font-semibold mb-3 mt-4 text-foreground/90 px-1">Actuales Servicios Destacados</h3>
+              {isLoadingHomePageServices ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : homePageServices.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                  <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
+                  <p className="font-medium">No hay servicios destacados.</p>
+                </div>
+              ) : (
+                <ScrollArea className={showAddEditHomePageServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1" : "max-h-[350px] overflow-y-auto border rounded-md p-1"}>
+                  <div className="space-y-3 p-3">
+                    {homePageServices.map(service => (
+                      <Card key={service.id} className="p-3 shadow-sm bg-card hover:bg-muted/20">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                              <div className="flex-grow min-w-0 mb-2 sm:mb-0">
+                                  <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name} (Orden: {service.order})</p>
+                                  <p className="text-xs text-muted-foreground truncate" title={service.description}>{service.description}</p>
+                                  <p className="text-xs text-muted-foreground/80">Ícono: {service.iconName}, Pista IA: {service.dataAiHint}</p>
+                              </div>
+                              <div className="flex-shrink-0 space-x-2 flex mt-2 sm:mt-0">
+                                  <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 px-2 py-1 h-auto" onClick={() => handleEditHomePageServiceClick(service)}>
+                                  <Edit3 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Editar</span>
+                                  </Button> 
+                                  <Dialog>
+                                  <DialogTrigger asChild>
+                                      <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-red-500/10 px-2 py-1 h-auto">
+                                      <Trash2 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Eliminar</span>
+                                      </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-md">
+                                      <DialogHeader> <DialogTitle>Confirmar Eliminación</DialogTitle>
+                                      <DialogPrimitiveDescription> ¿Estás seguro de que quieres eliminar "{service.name}"?</DialogPrimitiveDescription>
+                                      </DialogHeader>
+                                      <DialogFooter className="sm:justify-end">
+                                      <DialogClose asChild><Button type="button" variant="outline">Cancelar</Button></DialogClose>
+                                      <DialogClose asChild><Button type="button" variant="destructive" onClick={() => handleDeleteHomePageService(service.id)}>Eliminar</Button></DialogClose>
+                                      </DialogFooter>
+                                  </DialogContent>
+                                  </Dialog>
+                              </div>
+                          </div>
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Admin Contact Accordion Item */}
+          <AccordionItem value="admin-contact">
+            <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center text-xl font-semibold w-full">
+                    <PhoneIcon className="h-6 w-6 mr-3 text-primary" />
                     Contacto del Administrador (WhatsApp)
-                </CardTitle>
-                <CardDescription>
+                </div>
+            </AccordionTrigger>
+            <AccordionContent>
+                <p className="text-sm text-muted-foreground mb-4 px-1">
                     Configura el número de teléfono para que los clientes te contacten por WhatsApp.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+                </p>
                 {isLoadingAdminPhone ? (
                     <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
                 ) : (
-                    <div>
+                    <div className="space-y-3 p-1">
                         <UiLabel htmlFor="adminPhoneNumber" className="text-base font-medium">Número de WhatsApp del Administrador</UiLabel>
                         <Input
                             id="adminPhoneNumber"
@@ -680,319 +672,224 @@ export default function AdminSettingsPage() {
                         </Button>
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </AccordionContent>
+          </AccordionItem>
 
-
-        {/* Services Configuration (Booking Page) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Gestión de Servicios (Página de Reservas)</CardTitle>
-            <CardDescription>Añade, edita o elimina los servicios ofrecidos en la página de reservas. Estos son los servicios que los clientes pueden seleccionar al agendar una cita.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!showAddEditServiceForm && (
-              <Button onClick={handleAddNewServiceClick} className="mb-6 w-full sm:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Nuevo Servicio de Reserva
-              </Button>
-            )}
-
-            {showAddEditServiceForm && (
-              <Card className="mb-6 bg-secondary/30 p-0">
-                <CardHeader className="p-4">
-                  <CardTitle className="font-sans text-lg">
-                    {editingService ? 'Editar Servicio de Reserva' : 'Nuevo Servicio de Reserva'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <Form {...serviceForm}>
-                    <form onSubmit={serviceForm.handleSubmit(onServiceFormSubmit)} className="space-y-4">
-                      <FormField control={serviceForm.control} name="name" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre del Servicio</FormLabel>
-                          <FormControl><Input placeholder="Ej: Corte Clásico" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={serviceForm.control} name="description" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descripción</FormLabel>
-                          <FormControl><Textarea placeholder="Describe el servicio..." {...field} rows={3} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={serviceForm.control} name="price" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Precio</FormLabel>
-                          <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <div className="flex justify-end space-x-2 pt-2">
-                        <Button type="button" variant="outline" onClick={() => { setShowAddEditServiceForm(false); setEditingService(null); serviceForm.reset({name: '', description: '', price: 'ARS$ '}); }}>Cancelar</Button>
-                        <Button type="submit" disabled={isSubmittingService}>
-                          {isSubmittingService && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          {editingService ? 'Actualizar Servicio' : 'Añadir Servicio'}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            )}
-            
-            <h3 className="text-lg font-semibold mb-3 mt-4 text-foreground/90">Servicios de Reserva Actuales</h3>
-            {isLoadingServices ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : services.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
-                <PackageSearch className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
-                <p className="font-medium">No hay servicios de reserva configurados.</p>
-                <p className="text-sm">Añade servicios para que los clientes puedan seleccionarlos al reservar.</p>
-              </div>
-            ) : (
-              <ScrollArea className={showAddEditServiceForm ? "max-h-[250px] overflow-y-auto border rounded-md p-1" : "max-h-[400px] overflow-y-auto border rounded-md p-1"}>
-                <div className="space-y-3 p-3">
-                  {services.map(service => (
-                    <Card key={service.id} className="p-4 shadow-sm bg-card hover:bg-muted/20">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex-grow min-w-0 mb-2 sm:mb-0">
-                                <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name}</p>
-                                <p className="text-sm text-muted-foreground truncate" title={service.description}>{service.description}</p>
-                                <p className="text-sm text-primary font-medium">{service.price}</p>
-                            </div>
-                            <div className="flex-shrink-0 space-x-2 flex">
-                                <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 px-2 py-1 h-auto" onClick={() => handleEditServiceClick(service)}>
-                                <Edit3 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Editar</span>
-                                </Button> 
-                                <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-red-500/10 px-2 py-1 h-auto">
-                                    <Trash2 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Eliminar</span>
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-md">
-                                    <DialogHeader>
-                                    <DialogTitle>Confirmar Eliminación</DialogTitle>
-                                    <DialogPrimitiveDescription>
-                                        ¿Estás seguro de que quieres eliminar el servicio "{service.name}"? Esta acción no se puede deshacer.
-                                    </DialogPrimitiveDescription>
-                                    </DialogHeader>
-                                    <DialogFooter className="sm:justify-end">
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="outline">Cancelar</Button>
-                                    </DialogClose>
-                                    <DialogClose asChild>
-                                        <Button type="button" variant="destructive" onClick={() => handleDeleteService(service.id)}>Eliminar</Button>
-                                    </DialogClose>
-                                    </DialogFooter>
-                                </DialogContent>
-                                </Dialog>
-                            </div>
-                        </div>
-                    </Card>
-                  ))}
+          {/* Booking Services Accordion Item */}
+          <AccordionItem value="booking-services">
+             <AccordionTrigger className="hover:no-underline">
+               <div className="flex items-center text-xl font-semibold w-full">
+                  <ShoppingBag className="h-6 w-6 mr-3 text-primary" /> {/* Changed icon */}
+                  Gestión de Servicios (Página de Reservas)
                 </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-4 px-1">Añade, edita o elimina los servicios ofrecidos en la página de reservas.</p>
+               {!showAddEditServiceForm && (
+                <Button onClick={handleAddNewServiceClick} className="mb-6 w-full sm:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio de Reserva
+                </Button>
+              )}
 
-        {/* Business Hours Configuration */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-                <ClockIcon className="h-5 w-5 mr-2 text-primary" />
-                Horarios de Atención
-            </CardTitle>
-            <CardDescription>Define los horarios disponibles para agendar citas. Desactiva los horarios que no estarán disponibles.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingTimeSlots ? (
-              <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( 
-              <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
-                <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
-                <p className="font-medium">No hay horarios configurados en el sistema.</p>
-                <p className="text-sm">Contacta a soporte si esto es un error.</p>
-              </div>
-            ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( 
-                 <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
-                    <div className="space-y-1 p-3">
-                      {ALL_TIME_SLOTS.map((slotTime) => (
-                        <div key={slotTime} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
-                          <UiLabel htmlFor={`timeslot-${slotTime.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">
-                            {slotTime}
-                          </UiLabel>
-                          <div className="flex items-center space-x-2">
-                            {isUpdatingTimeSlot === slotTime ? (
-                              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                            ) : (
-                              <Switch
-                                id={`timeslot-${slotTime.replace(/\s|:/g, '-')}`}
-                                checked={true} 
-                                onCheckedChange={(checked) => handleTimeSlotToggle(slotTime, checked)}
-                                aria-label={`Activar o desactivar horario ${slotTime}`}
-                              />
-                            )}
-                            <Check className="h-5 w-5 text-green-500" />
+              {showAddEditServiceForm && (
+                <Card className="mb-6 bg-secondary/30 p-0">
+                  <CardHeader className="p-4 py-3">
+                    <CardTitle className="font-sans text-lg">
+                      {editingService ? 'Editar Servicio de Reserva' : 'Nuevo Servicio de Reserva'}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4">
+                    <Form {...serviceForm}>
+                      <form onSubmit={serviceForm.handleSubmit(onServiceFormSubmit)} className="space-y-4">
+                        <FormField control={serviceForm.control} name="name" render={({ field }) => (
+                          <FormItem> <FormLabel>Nombre del Servicio</FormLabel>
+                            <FormControl><Input placeholder="Ej: Corte Clásico" {...field} /></FormControl> <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={serviceForm.control} name="description" render={({ field }) => (
+                          <FormItem> <FormLabel>Descripción</FormLabel>
+                            <FormControl><Textarea placeholder="Describe el servicio..." {...field} rows={3} /></FormControl> <FormMessage />
+                          </FormItem>
+                        )} />
+                        <FormField control={serviceForm.control} name="price" render={({ field }) => (
+                          <FormItem> <FormLabel>Precio</FormLabel>
+                            <FormControl><Input placeholder="ARS$ 1500" {...field} /></FormControl> <FormMessage />
+                          </FormItem>
+                        )} />
+                        <div className="flex justify-end space-x-2 pt-2">
+                          <Button type="button" variant="outline" onClick={() => { setShowAddEditServiceForm(false); setEditingService(null); serviceForm.reset({name: '', description: '', price: 'ARS$ '}); }}>Cancelar</Button>
+                          <Button type="submit" disabled={isSubmittingService}>
+                            {isSubmittingService && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {editingService ? 'Actualizar Reserva' : 'Añadir Reserva'}
+                          </Button>
+                        </div>
+                      </form>
+                    </Form>
+                  </CardContent>
+                </Card>
+              )}
+              
+              <h3 className="text-md font-semibold mb-3 mt-4 text-foreground/90 px-1">Servicios de Reserva Actuales</h3>
+              {isLoadingServices ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : services.length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                  <PackageSearch className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
+                  <p className="font-medium">No hay servicios de reserva.</p>
+                </div>
+              ) : (
+                <ScrollArea className={showAddEditServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1" : "max-h-[350px] overflow-y-auto border rounded-md p-1"}>
+                  <div className="space-y-3 p-3">
+                    {services.map(service => (
+                      <Card key={service.id} className="p-3 shadow-sm bg-card hover:bg-muted/20">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex-grow min-w-0 mb-2 sm:mb-0">
+                                  <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate" title={service.description}>{service.description}</p>
+                                  <p className="text-sm text-primary font-medium">{service.price}</p>
+                              </div>
+                              <div className="flex-shrink-0 space-x-2 flex">
+                                  <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 px-2 py-1 h-auto" onClick={() => handleEditServiceClick(service)}>
+                                  <Edit3 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Editar</span>
+                                  </Button> 
+                                  <Dialog>
+                                  <DialogTrigger asChild>
+                                      <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-red-500/10 px-2 py-1 h-auto">
+                                      <Trash2 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Eliminar</span>
+                                      </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-md">
+                                      <DialogHeader><DialogTitle>Confirmar Eliminación</DialogTitle>
+                                      <DialogPrimitiveDescription>¿Estás seguro de que quieres eliminar "{service.name}"?</DialogPrimitiveDescription>
+                                      </DialogHeader>
+                                      <DialogFooter className="sm:justify-end">
+                                      <DialogClose asChild><Button type="button" variant="outline">Cancelar</Button></DialogClose>
+                                      <DialogClose asChild><Button type="button" variant="destructive" onClick={() => handleDeleteService(service.id)}>Eliminar</Button></DialogClose>
+                                      </DialogFooter>
+                                  </DialogContent>
+                                  </Dialog>
+                              </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                      </Card>
+                    ))}
+                  </div>
                 </ScrollArea>
-            ) : (
-              <ScrollArea className="max-h-[400px] overflow-y-auto border rounded-md p-1">
-                <div className="space-y-1 p-3">
-                  {timeSlotSettingsList.map((slotSetting) => (
-                    <div key={slotSetting.time} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
-                      <UiLabel htmlFor={`timeslot-${slotSetting.time.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">
-                        {slotSetting.time}
-                      </UiLabel>
-                      <div className="flex items-center space-x-2">
-                        {isUpdatingTimeSlot === slotSetting.time ? (
-                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                        ) : (
-                           <Switch
-                            id={`timeslot-${slotSetting.time.replace(/\s|:/g, '-')}`}
-                            checked={slotSetting.isActive}
-                            onCheckedChange={(checked) => handleTimeSlotToggle(slotSetting.time, checked)}
-                            aria-label={`Activar o desactivar horario ${slotSetting.time}`}
-                          />
-                        )}
-                        {slotSetting.isActive ? 
-                           <Check className="h-5 w-5 text-green-500" /> : 
-                           <X className="h-5 w-5 text-destructive" />
-                        }
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </AccordionContent>
+          </AccordionItem>
 
-        {/* WhatsApp Messages Configuration */}
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center">
-                    <MessageSquareIcon className="h-5 w-5 mr-2 text-primary" />
+          {/* Business Hours Accordion Item */}
+          <AccordionItem value="business-hours">
+            <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center text-xl font-semibold w-full">
+                    <ClockIcon className="h-6 w-6 mr-3 text-primary" />
+                    Horarios de Atención
+                </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <p className="text-sm text-muted-foreground mb-4 px-1">Define los horarios disponibles para agendar citas.</p>
+              {isLoadingTimeSlots ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( 
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                  <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
+                  <p className="font-medium">No hay horarios configurados.</p>
+                </div>
+              ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( 
+                  <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1">
+                      <div className="space-y-1 p-3">
+                        {ALL_TIME_SLOTS.map((slotTime) => (
+                          <div key={slotTime} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                            <UiLabel htmlFor={`ts-${slotTime.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">{slotTime}</UiLabel>
+                            <div className="flex items-center space-x-2">
+                              {isUpdatingTimeSlot === slotTime ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : 
+                                <Switch id={`ts-${slotTime.replace(/\s|:/g, '-')}`} checked={true} onCheckedChange={(c) => handleTimeSlotToggle(slotTime, c)} />}
+                              <Check className="h-5 w-5 text-green-500" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                  </ScrollArea>
+              ) : (
+                <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1">
+                  <div className="space-y-1 p-3">
+                    {timeSlotSettingsList.map((slot) => (
+                      <div key={slot.time} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                        <UiLabel htmlFor={`ts-${slot.time.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">{slot.time}</UiLabel>
+                        <div className="flex items-center space-x-2">
+                          {isUpdatingTimeSlot === slot.time ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : 
+                           <Switch id={`ts-${slot.time.replace(/\s|:/g, '-')}`} checked={slot.isActive} onCheckedChange={(c) => handleTimeSlotToggle(slot.time, c)} />}
+                          {slot.isActive ? <Check className="h-5 w-5 text-green-500" /> : <X className="h-5 w-5 text-destructive" />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* WhatsApp Messages Accordion Item */}
+          <AccordionItem value="whatsapp-templates">
+             <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center text-xl font-semibold w-full">
+                    <MessageSquareIcon className="h-6 w-6 mr-3 text-primary" />
                     Plantillas de Mensajes de WhatsApp
-                </CardTitle>
-                <CardDescription>
-                    Personaliza los mensajes para diferentes interacciones.
-                    Utiliza los marcadores de posición disponibles para incluir detalles dinámicos.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
+                </div>
+            </AccordionTrigger>
+            <AccordionContent>
+                <p className="text-sm text-muted-foreground mb-4 px-1">Personaliza los mensajes para diferentes interacciones.</p>
                 {isLoadingTemplates ? (
                      <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
                 ) : (
-                    <>
+                    <div className="space-y-6 p-1">
                         <div className="space-y-2">
-                            <UiLabel htmlFor="confirmationTemplate" className="text-base font-medium">Plantilla de Confirmación de Cita (Admin a Cliente)</UiLabel>
-                            <Textarea
-                                id="confirmationTemplate"
-                                value={confirmationTemplate}
-                                onChange={(e) => setConfirmationTemplate(e.target.value)}
-                                placeholder="Escribe tu mensaje de confirmación aquí..."
-                                rows={5}
-                                className="text-sm"
-                            />
-                            <Button 
-                                onClick={() => handleSaveTemplate('confirmation')} 
-                                disabled={isSubmittingTemplate === 'confirmation'}
-                                size="sm"
-                                className="mt-2"
-                            >
-                                {isSubmittingTemplate === 'confirmation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Confirmación (Admin)
+                            <UiLabel htmlFor="confTemplate" className="text-base font-medium">Confirmación de Cita (Admin a Cliente)</UiLabel>
+                            <Textarea id="confTemplate" value={confirmationTemplate} onChange={(e) => setConfirmationTemplate(e.target.value)} rows={5} className="text-sm"/>
+                            <Button onClick={() => handleSaveTemplate('confirmation')} disabled={isSubmittingTemplate === 'confirmation'} size="sm" className="mt-2">
+                                {isSubmittingTemplate === 'confirmation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Guardar
                             </Button>
                         </div>
-
                         <div className="space-y-2">
-                            <UiLabel htmlFor="cancellationTemplate" className="text-base font-medium">Plantilla de Cancelación de Cita (Admin a Cliente)</UiLabel>
-                            <Textarea
-                                id="cancellationTemplate"
-                                value={cancellationTemplate}
-                                onChange={(e) => setCancellationTemplate(e.target.value)}
-                                placeholder="Escribe tu mensaje de cancelación aquí..."
-                                rows={5}
-                                className="text-sm"
-                            />
-                            <Button 
-                                onClick={() => handleSaveTemplate('cancellation')} 
-                                disabled={isSubmittingTemplate === 'cancellation'}
-                                size="sm"
-                                className="mt-2"
-                            >
-                                {isSubmittingTemplate === 'cancellation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Cancelación (Admin)
+                            <UiLabel htmlFor="cancTemplate" className="text-base font-medium">Cancelación de Cita (Admin a Cliente)</UiLabel>
+                            <Textarea id="cancTemplate" value={cancellationTemplate} onChange={(e) => setCancellationTemplate(e.target.value)} rows={5} className="text-sm"/>
+                            <Button onClick={() => handleSaveTemplate('cancellation')} disabled={isSubmittingTemplate === 'cancellation'} size="sm" className="mt-2">
+                                {isSubmittingTemplate === 'cancellation' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Guardar
                             </Button>
                         </div>
-
                          <div className="space-y-2">
-                            <UiLabel htmlFor="adminContactCancellationTemplate" className="text-base font-medium">Plantilla para "Solicitar Cancelación" (Cliente a Admin)</UiLabel>
-                            <Textarea
-                                id="adminContactCancellationTemplate"
-                                value={adminContactCancellationTemplate}
-                                onChange={(e) => setAdminContactCancellationTemplate(e.target.value)}
-                                placeholder="Mensaje prellenado cuando el cliente quiere cancelar vía WhatsApp..."
-                                rows={5}
-                                className="text-sm"
-                            />
-                            <Button 
-                                onClick={() => handleSaveTemplate('adminContactCancellationRequest')} 
-                                disabled={isSubmittingTemplate === 'adminContactCancellationRequest'}
-                                size="sm"
-                                className="mt-2"
-                            >
-                                {isSubmittingTemplate === 'adminContactCancellationRequest' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Plantilla Cliente-Cancelación
+                            <UiLabel htmlFor="adminContactCancTemplate" className="text-base font-medium">"Solicitar Cancelación" (Cliente a Admin)</UiLabel>
+                            <Textarea id="adminContactCancTemplate" value={adminContactCancellationTemplate} onChange={(e) => setAdminContactCancellationTemplate(e.target.value)} rows={5} className="text-sm"/>
+                            <Button onClick={() => handleSaveTemplate('adminContactCancellationRequest')} disabled={isSubmittingTemplate === 'adminContactCancellationRequest'} size="sm" className="mt-2">
+                                {isSubmittingTemplate === 'adminContactCancellationRequest' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Guardar
                             </Button>
                         </div>
-
                         <div className="space-y-2">
-                            <UiLabel htmlFor="adminContactQueryTemplate" className="text-base font-medium">Plantilla para "Hacer Consulta" (Cliente a Admin)</UiLabel>
-                            <Textarea
-                                id="adminContactQueryTemplate"
-                                value={adminContactQueryTemplate}
-                                onChange={(e) => setAdminContactQueryTemplate(e.target.value)}
-                                placeholder="Mensaje prellenado cuando el cliente tiene una consulta vía WhatsApp..."
-                                rows={5}
-                                className="text-sm"
-                            />
-                            <Button 
-                                onClick={() => handleSaveTemplate('adminContactQuery')} 
-                                disabled={isSubmittingTemplate === 'adminContactQuery'}
-                                size="sm"
-                                className="mt-2"
-                            >
-                                {isSubmittingTemplate === 'adminContactQuery' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Guardar Plantilla Cliente-Consulta
+                            <UiLabel htmlFor="adminContactQueryTemplate" className="text-base font-medium">"Hacer Consulta" (Cliente a Admin)</UiLabel>
+                            <Textarea id="adminContactQueryTemplate" value={adminContactQueryTemplate} onChange={(e) => setAdminContactQueryTemplate(e.target.value)} rows={5} className="text-sm"/>
+                            <Button onClick={() => handleSaveTemplate('adminContactQuery')} disabled={isSubmittingTemplate === 'adminContactQuery'} size="sm" className="mt-2">
+                                {isSubmittingTemplate === 'adminContactQuery' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Guardar
                             </Button>
                         </div>
-                    </>
+                    </div>
                 )}
-                 <Card className="mt-4 bg-secondary/30">
+                 <Card className="mt-6 bg-secondary/30 mx-1">
                     <CardHeader className="pb-2 pt-3">
                         <CardTitle className="text-sm font-medium flex items-center">
-                            <InfoIcon className="h-4 w-4 mr-2 text-primary" />
-                            Marcadores de Posición Disponibles
+                            <InfoIcon className="h-4 w-4 mr-2 text-primary" /> Marcadores de Posición
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0 pb-3">
                         <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
                             {availablePlaceholders.map(ph => <li key={ph}><code>{ph}</code></li>)}
                         </ul>
-                         <p className="text-xs text-muted-foreground mt-2">Para la plantilla "Hacer Consulta", el cliente deberá añadir manualmente su pregunta donde dice `[ESCRIBE TU CONSULTA AQUÍ]`.</p>
+                         <p className="text-xs text-muted-foreground mt-2">Para "Hacer Consulta", el cliente añadirá su pregunta en `[ESCRIBE TU CONSULTA AQUÍ]`.</p>
                     </CardContent>
                 </Card>
-            </CardContent>
-        </Card>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   );
 }
-

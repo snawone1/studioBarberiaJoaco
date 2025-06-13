@@ -44,7 +44,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle, MessageSquare, HelpCircle, Phone } from "lucide-react"
+import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle, MessageSquare, HelpCircle, Phone, ShoppingBag, PackageSearch } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
@@ -63,7 +63,9 @@ import {
   getAdminPhoneNumber,
   getMessageTemplate,
   type MessageTemplateId,
+  getProducts, // Import getProducts
 } from '@/app/actions';
+import type { Product } from '@/app/products/page'; // Import Product type
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState, useMemo } from 'react';
@@ -77,7 +79,7 @@ const now = new Date();
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
-  const { currentUser, loading: authLoading } = useAuth(); // Added authLoading
+  const { currentUser, loading: authLoading } = useAuth(); 
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = React.useState<string | undefined>(undefined);
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
@@ -86,6 +88,9 @@ export default function BookAppointmentPage() {
 
   const [allServices, setAllServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // State for products
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // Loading state for products
+
 
   const [activeTimeSlotSettings, setActiveTimeSlotSettings] = useState<TimeSlotSetting[]>([]);
   const [isLoadingSlotSettings, setIsLoadingSlotSettings] = useState(true);
@@ -106,6 +111,7 @@ export default function BookAppointmentPage() {
     resolver: zodResolver(clientAppointmentSchema),
     defaultValues: {
       services: [],
+      selectedProducts: [], // Initialize selectedProducts
       preferredDate: undefined,
       preferredTime: '',
       message: '',
@@ -116,21 +122,29 @@ export default function BookAppointmentPage() {
     return new Map(allServices.map(service => [service.id, service.name]));
   }, [allServices]);
 
+  const productMap = useMemo(() => {
+    return new Map(allProducts.map(product => [product.id, product.name]));
+  }, [allProducts]);
+
   const fetchPageData = async () => {
     setIsLoadingServices(true);
+    setIsLoadingProducts(true);
     setIsLoadingSlotSettings(true);
     try {
-      const [fetchedServices, fetchedSlotSettings] = await Promise.all([
+      const [fetchedServices, fetchedProducts, fetchedSlotSettings] = await Promise.all([
         getServices(),
+        getProducts(), // Fetch products
         getTimeSlotSettings()
       ]);
       setAllServices(fetchedServices);
+      setAllProducts(fetchedProducts.filter(p => (p.stock ?? 0) > 0)); // Only show products with stock
       setActiveTimeSlotSettings(fetchedSlotSettings);
     } catch (error) {
       console.error("Error fetching page data:", error);
       toast({ title: 'Error', description: 'No se pudieron cargar los datos necesarios para la reserva.', variant: 'destructive' });
     } finally {
       setIsLoadingServices(false);
+      setIsLoadingProducts(false);
       setIsLoadingSlotSettings(false);
     }
   };
@@ -141,9 +155,14 @@ export default function BookAppointmentPage() {
       setIsLoadingMyAppointments(true);
       try {
         const userAppointments = await getUserAppointments(currentUser.uid);
-        // Log para depurar qué datos llegan al cliente
         console.log("BookPage: Fetched user appointments from server action:", JSON.stringify(userAppointments, null, 2));
         setMyAppointments(userAppointments);
+        // Ensure products are loaded for mapping in "Mis Citas" if not already loaded
+        if (allProducts.length === 0 && !isLoadingProducts) {
+          const fetchedProducts = await getProducts();
+          setAllProducts(fetchedProducts);
+        }
+
       } catch (error) {
         console.error("BookPage: Error fetching user appointments in client:", error);
         toast({ title: 'Error', description: 'No se pudieron cargar tus citas.', variant: 'destructive' });
@@ -153,25 +172,24 @@ export default function BookAppointmentPage() {
     } else if (!currentUser && !authLoading) {
       console.log("BookPage: fetchUserAppointments - no current user or auth is loading, clearing appointments.");
       setMyAppointments([]);
-      setIsLoadingMyAppointments(false); // Asegúrate de que esto también se establece
+      setIsLoadingMyAppointments(false); 
     }
   };
 
   useEffect(() => {
     fetchPageData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (activeTab === 'my-appointments' && !authLoading && currentUser) {
       fetchUserAppointments();
     } else if (activeTab === 'my-appointments' && !authLoading && !currentUser) {
-      // Si la pestaña "Mis Citas" está activa, la autenticación ha terminado y no hay usuario,
-      // limpiamos las citas y detenemos la carga.
       setMyAppointments([]);
       setIsLoadingMyAppointments(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, activeTab, authLoading]); // authLoading es dependencia clave
+  }, [currentUser, activeTab, authLoading]); 
 
 
   const watchedDate = form.watch('preferredDate');
@@ -243,6 +261,7 @@ export default function BookAppointmentPage() {
       const payloadForServer: AppointmentFormValues = {
         ...data,
         userId: currentUser.uid,
+        selectedProducts: data.selectedProducts || [], // Ensure it's an array
       };
       result = await submitAppointmentRequest(payloadForServer);
     } catch (error) {
@@ -265,6 +284,7 @@ export default function BookAppointmentPage() {
       });
       form.reset({
         services: [],
+        selectedProducts: [],
         preferredDate: watchedDate,
         preferredTime: '',
         message: ''
@@ -313,7 +333,6 @@ export default function BookAppointmentPage() {
   const handleUserCancelAppointment = async () => {
     if (!appointmentToCancel || !currentUser) return;
     setIsCancellingAppointment(true);
-    // Pass currentUserId for ownership verification for 'pending' or 'confirmed' appointments by user.
     const result = await updateAppointmentStatus(appointmentToCancel.id, 'cancelled', currentUser.uid);
     setIsCancellingAppointment(false);
     setIsCancelDialogOpen(false);
@@ -348,12 +367,17 @@ export default function BookAppointmentPage() {
       }
 
       let messageContent = await getMessageTemplate(type);
-
-      // Ensure allServices are loaded if not already
+      
       let currentServices = allServices;
       if (currentServices.length === 0 && !isLoadingServices) {
-        currentServices = await getServices(); // Fetch if not already available and not currently loading
-        setAllServices(currentServices); // Update state if fetched here
+        currentServices = await getServices();
+        setAllServices(currentServices);
+      }
+      
+      let currentProducts = allProducts;
+       if (currentProducts.length === 0 && !isLoadingProducts && selectedAppointmentForContact.selectedProducts && selectedAppointmentForContact.selectedProducts.length > 0) {
+        currentProducts = await getProducts();
+        setAllProducts(currentProducts);
       }
 
 
@@ -362,6 +386,13 @@ export default function BookAppointmentPage() {
         return serviceDetail ? serviceDetail.name : serviceId;
       });
       const servicesText = serviceNames.join(', ') || 'No especificados';
+
+      const productNames = (selectedAppointmentForContact.selectedProducts || []).map(productId => {
+        const productDetail = currentProducts.find(p => p.id === productId);
+        return productDetail ? productDetail.name : productId;
+      });
+      const productsText = productNames.join(', ') || 'Ninguno';
+      
       const clientName = currentUser.displayName || currentUser.email || 'Cliente';
       const apptDate = format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es });
       const apptTime = selectedAppointmentForContact.preferredTime;
@@ -371,7 +402,9 @@ export default function BookAppointmentPage() {
         .replace(/\{\{appointmentDate\}\}/g, apptDate)
         .replace(/\{\{appointmentTime\}\}/g, apptTime)
         .replace(/\{\{siteName\}\}/g, siteConfig.name)
-        .replace(/\{\{servicesList\}\}/g, servicesText);
+        .replace(/\{\{servicesList\}\}/g, servicesText)
+        .replace(/\{\{productsList\}\}/g, productsText);
+
 
       const cleanedAdminPhoneNumber = adminPhoneNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanedAdminPhoneNumber}?text=${encodeURIComponent(messageContent)}`;
@@ -400,7 +433,7 @@ export default function BookAppointmentPage() {
 
   const currentlyActiveSlots = ALL_TIME_SLOTS.filter(slot => {
     const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
-    return slotSetting ? slotSetting.isActive : true; // Default to true if not found (shouldn't happen ideally)
+    return slotSetting ? slotSetting.isActive : true; 
   });
 
   return (
@@ -635,6 +668,79 @@ export default function BookAppointmentPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Products Selection Field */}
+              <FormField
+                control={form.control}
+                name="selectedProducts"
+                render={() => (
+                  <FormItem>
+                    <div className="mb-4">
+                      <FormLabel className="text-lg font-semibold flex items-center">
+                        <ShoppingBag className="mr-2 h-5 w-5 text-primary" />
+                        Encargar Productos (Opcional)
+                      </FormLabel>
+                      <FormDescription className="text-sm">
+                        Añade productos a tu cita. Solo se muestran productos con stock.
+                      </FormDescription>
+                    </div>
+                    {isLoadingProducts ? (
+                      <div className="flex justify-center items-center py-4">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        <span className="ml-2">Cargando productos...</span>
+                      </div>
+                    ) : allProducts.length === 0 ? (
+                       <p className="text-sm text-muted-foreground text-center py-4">
+                          No hay productos disponibles para encargar en este momento.
+                       </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {allProducts.map((product) => (
+                          <FormField
+                            key={product.id}
+                            control={form.control}
+                            name="selectedProducts"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(product.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...(field.value || []), product.id])
+                                          : field.onChange(
+                                              (field.value || []).filter(
+                                                (value) => value !== product.id
+                                              )
+                                            )
+                                      }}
+                                      className="h-5 w-5"
+                                      disabled={(product.stock ?? 0) === 0}
+                                    />
+                                  </FormControl>
+                                  <div className="flex-grow">
+                                    <FormLabel className={cn("font-normal text-base cursor-pointer flex justify-between items-center w-full", (product.stock ?? 0) === 0 && "text-muted-foreground line-through")}>
+                                      <span>{product.name}</span>
+                                      <span className="text-sm text-primary font-medium">{product.price}</span>
+                                    </FormLabel>
+                                    {(product.stock ?? 0) === 0 && <p className="text-xs text-destructive">Agotado</p>}
+                                    <p className={cn("text-xs text-muted-foreground mt-0.5", (product.stock ?? 0) === 0 && "line-through")}>{product.description}</p>
+                                  </div>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="message"
@@ -656,15 +762,15 @@ export default function BookAppointmentPage() {
                <Button
                   type="submit"
                   className="w-full py-6 text-lg"
-                  disabled={isLoading || authLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings}
+                  disabled={isLoading || authLoading || !currentUser || isLoadingBookedSlots || isLoadingServices || isLoadingProducts || isLoadingSlotSettings}
                 >
                 <Loader2
                   className={cn(
                     "mr-2 h-5 w-5 animate-spin",
-                    (isLoading || authLoading ||isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings) ? "inline-block" : "hidden"
+                    (isLoading || authLoading ||isLoadingBookedSlots || isLoadingServices || isLoadingProducts || isLoadingSlotSettings) ? "inline-block" : "hidden"
                   )}
                 />
-                {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingSlotSettings ? (
+                {isLoading || isLoadingBookedSlots || isLoadingServices || isLoadingProducts || isLoadingSlotSettings ? (
                   'Procesando...'
                 ) : authLoading ? (
                   'Cargando sesión...'
@@ -699,7 +805,7 @@ export default function BookAppointmentPage() {
                 </p>
               </CardContent>
             </Card>
-          ) : isLoadingMyAppointments || isLoadingServices ? (
+          ) : isLoadingMyAppointments || isLoadingServices || isLoadingProducts ? (
             <div className="flex justify-center items-center py-10">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
               <p className="ml-3 text-muted-foreground">Cargando tus citas...</p>
@@ -737,6 +843,12 @@ export default function BookAppointmentPage() {
                       <span className="font-semibold">Servicios: </span>
                       {appt.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}
                     </div>
+                    {appt.selectedProducts && appt.selectedProducts.length > 0 && (
+                       <div>
+                        <span className="font-semibold">Productos Encargados: </span>
+                        {appt.selectedProducts.map(productId => productMap.get(productId) || productId).join(', ') || 'Ninguno'}
+                       </div>
+                    )}
                     {appt.message && (
                       <div>
                         <span className="font-semibold">Tu Mensaje: </span>
@@ -760,7 +872,7 @@ export default function BookAppointmentPage() {
                         Cancelar Cita
                       </Button>
                     )}
-                     {(appt.status === 'confirmed' || appt.status === 'pending' ) && ( // Show contact button also for pending if user wants to ask before admin confirms
+                     {(appt.status === 'confirmed' || appt.status === 'pending' ) && ( 
                       <Button
                         variant="outline"
                         size="sm"
@@ -788,6 +900,12 @@ export default function BookAppointmentPage() {
                 <strong className="text-foreground"> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })} a las {appointmentToCancel.preferredTime}</strong>?
                 <br/>
                 Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
+                {appointmentToCancel.selectedProducts && appointmentToCancel.selectedProducts.length > 0 && (
+                  <>
+                  <br/>
+                  Productos: {appointmentToCancel.selectedProducts.map(productId => productMap.get(productId) || productId).join(', ') || 'Ninguno'}.
+                  </>
+                )}
                 <br/>
                 {(appointmentToCancel.status === 'pending') && "Esta acción no se puede deshacer."}
                 {(appointmentToCancel.status === 'confirmed') && "Si tu cita ya estaba confirmada, esta acción notificará al barbero tu solicitud de cancelación. No es una cancelación automática."}
@@ -812,7 +930,7 @@ export default function BookAppointmentPage() {
       {selectedAppointmentForContact && (
         <Dialog open={contactAdminDialogOpen} onOpenChange={(isOpen) => {
             setContactAdminDialogOpen(isOpen);
-            if (!isOpen) setSelectedAppointmentForContact(null); // Clear selection on close
+            if (!isOpen) setSelectedAppointmentForContact(null); 
         }}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
