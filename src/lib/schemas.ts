@@ -70,7 +70,7 @@ export const productSchema = z.object({
 });
 export type ProductFormValues = z.infer<typeof productSchema>;
 
-// Service Form Schema
+// Service Form Schema (for booking page)
 export const serviceSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, { message: "El nombre del servicio debe tener al menos 3 caracteres." }),
@@ -87,3 +87,13 @@ export const adminEditUserSchema = z.object({
 });
 export type AdminEditUserFormValues = z.infer<typeof adminEditUserSchema>;
 
+// Home Page Service Card Schema
+export const homePageServiceSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, { message: "El nombre del servicio debe tener al menos 3 caracteres." }),
+  description: z.string().min(10, { message: "La descripción debe tener al menos 10 caracteres." }),
+  iconName: z.string().min(1, { message: "El nombre del ícono no puede estar vacío." }),
+  dataAiHint: z.string().min(2, { message: "La pista para IA debe tener al menos 2 caracteres." }),
+  order: z.coerce.number().min(0).optional().default(0), // For ordering display
+});
+export type HomePageServiceFormValues = z.infer<typeof homePageServiceSchema>;

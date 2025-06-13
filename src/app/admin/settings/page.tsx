@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -27,7 +28,11 @@ import {
 } from '@/components/ui/form';
 import { PageHeader } from '@/components/page-header';
 import { useAuth } from '@/context/AuthContext';
-import { siteSettingsSchema, type SiteSettingsFormValues, serviceSchema, type ServiceFormValues } from '@/lib/schemas';
+import { 
+  siteSettingsSchema, type SiteSettingsFormValues, 
+  serviceSchema, type ServiceFormValues,
+  homePageServiceSchema, type HomePageServiceFormValues
+} from '@/lib/schemas';
 import { 
   submitSiteSettings, 
   getServices, 
@@ -43,16 +48,24 @@ import {
   getAdminPhoneNumber,
   updateAdminPhoneNumber,
   type MessageTemplateId,
-  getSiteDetails, // Import getSiteDetails
+  getSiteDetails,
+  getHomePageServices,
+  addHomePageService,
+  updateHomePageService,
+  deleteHomePageService,
+  type HomePageService,
 } from '@/app/actions';
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon, HomeIcon, Image as ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label as UiLabel } from '@/components/ui/label'; 
+
+const validIconNames = ["Scissors", "StraightRazorIcon", "BeardTrimIcon", "Smile", "Gem", "FacialMassageIcon"];
+
 
 export default function AdminSettingsPage() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -60,12 +73,20 @@ export default function AdminSettingsPage() {
   const { toast } = useToast();
   const [isSubmittingSettings, setIsSubmittingSettings] = useState(false);
 
-  // States for Service Management
+  // States for Service Management (booking page)
   const [services, setServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isSubmittingService, setIsSubmittingService] = useState(false);
   const [showAddEditServiceForm, setShowAddEditServiceForm] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
+
+  // States for Home Page Service Card Management
+  const [homePageServices, setHomePageServices] = useState<HomePageService[]>([]);
+  const [isLoadingHomePageServices, setIsLoadingHomePageServices] = useState(false);
+  const [isSubmittingHomePageService, setIsSubmittingHomePageService] = useState(false);
+  const [showAddEditHomePageServiceForm, setShowAddEditHomePageServiceForm] = useState(false);
+  const [editingHomePageService, setEditingHomePageService] = useState<HomePageService | null>(null);
+
 
   // States for Time Slot Management
   const [timeSlotSettingsList, setTimeSlotSettingsList] = useState<TimeSlotSetting[]>([]);
@@ -91,8 +112,8 @@ export default function AdminSettingsPage() {
   const settingsForm = useForm<SiteSettingsFormValues>({
     resolver: zodResolver(siteSettingsSchema),
     defaultValues: {
-      siteName: '', // Will be populated from Firestore
-      siteDescription: '', // Will be populated from Firestore
+      siteName: '',
+      siteDescription: '',
     },
   });
 
@@ -102,6 +123,17 @@ export default function AdminSettingsPage() {
       name: '',
       description: '',
       price: 'ARS$ ',
+    },
+  });
+
+  const homePageServiceForm = useForm<HomePageServiceFormValues>({
+    resolver: zodResolver(homePageServiceSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      iconName: 'Scissors',
+      dataAiHint: '',
+      order: 0,
     },
   });
 
@@ -118,7 +150,6 @@ export default function AdminSettingsPage() {
     }
   }, [currentUser, authLoading, router, toast]);
 
-  // Fetch site details and populate form
   useEffect(() => {
     async function fetchAndSetSiteDetails() {
       if (currentUser?.email === 'joacoadmin@admin.com') {
@@ -132,7 +163,7 @@ export default function AdminSettingsPage() {
           console.error("Failed to fetch site details for admin settings:", error);
           toast({ title: 'Error', description: 'No se pudo cargar la configuración actual del sitio.', variant: 'destructive' });
            settingsForm.reset({
-            siteName: siteConfig.name, // Fallback to static config
+            siteName: siteConfig.name,
             siteDescription: siteConfig.description,
           });
         }
@@ -140,7 +171,7 @@ export default function AdminSettingsPage() {
     }
     fetchAndSetSiteDetails();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, settingsForm]);
+  }, [currentUser]);
 
 
   async function fetchAdminServices() {
@@ -153,9 +184,21 @@ export default function AdminSettingsPage() {
         return dateB - dateA; 
       }));
     } catch (error) {
-      toast({ title: 'Error', description: 'No se pudieron cargar los servicios.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'No se pudieron cargar los servicios de reserva.', variant: 'destructive' });
     } finally {
       setIsLoadingServices(false);
+    }
+  }
+
+  async function fetchAdminHomePageServices() {
+    setIsLoadingHomePageServices(true);
+    try {
+      const fetchedHomePageServices = await getHomePageServices();
+      setHomePageServices(fetchedHomePageServices.sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || (new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()) ));
+    } catch (error) {
+      toast({ title: 'Error', description: 'No se pudieron cargar los servicios de la página de inicio.', variant: 'destructive' });
+    } finally {
+      setIsLoadingHomePageServices(false);
     }
   }
 
@@ -212,6 +255,7 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     if (currentUser?.email === 'joacoadmin@admin.com') {
       fetchAdminServices();
+      fetchAdminHomePageServices();
       fetchTimeSlotSettingsAdmin();
       fetchMessageTemplates();
       fetchAdminContactSettings();
@@ -284,6 +328,64 @@ export default function AdminSettingsPage() {
     }
   }
 
+  // Home Page Service Handlers
+  const handleAddNewHomePageServiceClick = () => {
+    setEditingHomePageService(null);
+    homePageServiceForm.reset({
+      name: '',
+      description: '',
+      iconName: 'Scissors',
+      dataAiHint: '',
+      order: homePageServices.length > 0 ? Math.max(...homePageServices.map(s => s.order)) + 1 : 0,
+    });
+    setShowAddEditHomePageServiceForm(true);
+  };
+
+  const handleEditHomePageServiceClick = (service: HomePageService) => {
+    setEditingHomePageService(service);
+    homePageServiceForm.reset({
+      id: service.id,
+      name: service.name,
+      description: service.description,
+      iconName: service.iconName,
+      dataAiHint: service.dataAiHint,
+      order: service.order,
+    });
+    setShowAddEditHomePageServiceForm(true);
+  };
+
+  async function onHomePageServiceFormSubmit(data: HomePageServiceFormValues) {
+    setIsSubmittingHomePageService(true);
+    let result;
+    if (editingHomePageService && data.id) {
+      result = await updateHomePageService(data);
+    } else {
+      result = await addHomePageService(data);
+    }
+
+    if (result.success && result.service) {
+      toast({ title: editingHomePageService ? '¡Servicio de Inicio Actualizado!' : '¡Servicio de Inicio Añadido!', description: result.message });
+      fetchAdminHomePageServices(); 
+      homePageServiceForm.reset({name: '', description: '', iconName: 'Scissors', dataAiHint: '', order: 0});
+      setShowAddEditHomePageServiceForm(false);
+      setEditingHomePageService(null);
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo guardar el servicio de inicio.', variant: 'destructive' });
+    }
+    setIsSubmittingHomePageService(false);
+  }
+
+  async function handleDeleteHomePageService(serviceId: string) {
+    const result = await deleteHomePageService(serviceId);
+    if (result.success) {
+      toast({ title: '¡Servicio de Inicio Eliminado!', description: result.message });
+      setHomePageServices(prev => prev.filter(s => s.id !== serviceId));
+    } else {
+      toast({ title: 'Error', description: result.message || 'No se pudo eliminar el servicio de inicio.', variant: 'destructive' });
+    }
+  }
+
+
   async function handleTimeSlotToggle(time: string, isActive: boolean) {
     setIsUpdatingTimeSlot(time);
     const result = await updateTimeSlotSetting(time, isActive);
@@ -319,9 +421,8 @@ export default function AdminSettingsPage() {
 
   async function handleSaveAdminPhoneNumber() {
     setIsSubmittingAdminPhone(true);
-    // Basic validation for Argentinian numbers (can be improved)
     const cleanedPhone = adminPhoneNumber.replace(/\D/g, '');
-    if (!cleanedPhone.startsWith('54') || cleanedPhone.length < 11 ) { // e.g. 54911... or 5411...
+    if (!cleanedPhone.startsWith('54') || cleanedPhone.length < 11 ) { 
          toast({ title: 'Número Inválido', description: 'El formato debe ser Ej: 5491123456789 o 542211234567. Incluir código de país y área sin "+" ni espacios.', variant: 'destructive'});
          setIsSubmittingAdminPhone(false);
          return;
@@ -336,7 +437,7 @@ export default function AdminSettingsPage() {
     setIsSubmittingAdminPhone(false);
   }
   
-  if (authLoading || (currentUser && settingsForm.getValues().siteName === '')) { // Also check if form values are not yet populated
+  if (authLoading || (currentUser && settingsForm.getValues().siteName === '')) { 
     return (
       <div className="container mx-auto px-4 py-12 flex justify-center items-center min-h-[calc(100vh-10rem)]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -408,6 +509,139 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Home Page Services Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <HomeIcon className="h-5 w-5 mr-2 text-primary" />
+              Servicios Destacados (Página de Inicio)
+            </CardTitle>
+            <CardDescription>Gestiona las tarjetas de servicios que aparecen en la página principal.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!showAddEditHomePageServiceForm && (
+              <Button onClick={handleAddNewHomePageServiceClick} className="mb-6 w-full sm:w-auto">
+                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio Destacado
+              </Button>
+            )}
+
+            {showAddEditHomePageServiceForm && (
+              <Card className="mb-6 bg-secondary/30 p-0">
+                <CardHeader className="p-4">
+                  <CardTitle className="font-sans text-lg">
+                    {editingHomePageService ? 'Editar Servicio Destacado' : 'Nuevo Servicio Destacado'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <Form {...homePageServiceForm}>
+                    <form onSubmit={homePageServiceForm.handleSubmit(onHomePageServiceFormSubmit)} className="space-y-4">
+                      <FormField control={homePageServiceForm.control} name="name" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nombre del Servicio</FormLabel>
+                          <FormControl><Input placeholder="Ej: Corte de Pelo" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={homePageServiceForm.control} name="description" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descripción Breve</FormLabel>
+                          <FormControl><Textarea placeholder="Estilos clásicos y modernos." {...field} rows={2} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={homePageServiceForm.control} name="iconName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nombre del Ícono</FormLabel>
+                          <FormControl><Input placeholder="Ej: Scissors" {...field} /></FormControl>
+                          <FormDescription className="text-xs">Nombres válidos: {validIconNames.join(", ")}</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                       <FormField control={homePageServiceForm.control} name="dataAiHint" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pista para IA (Imagen)</FormLabel>
+                          <FormControl><Input placeholder="Ej: haircut barber" {...field} /></FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={homePageServiceForm.control} name="order" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Orden de Visualización</FormLabel>
+                          <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
+                          <FormDescription className="text-xs">Menor número aparece primero.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <div className="flex justify-end space-x-2 pt-2">
+                        <Button type="button" variant="outline" onClick={() => { setShowAddEditHomePageServiceForm(false); setEditingHomePageService(null); homePageServiceForm.reset(); }}>Cancelar</Button>
+                        <Button type="submit" disabled={isSubmittingHomePageService}>
+                          {isSubmittingHomePageService && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          {editingHomePageService ? 'Actualizar' : 'Añadir'}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            )}
+            
+            <h3 className="text-lg font-semibold mb-3 mt-4 text-foreground/90">Servicios Destacados Actuales</h3>
+            {isLoadingHomePageServices ? (
+              <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+            ) : homePageServices.length === 0 ? (
+              <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
+                <p className="font-medium">No hay servicios destacados configurados.</p>
+                <p className="text-sm">Añade algunos para que aparezcan en la página de inicio.</p>
+              </div>
+            ) : (
+              <ScrollArea className={showAddEditHomePageServiceForm ? "max-h-[250px] overflow-y-auto border rounded-md p-1" : "max-h-[400px] overflow-y-auto border rounded-md p-1"}>
+                <div className="space-y-3 p-3">
+                  {homePageServices.map(service => (
+                    <Card key={service.id} className="p-4 shadow-sm bg-card hover:bg-muted/20">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex-grow min-w-0 mb-2 sm:mb-0">
+                                <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name} (Orden: {service.order})</p>
+                                <p className="text-xs text-muted-foreground truncate" title={service.description}>{service.description}</p>
+                                <p className="text-xs text-muted-foreground/80">Ícono: {service.iconName}, Pista IA: {service.dataAiHint}</p>
+                            </div>
+                            <div className="flex-shrink-0 space-x-2 flex mt-2 sm:mt-0">
+                                <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 px-2 py-1 h-auto" onClick={() => handleEditHomePageServiceClick(service)}>
+                                <Edit3 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Editar</span>
+                                </Button> 
+                                <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="text-destructive hover:text-red-700 hover:bg-red-500/10 px-2 py-1 h-auto">
+                                    <Trash2 className="h-4 w-4 mr-1 sm:mr-0" /> <span className="sm:hidden">Eliminar</span>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                    <DialogTitle>Confirmar Eliminación</DialogTitle>
+                                    <DialogDescription>
+                                        ¿Estás seguro de que quieres eliminar el servicio destacado "{service.name}"?
+                                    </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter className="sm:justify-end">
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="outline">Cancelar</Button>
+                                    </DialogClose>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="destructive" onClick={() => handleDeleteHomePageService(service.id)}>Eliminar</Button>
+                                    </DialogClose>
+                                    </DialogFooter>
+                                </DialogContent>
+                                </Dialog>
+                            </div>
+                        </div>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Admin Contact Configuration */}
         <Card>
             <CardHeader>
@@ -449,16 +683,16 @@ export default function AdminSettingsPage() {
         </Card>
 
 
-        {/* Services Configuration */}
+        {/* Services Configuration (Booking Page) */}
         <Card>
           <CardHeader>
-            <CardTitle>Gestión de Servicios</CardTitle>
-            <CardDescription>Añade, edita o elimina los servicios ofrecidos. Estos servicios se mostrarán en la página de reservas.</CardDescription>
+            <CardTitle>Gestión de Servicios (Página de Reservas)</CardTitle>
+            <CardDescription>Añade, edita o elimina los servicios ofrecidos en la página de reservas. Estos son los servicios que los clientes pueden seleccionar al agendar una cita.</CardDescription>
           </CardHeader>
           <CardContent>
             {!showAddEditServiceForm && (
               <Button onClick={handleAddNewServiceClick} className="mb-6 w-full sm:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Nuevo Servicio
+                <PlusCircle className="mr-2 h-4 w-4" /> Añadir Nuevo Servicio de Reserva
               </Button>
             )}
 
@@ -466,7 +700,7 @@ export default function AdminSettingsPage() {
               <Card className="mb-6 bg-secondary/30 p-0">
                 <CardHeader className="p-4">
                   <CardTitle className="font-sans text-lg">
-                    {editingService ? 'Editar Servicio' : 'Nuevo Servicio'}
+                    {editingService ? 'Editar Servicio de Reserva' : 'Nuevo Servicio de Reserva'}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
@@ -506,14 +740,14 @@ export default function AdminSettingsPage() {
               </Card>
             )}
             
-            <h3 className="text-lg font-semibold mb-3 mt-4 text-foreground/90">Servicios Actuales</h3>
+            <h3 className="text-lg font-semibold mb-3 mt-4 text-foreground/90">Servicios de Reserva Actuales</h3>
             {isLoadingServices ? (
               <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
             ) : services.length === 0 ? (
               <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
                 <PackageSearch className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
-                <p className="font-medium">No hay servicios configurados.</p>
-                <p className="text-sm">Empieza añadiendo uno nuevo para que aparezcan en la página de reservas.</p>
+                <p className="font-medium">No hay servicios de reserva configurados.</p>
+                <p className="text-sm">Añade servicios para que los clientes puedan seleccionarlos al reservar.</p>
               </div>
             ) : (
               <ScrollArea className={showAddEditServiceForm ? "max-h-[250px] overflow-y-auto border rounded-md p-1" : "max-h-[400px] overflow-y-auto border rounded-md p-1"}>

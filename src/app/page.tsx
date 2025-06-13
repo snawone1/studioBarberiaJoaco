@@ -1,9 +1,13 @@
 
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Scissors, Smile, Gem } from 'lucide-react';
+import { Scissors, Smile, Gem, Loader2, AlertTriangleIcon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { getHomePageServices, type HomePageService } from '@/app/actions';
 
 //  SVG Straight Razor
 const StraightRazorIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -30,29 +34,47 @@ const BeardTrimIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // Custom SVG for Facial Massage
 const FacialMassageIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    {/* Capa cara (ovalo simple ) */}
     <ellipse cx="12" cy="13" rx="5" ry="7" />
-    {/* Eyes (dots) */}
     <circle cx="10" cy="11.5" r="0.5" fill="currentColor" stroke="none" />
     <circle cx="14" cy="11.5" r="0.5" fill="currentColor" stroke="none" />
-    {/* Mouth (line) */}
     <line x1="10" y1="15.5" x2="14" y2="15.5" />
-    {/* Hands (curves on cheeks) */}
     <path d="M6.5 15.5c-1-1-1.5-2.5-.5-4" />
     <path d="M17.5 15.5c1-1 1.5-2.5.5-4" />
   </svg>
 );
 
-const services = [
-  { name: "Corte de pelo", description: "Estilos clásicos y modernos.", icon: Scissors, dataAiHint: "haircut barber" },
-  { name: "Afeitado", description: "Afeitado tradicional con navaja.", icon: StraightRazorIcon, dataAiHint: "shave razor" },
-  { name: "Corte de barba", description: "Define y cuida tu barba.", icon: BeardTrimIcon, dataAiHint: "beard trim grooming" },
-  { name: "Corte para niños", description: "Cortes divertidos y cómodos.", icon: Smile, dataAiHint: "kids haircut child" },
-  { name: "Afeitado característico", description: "Experiencia de afeitado premium.", icon: Gem, dataAiHint: "premium shave luxury" },
-  { name: "Masaje facial", description: "Relajación y cuidado de la piel.", icon: FacialMassageIcon, dataAiHint: "facial massage care" },
-];
+const iconMap: { [key: string]: React.ElementType } = {
+  Scissors: Scissors,
+  Smile: Smile,
+  Gem: Gem,
+  StraightRazorIcon: StraightRazorIcon,
+  BeardTrimIcon: BeardTrimIcon,
+  FacialMassageIcon: FacialMassageIcon,
+};
+
 
 export default function HomePage() {
+  const [services, setServices] = useState<HomePageService[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadServices() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const fetchedServices = await getHomePageServices();
+        setServices(fetchedServices);
+      } catch (e) {
+        console.error("Failed to load home page services:", e);
+        setError("No se pudieron cargar los servicios. Inténtalo de nuevo más tarde.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadServices();
+  }, []);
+
   return (
     <div className="container mx-auto px-4 py-12 md:py-16 space-y-16 md:space-y-24">
       {/* Hero Section */}
@@ -83,19 +105,43 @@ export default function HomePage() {
       {/* Services Section */}
       <section className="py-12">
         <h2 className="text-4xl font-bold text-center mb-12 font-headline text-primary">Nuestros Servicios</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {services.map((service) => (
-            <Card key={service.name} className="bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl flex flex-col items-center text-center p-6 md:p-8">
-              <CardHeader className="p-0 mb-4">
-                <service.icon className="h-12 w-12 md:h-14 md:w-14 text-primary" />
-              </CardHeader>
-              <CardContent className="p-0 flex-grow flex flex-col justify-center">
-                <CardTitle className="text-xl md:text-2xl font-semibold mb-1 text-card-foreground font-headline">{service.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{service.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {isLoading && (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="ml-4 text-lg text-muted-foreground">Cargando servicios...</p>
+          </div>
+        )}
+        {error && (
+          <div className="text-center py-10 text-destructive flex flex-col items-center">
+            <AlertTriangleIcon className="h-10 w-10 mb-2"/>
+            <p className="text-lg">{error}</p>
+          </div>
+        )}
+        {!isLoading && !error && services.length === 0 && (
+          <div className="text-center py-10 text-muted-foreground">
+            <Scissors className="h-12 w-12 mx-auto mb-3 opacity-50"/>
+            <p className="text-lg">Actualmente no hay servicios destacados para mostrar.</p>
+            <p className="text-sm">Por favor, añádelos desde el panel de administración.</p>
+          </div>
+        )}
+        {!isLoading && !error && services.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {services.map((service) => {
+              const IconComponent = iconMap[service.iconName] || Scissors; // Default to Scissors if iconName is not found
+              return (
+                <Card key={service.id} className="bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-xl flex flex-col items-center text-center p-6 md:p-8">
+                  <CardHeader className="p-0 mb-4">
+                    <IconComponent className="h-12 w-12 md:h-14 md:w-14 text-primary" data-ai-hint={service.dataAiHint} />
+                  </CardHeader>
+                  <CardContent className="p-0 flex-grow flex flex-col justify-center">
+                    <CardTitle className="text-xl md:text-2xl font-semibold mb-1 text-card-foreground font-headline">{service.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{service.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </section>
     </div>
   );

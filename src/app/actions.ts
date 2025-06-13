@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues, AdminEditUserFormValues } from '@/lib/schemas';
+import type { AppointmentFormValues, SiteSettingsFormValues, StyleAdvisorFormValues, ProductFormValues, ServiceFormValues, AdminEditUserFormValues, HomePageServiceFormValues } from '@/lib/schemas';
 import { getStyleRecommendationWithServices } from '@/ai/flows/style-recommendation-with-services';
 import type { Product } from '@/app/products/page';
 import { revalidatePath } from 'next/cache';
@@ -14,10 +14,11 @@ import { siteConfig } from '@/config/site';
 const appointmentsCollectionRef = collection(firestore, 'appointments');
 const productsCollectionRef = collection(firestore, 'products');
 const usersCollectionRef = collection(firestore, 'users');
-const servicesCollectionRef = collection(firestore, 'services');
+const servicesCollectionRef = collection(firestore, 'services'); // For booking page services
 const timeSlotSettingsCollectionRef = collection(firestore, 'timeSlotSettings');
 const messageTemplatesCollectionRef = collection(firestore, 'messageTemplates');
 const appSettingsCollectionRef = collection(firestore, 'appSettings');
+const homePageServicesCollectionRef = collection(firestore, 'homePageServices'); // For home page services
 
 
 // --- User Types ---
@@ -39,13 +40,13 @@ export type Appointment = {
   userPhone?: string;
   preferredDate: string;
   preferredTime: string;
-  services: string[];
+  services: string[]; // These are IDs from the 'services' collection
   message?: string;
   status: string;
   createdAt: string;
 };
 
-// --- Service Type ---
+// --- Service Type (for booking page) ---
 export type Service = {
   id: string;
   name: string;
@@ -53,6 +54,18 @@ export type Service = {
   price: string;
   createdAt?: string;
 };
+
+// --- Home Page Service Type ---
+export type HomePageService = {
+  id: string;
+  name: string;
+  description: string;
+  iconName: string;
+  dataAiHint: string;
+  order: number;
+  createdAt?: string;
+};
+
 
 // --- Time Slot Settings Types ---
 export type TimeSlotSetting = {
@@ -473,7 +486,8 @@ export async function submitSiteSettings(data: SiteSettingsFormValues): Promise<
 // --- Product Management Actions ---
 export async function getProducts(): Promise<Product[]> {
   try {
-    const querySnapshot = await getDocs(productsCollectionRef);
+    const q = query(productsCollectionRef, orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
     const products = querySnapshot.docs.map(docSnap => {
       const data = docSnap.data();
       let imageSrcVal = 'https://placehold.co/400x400.png';
@@ -489,7 +503,7 @@ export async function getProducts(): Promise<Product[]> {
         imageSrc: imageSrcVal,
         aiHint: data.aiHint || '',
         stock: typeof data.stock === 'number' ? data.stock : 0,
-        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : undefined,
+        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : new Date(0).toISOString(),
       } as Product;
     });
     return products;
@@ -585,7 +599,7 @@ export async function deleteProduct(productId: string) {
 }
 
 
-// --- Service Management Actions ---
+// --- Service Management Actions (for booking page) ---
 export async function getServices(): Promise<Service[]> {
   try {
     const q = query(servicesCollectionRef, orderBy('name', 'asc'));
@@ -677,6 +691,111 @@ export async function deleteService(serviceId: string) {
     return { success: false, message: 'Error al eliminar el servicio.' };
   }
 }
+
+// --- Home Page Service Card Actions ---
+export async function getHomePageServices(): Promise<HomePageService[]> {
+  try {
+    const q = query(homePageServicesCollectionRef, orderBy('order', 'asc'), orderBy('createdAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    const homeServices = querySnapshot.docs.map(docSnap => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        name: data.name || 'Unnamed Service',
+        description: data.description || '',
+        iconName: data.iconName || 'Scissors', // Default icon if not set
+        dataAiHint: data.dataAiHint || 'service',
+        order: typeof data.order === 'number' ? data.order : 0,
+        createdAt: data.createdAt ? (data.createdAt as Timestamp).toDate().toISOString() : new Date(0).toISOString(),
+      } as HomePageService;
+    });
+    return homeServices;
+  } catch (error: any) {
+    console.error("Error fetching home page services from Firestore:", error);
+    if (error.code === 'failed-precondition') {
+        console.error("IMPORTANT: Firestore 'failed-precondition' error for homePageServices query. This might mean a composite index on 'order' (asc) and 'createdAt' (desc) is required in 'homePageServices' collection. Check Firestore console.");
+    }
+    return [];
+  }
+}
+
+export async function addHomePageService(data: HomePageServiceFormValues) {
+  try {
+    const serviceDataToAdd = {
+      name: data.name,
+      description: data.description,
+      iconName: data.iconName,
+      dataAiHint: data.dataAiHint,
+      order: data.order ?? 0,
+      createdAt: Timestamp.now()
+    };
+    const docRef = await addDoc(homePageServicesCollectionRef, serviceDataToAdd);
+    const newService: HomePageService = {
+      id: docRef.id,
+      ...serviceDataToAdd,
+      createdAt: serviceDataToAdd.createdAt.toDate().toISOString(),
+    };
+    revalidatePath('/');
+    revalidatePath('/admin/settings');
+    return { success: true, message: 'Servicio de página de inicio añadido con éxito.', service: newService };
+  } catch (error) {
+    console.error("Error adding home page service to Firestore:", error);
+    return { success: false, message: 'Error al añadir el servicio de página de inicio.' };
+  }
+}
+
+export async function updateHomePageService(data: HomePageServiceFormValues) {
+  if (!data.id) {
+    return { success: false, message: 'Home Page Service ID is missing for update.' };
+  }
+  try {
+    const serviceDocRef = doc(firestore, 'homePageServices', data.id);
+    const serviceDataToUpdate = {
+      name: data.name,
+      description: data.description,
+      iconName: data.iconName,
+      dataAiHint: data.dataAiHint,
+      order: data.order ?? 0,
+    };
+    await updateDoc(serviceDocRef, serviceDataToUpdate);
+
+    const updatedDocSnap = await getDoc(serviceDocRef);
+     if (!updatedDocSnap.exists()) {
+        return { success: false, message: 'Failed to retrieve updated home page service.' };
+    }
+    const updatedData = updatedDocSnap.data();
+    const updatedService: HomePageService = {
+      id: updatedDocSnap.id,
+      name: updatedData.name,
+      description: updatedData.description,
+      iconName: updatedData.iconName,
+      dataAiHint: updatedData.dataAiHint,
+      order: updatedData.order,
+      createdAt: updatedData.createdAt ? (updatedData.createdAt as Timestamp).toDate().toISOString() : undefined,
+    };
+
+    revalidatePath('/');
+    revalidatePath('/admin/settings');
+    return { success: true, message: 'Servicio de página de inicio actualizado con éxito.', service: updatedService };
+  } catch (error) {
+    console.error("Error updating home page service in Firestore:", error);
+    return { success: false, message: 'Error al actualizar el servicio de página de inicio.' };
+  }
+}
+
+export async function deleteHomePageService(serviceId: string) {
+  try {
+    const serviceDocRef = doc(firestore, 'homePageServices', serviceId);
+    await deleteDoc(serviceDocRef);
+    revalidatePath('/');
+    revalidatePath('/admin/settings');
+    return { success: true, message: 'Servicio de página de inicio eliminado con éxito.' };
+  } catch (error) {
+    console.error("Error deleting home page service from Firestore:", error);
+    return { success: false, message: 'Error al eliminar el servicio de página de inicio.' };
+  }
+}
+
 
 // --- Time Slot Settings Actions ---
 export async function getTimeSlotSettings(): Promise<TimeSlotSetting[]> {
@@ -780,4 +899,3 @@ export async function updateAdminPhoneNumber(phoneNumber: string) {
     return { success: false, message: 'Error al actualizar el número de teléfono del administrador.' };
   }
 }
-    
