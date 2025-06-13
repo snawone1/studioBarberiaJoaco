@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -53,7 +54,7 @@ import {
 } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, MessageSquare, ShoppingBag } from 'lucide-react';
+import { ShieldAlert, Settings, Users, CalendarCheck, Package, PlusCircle, Trash2, Loader2, Edit3, XCircle, PackageSearch, CalendarDays, UserCircle2, CheckCircle, XIcon, PlayCircle, Phone, Mail, MessageSquare, ShoppingBag, ArrowLeft } from 'lucide-react';
 import type { Product } from '@/app/products/page';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -547,7 +548,7 @@ export default function AdminPage() {
             </DialogHeader>
 
             <Tabs value={activeAppointmentTab} onValueChange={(value) => setActiveAppointmentTab(value as AppointmentStatus | 'all')} className="w-full mt-4">
-              <TabsList className="flex w-full overflow-x-auto pb-2 justify-start md:justify-center">
+              <TabsList className="flex w-full overflow-x-auto pb-2 justify-start md:grid md:grid-cols-5 md:overflow-visible">
                 {appointmentTabs.map(tab => (
                   <TabsTrigger key={tab.value} value={tab.value} className="whitespace-nowrap">{tab.label}</TabsTrigger>
                 ))}
@@ -1125,4 +1126,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
 
