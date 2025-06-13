@@ -23,7 +23,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
+  AlertDialogDescription as AlertDialogPrimitiveDescription, // Renamed to avoid conflict
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -547,7 +547,7 @@ export default function AdminPage() {
             </DialogHeader>
 
             <Tabs value={activeAppointmentTab} onValueChange={(value) => setActiveAppointmentTab(value as AppointmentStatus | 'all')} className="w-full mt-4">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-5">
                 {appointmentTabs.map(tab => (
                   <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
                 ))}
@@ -903,9 +903,9 @@ export default function AdminPage() {
                               <DialogContent className="sm:max-w-md">
                                 <DialogHeader>
                                   <DialogTitle>Confirmar Eliminación</DialogTitle>
-                                  <DialogDescription>
+                                  <AlertDialogPrimitiveDescription>
                                     ¿Estás seguro de que quieres eliminar el producto "{product.name}"? Esta acción no se puede deshacer.
-                                  </DialogDescription>
+                                  </AlertDialogPrimitiveDescription>
                                 </DialogHeader>
                                 <DialogFooter className="sm:justify-end">
                                   <DialogClose asChild>
@@ -947,18 +947,25 @@ export default function AdminPage() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Confirmar Cita</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogPrimitiveDescription>
                 Estás a punto de confirmar la siguiente cita:
-                <div className="mt-2 text-sm text-foreground space-y-1">
-                  <div><strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}</div>
-                  <div><strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}</div>
-                  <div><strong>Hora:</strong> {appointmentToConfirm.preferredTime}</div>
-                  <div><strong>Servicios:</strong> {appointmentToConfirm.services.map(id => serviceMap.get(id) || id).join(', ')}</div>
+                <br />
+                <span className="mt-2 text-sm text-foreground space-y-1">
+                  <strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}
+                  <br />
+                  <strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}
+                  <br />
+                  <strong>Hora:</strong> {appointmentToConfirm.preferredTime}
+                  <br />
+                  <strong>Servicios:</strong> {appointmentToConfirm.services.map(id => serviceMap.get(id) || id).join(', ')}
                   {appointmentToConfirm.selectedProducts && appointmentToConfirm.selectedProducts.length > 0 && (
-                    <div><strong>Productos:</strong> {appointmentToConfirm.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}</div>
+                    <>
+                      <br />
+                      <strong>Productos:</strong> {appointmentToConfirm.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}
+                    </>
                   )}
-                </div>
-              </AlertDialogDescription>
+                </span>
+              </AlertDialogPrimitiveDescription>
             </AlertDialogHeader>
             <div className="flex items-center space-x-2 my-4">
               <Checkbox
@@ -1001,18 +1008,25 @@ export default function AdminPage() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Confirmar Cancelación</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogPrimitiveDescription>
                 Estás a punto de cancelar la siguiente cita:
-                <div className="mt-2 text-sm text-foreground space-y-1">
-                  <div><strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}</div>
-                  <div><strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}</div>
-                  <div><strong>Hora:</strong> {appointmentToCancel.preferredTime}</div>
-                  <div><strong>Servicios:</strong> {appointmentToCancel.services.map(id => serviceMap.get(id) || id).join(', ')}</div>
+                <br />
+                <span className="mt-2 text-sm text-foreground space-y-1">
+                  <strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}
+                  <br />
+                  <strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}
+                  <br />
+                  <strong>Hora:</strong> {appointmentToCancel.preferredTime}
+                  <br />
+                  <strong>Servicios:</strong> {appointmentToCancel.services.map(id => serviceMap.get(id) || id).join(', ')}
                   {appointmentToCancel.selectedProducts && appointmentToCancel.selectedProducts.length > 0 && (
-                    <div><strong>Productos:</strong> {appointmentToCancel.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}</div>
+                     <>
+                      <br />
+                      <strong>Productos:</strong> {appointmentToCancel.selectedProducts.map(id => productMapAdmin.get(id) || id).join(', ')}
+                    </>
                   )}
-                </div>
-              </AlertDialogDescription>
+                </span>
+              </AlertDialogPrimitiveDescription>
             </AlertDialogHeader>
             <div className="flex items-center space-x-2 my-4">
               <Checkbox
@@ -1111,3 +1125,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

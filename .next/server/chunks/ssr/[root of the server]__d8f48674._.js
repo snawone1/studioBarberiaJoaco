@@ -844,7 +844,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateUserDetail(data) 
     }
 }
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentRequest(data) {
-    console.log("[submitAppointmentRequest] Received data with userId:", data.userId);
+    console.log("[submitAppointmentRequest] Received data with userId:", data.userId, "and products:", data.selectedProducts);
     try {
         const clientPreferredDate = data.preferredDate;
         const normalizedPreferredDateObject = new Date(clientPreferredDate);
@@ -868,6 +868,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ submitAppointmentReques
             preferredDate: preferredDateTimestamp,
             preferredTime: data.preferredTime,
             services: data.services,
+            selectedProducts: data.selectedProducts || [],
             message: data.message || '',
             status: 'pending',
             createdAt: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["Timestamp"].now()
@@ -944,6 +945,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getAppointments() {
                 preferredDate: preferredDateISO,
                 preferredTime: data.preferredTime || 'N/A',
                 services: Array.isArray(data.services) ? data.services : [],
+                selectedProducts: Array.isArray(data.selectedProducts) ? data.selectedProducts : [],
                 message: data.message || '',
                 status: data.status || 'unknown',
                 createdAt: createdAtISO
@@ -1008,6 +1010,7 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getUserAppointments(use
                 preferredDate: preferredDateISO,
                 preferredTime: data.preferredTime || 'N/A',
                 services: Array.isArray(data.services) ? data.services : [],
+                selectedProducts: Array.isArray(data.selectedProducts) ? data.selectedProducts : [],
                 message: data.message || '',
                 status: data.status || 'unknown',
                 createdAt: createdAtISO
@@ -1577,10 +1580,10 @@ async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ updateTimeSlotSetting(t
     }
 }
 // --- WhatsApp Message Template & Admin Contact Actions ---
-const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. ¡Te esperamos!`;
-const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
-const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nGracias.`;
-const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
+const DEFAULT_CONFIRMATION_TEMPLATE = `Hola {{clientName}}, tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} ha sido CONFIRMADA. Servicios: {{servicesList}}. Productos: {{productsList}}. ¡Te esperamos!`;
+const DEFAULT_CANCELLATION_TEMPLATE = `Hola {{clientName}}, lamentamos informarte que tu cita en ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name} para el {{appointmentDate}} a las {{appointmentTime}} (Servicios: {{servicesList}}, Productos: {{productsList}}) ha sido CANCELADA. Por favor, contáctanos si deseas reprogramar.`;
+const DEFAULT_ADMIN_CONTACT_CANCELLATION_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, quisiera solicitar la cancelación de mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nProductos: {{productsList}}\nGracias.`;
+const DEFAULT_ADMIN_CONTACT_QUERY_TEMPLATE = `Hola ${__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$config$2f$site$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["siteConfig"].name}, tengo una consulta sobre mi cita.\nCliente: {{clientName}}\nFecha: {{appointmentDate}}\nHora: {{appointmentTime}}\nServicios: {{servicesList}}\nProductos: {{productsList}}\nMi consulta es: [ESCRIBE TU CONSULTA AQUÍ]\nGracias.`;
 async function /*#__TURBOPACK_DISABLE_EXPORT_MERGING__*/ getMessageTemplate(templateId) {
     try {
         const templateDocRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$firebase$2f$firestore$2f$dist$2f$index$2e$node$2e$mjs__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["doc"])(messageTemplatesCollectionRef, templateId);

@@ -14,8 +14,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -23,7 +31,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "00341173e521f89c1eccb89137a0c821c5b391297b": {
@@ -40,8 +50,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -49,7 +67,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "0035970fe75c1458b3307dd66a4d7ba82bd85edc12": {
@@ -66,8 +86,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -75,7 +103,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "005ce712c32342acd38082636e5dc614daa6adfb4c": {
@@ -92,8 +122,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -101,7 +139,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "008945fd2a69b2f92ca2e307a103b4c75c7dee6185": {
@@ -118,8 +158,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -127,7 +175,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "00aaf5332ffa4cedc291e72856e927bad15d539ae0": {
@@ -144,8 +194,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -153,7 +211,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "00e12f5822ed0746140d44f336b07b380a4b412e88": {
@@ -170,8 +230,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -179,7 +247,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "00e84c300fdf537aa199023c4a6d4f8cd1678840ab": {
@@ -196,8 +266,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -205,7 +283,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40020c7f81da5ff8ebd3d0c98ce14b665f30caabc6": {
@@ -222,8 +302,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -231,7 +319,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "4016066102b7c3e8f3c6d97016f14a0414695eafbe": {
@@ -248,8 +338,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -257,7 +355,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "402b7e3dbb32f5d64dc86bf0b32408259fdcfe92a3": {
@@ -274,8 +374,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -283,7 +391,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "402e89c30120e3199bf7b7164003300e5d32c67d2d": {
@@ -300,8 +410,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -309,7 +427,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "403ae2a056240a7b05158dbd8cd8643fead18f1fd4": {
@@ -326,8 +446,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -335,7 +463,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "4054b8264a9d1e80f44742f2f7567713c22e089825": {
@@ -352,8 +482,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -361,7 +499,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "4062447815821ef3ddc46154612af223cd5604e4f9": {
@@ -378,8 +518,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -387,7 +535,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40857648b9877f2e0a8188dfad6f3147ad4a905c2c": {
@@ -404,8 +554,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -413,7 +571,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "408c3740241a917b864710f949e092258b8e366293": {
@@ -430,8 +590,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -439,7 +607,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40a7151c7200c725962ec313e9e769b68883d0a7c8": {
@@ -456,8 +626,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -465,7 +643,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40b73813f0c82410f254a24b32409f7189a1b1ac0c": {
@@ -482,8 +662,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -491,7 +679,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40bbf7ab092ba0a43385c3b484dd292298891fc1d4": {
@@ -508,8 +698,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -517,7 +715,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40caf416edbb707356716f925239e16c8970013236": {
@@ -534,8 +734,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -543,7 +751,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40cb18cfde7898d1c1d082dc9266894eb9881f296d": {
@@ -560,8 +770,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -569,7 +787,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40da10036fe76165f7bdab3c65eb3a9e264a1a604e": {
@@ -586,8 +806,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -595,7 +823,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40e8caa2e4508de437dd356a72f607887f92f6b53b": {
@@ -612,8 +842,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -621,7 +859,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40eac7d4fc402c740264556fcc123d86b3754e3b2b": {
@@ -638,8 +878,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -647,7 +895,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "604b87f51c9e11bbc2905b6d8c9ac9f150a2f257c4": {
@@ -664,8 +914,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -673,7 +931,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "609cf67585d37e0cbe7cd6fe830c9d97938dc39f1a": {
@@ -690,8 +950,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -699,7 +967,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "70df8604b55fb28ca85f574dd721ecefbfd80a9cdf": {
@@ -716,8 +986,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -725,7 +1003,9 @@
         "app/admin/page": "action-browser",
         "app/admin/settings/page": "action-browser",
         "app/book/page": "action-browser",
-        "app/page": "action-browser"
+        "app/login/page": "action-browser",
+        "app/page": "action-browser",
+        "app/products/page": "action-browser"
       }
     },
     "40069a173bd2f67e3484d5fa8f5081c7875044c198": {
@@ -742,8 +1022,16 @@
           "moduleId": "[project]/.next-internal/server/app/book/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         },
+        "app/login/page": {
+          "moduleId": "[project]/.next-internal/server/app/login/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
         "app/page": {
           "moduleId": "[project]/.next-internal/server/app/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        },
+        "app/products/page": {
+          "moduleId": "[project]/.next-internal/server/app/products/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/src/ai/flows/style-recommendation-with-services.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
           "async": false
         }
       },
@@ -751,7 +1039,9 @@
         "app/admin/page": "rsc",
         "app/admin/settings/page": "rsc",
         "app/book/page": "rsc",
-        "app/page": "rsc"
+        "app/login/page": "rsc",
+        "app/page": "rsc",
+        "app/products/page": "rsc"
       }
     }
   },

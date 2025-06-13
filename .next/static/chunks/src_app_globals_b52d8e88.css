@@ -539,6 +539,11 @@ h1, h2, h3, h4, h5, h6 {
   margin-right: -.25rem;
 }
 
+.mx-1 {
+  margin-left: .25rem;
+  margin-right: .25rem;
+}
+
 .mx-2 {
   margin-left: .5rem;
   margin-right: .5rem;
@@ -818,8 +823,8 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 200px;
 }
 
-.max-h-\[250px\] {
-  max-height: 250px;
+.max-h-\[350px\] {
+  max-height: 350px;
 }
 
 .max-h-\[400px\] {
@@ -988,6 +993,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .max-w-2xl {
   max-width: 42rem;
+}
+
+.max-w-3xl {
+  max-width: 48rem;
 }
 
 .max-w-\[--skeleton-width\] {
@@ -1951,6 +1960,10 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration-line: underline;
 }
 
+.line-through {
+  text-decoration-line: line-through;
+}
+
 .underline-offset-4 {
   text-underline-offset: 4px;
 }
@@ -2390,6 +2403,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .hover\:underline:hover {
   text-decoration-line: underline;
+}
+
+.hover\:no-underline:hover {
+  text-decoration-line: none;
 }
 
 .hover\:opacity-100:hover {
