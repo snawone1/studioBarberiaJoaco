@@ -988,6 +988,10 @@ h1, h2, h3, h4, h5, h6 {
   width: var(--radix-popover-trigger-width);
 }
 
+.w-\[var\(--radix-popover-trigger-width\)\] {
+  width: var(--radix-popover-trigger-width);
+}
+
 .min-w-0 {
   min-width: 0;
 }

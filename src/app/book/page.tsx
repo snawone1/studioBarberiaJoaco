@@ -751,9 +751,9 @@ export default function BookAppointmentPage() {
                                 <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isProductPopoverOpen ? 'rotate-180' : ''}`} />
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2">
                               <ScrollArea className="max-h-72">
-                                <div className="p-4 space-y-2">
+                                <div className="space-y-2">
                                   {popoverProducts.map((product) => (
                                     <FormItem
                                       key={product.id}
@@ -1047,3 +1047,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    
