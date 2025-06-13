@@ -79,6 +79,13 @@ const MIN_ADVANCE_BOOKING_MINUTES = 15;
 const now = new Date();
 const PRODUCTS_TO_SHOW_INLINE = 2;
 
+// Helper function to create a displayable date from a UTC date string
+const getDisplayableDate = (isoString: string): Date => {
+  const d = new Date(isoString);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
+
 export default function BookAppointmentPage() {
   const { toast } = useToast();
   const { currentUser, loading: authLoading } = useAuth(); 
@@ -399,7 +406,7 @@ export default function BookAppointmentPage() {
       const productsText = productNames.join(', ') || 'Ninguno';
       
       const clientName = currentUser.displayName || currentUser.email || 'Cliente';
-      const apptDate = format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es });
+      const apptDate = format(getDisplayableDate(selectedAppointmentForContact.preferredDate), "PPP", { locale: es });
       const apptTime = selectedAppointmentForContact.preferredTime;
 
       messageContent = messageContent
@@ -897,10 +904,10 @@ export default function BookAppointmentPage() {
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle className="text-lg font-sans">
-                          {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
+                          {format(getDisplayableDate(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
                         </CardTitle>
                         <CardDescription className="text-xs pt-1">
-                          Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
+                          Solicitada: {format(getDisplayableDate(appt.createdAt), "Pp", { locale: es })}
                         </CardDescription>
                       </div>
                       <Badge variant={getStatusVariant(appt.status)} className="capitalize text-xs px-2 py-0.5">{appt.status}</Badge>
@@ -965,7 +972,7 @@ export default function BookAppointmentPage() {
               <AlertDialogTitle className="flex items-center"><AlertCircle className="h-5 w-5 mr-2 text-destructive"/>¿Confirmar Cancelación?</AlertDialogTitle>
               <AlertDialogDescription>
                 ¿Estás seguro de que quieres cancelar tu cita para el
-                <strong className="text-foreground"> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })} a las {appointmentToCancel.preferredTime}</strong>?
+                <strong className="text-foreground"> {format(getDisplayableDate(appointmentToCancel.preferredDate), "PPP", { locale: es })} a las {appointmentToCancel.preferredTime}</strong>?
                 <br/>
                 Servicios: {appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId).join(', ')}.
                 {appointmentToCancel.selectedProducts && appointmentToCancel.selectedProducts.length > 0 && (
@@ -1007,7 +1014,7 @@ export default function BookAppointmentPage() {
                 Contactar al Barbero
               </DialogTitle>
               <DialogPrimitiveDescription>
-                Selecciona una opción para comunicarte por WhatsApp sobre tu cita del <strong className="text-foreground">{format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es })} a las {selectedAppointmentForContact.preferredTime}</strong>.
+                Selecciona una opción para comunicarte por WhatsApp sobre tu cita del <strong className="text-foreground">{format(getDisplayableDate(selectedAppointmentForContact.preferredDate), "PPP", { locale: es })} a las {selectedAppointmentForContact.preferredTime}</strong>.
               </DialogPrimitiveDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 gap-4 py-4">
@@ -1047,5 +1054,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

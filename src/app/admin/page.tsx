@@ -69,6 +69,12 @@ import type { Service } from '@/app/actions';
 
 type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
+// Helper function to create a displayable date from a UTC date string
+const getDisplayableDate = (isoString: string): Date => {
+  const d = new Date(isoString);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
 export default function AdminPage() {
   const { currentUser, loading } = useAuth();
   const router = useRouter();
@@ -295,7 +301,7 @@ export default function AdminPage() {
         try {
           let messageContent = await getMessageTemplate('confirmation');
           const clientName = appointmentToConfirm.userName;
-          const apptDate = format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es });
+          const apptDate = format(getDisplayableDate(appointmentToConfirm.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToConfirm.preferredTime;
           
           const serviceNames = appointmentToConfirm.services.map(serviceId => serviceMap.get(serviceId) || serviceId);
@@ -350,7 +356,7 @@ export default function AdminPage() {
         try {
           let messageContent = await getMessageTemplate('cancellation');
           const clientName = appointmentToCancel.userName;
-          const apptDate = format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es });
+          const apptDate = format(getDisplayableDate(appointmentToCancel.preferredDate), "PPP", { locale: es });
           const apptTime = appointmentToCancel.preferredTime;
           
           const serviceNames = appointmentToCancel.services.map(serviceId => serviceMap.get(serviceId) || serviceId);
@@ -570,7 +576,7 @@ export default function AdminPage() {
                           <div className="flex justify-between items-start">
                             <div>
                               <CardTitle className="text-lg font-sans">
-                                {format(new Date(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
+                                {format(getDisplayableDate(appt.preferredDate), "PPP", { locale: es })} - {appt.preferredTime}
                               </CardTitle>
                               <div className="text-sm text-muted-foreground flex items-center mt-1">
                                 <UserCircle2 className="h-4 w-4 mr-1 text-primary"/> 
@@ -608,7 +614,7 @@ export default function AdminPage() {
                             </div>
                           )}
                           <div className="text-xs text-muted-foreground pt-1">
-                            Solicitada: {format(new Date(appt.createdAt), "Pp", { locale: es })}
+                            Solicitada: {format(getDisplayableDate(appt.createdAt), "Pp", { locale: es })}
                           </div>
                         </CardContent>
                         <CardFooter className="pt-3 border-t flex flex-wrap gap-2 justify-end">
@@ -706,7 +712,7 @@ export default function AdminPage() {
                         </div>
                          <div className="flex items-center text-xs text-muted-foreground/80 pt-1">
                           <CalendarDays className="h-3 w-3 mr-1.5" />
-                          Registrado: {format(new Date(user.createdAt), "PPP 'a las' p", { locale: es })}
+                          Registrado: {format(getDisplayableDate(user.createdAt), "PPP 'a las' p", { locale: es })}
                         </div>
                       </CardContent>
                       <CardFooter className="pt-3 border-t">
@@ -954,7 +960,7 @@ export default function AdminPage() {
                 <span className="mt-2 text-sm text-foreground space-y-1">
                   <strong>Cliente:</strong> {appointmentToConfirm.userName || 'N/A'}
                   <br />
-                  <strong>Fecha:</strong> {format(new Date(appointmentToConfirm.preferredDate), "PPP", { locale: es })}
+                  <strong>Fecha:</strong> {format(getDisplayableDate(appointmentToConfirm.preferredDate), "PPP", { locale: es })}
                   <br />
                   <strong>Hora:</strong> {appointmentToConfirm.preferredTime}
                   <br />
@@ -1015,7 +1021,7 @@ export default function AdminPage() {
                 <span className="mt-2 text-sm text-foreground space-y-1">
                   <strong>Cliente:</strong> {appointmentToCancel.userName || 'N/A'}
                   <br />
-                  <strong>Fecha:</strong> {format(new Date(appointmentToCancel.preferredDate), "PPP", { locale: es })}
+                  <strong>Fecha:</strong> {format(getDisplayableDate(appointmentToCancel.preferredDate), "PPP", { locale: es })}
                   <br />
                   <strong>Hora:</strong> {appointmentToCancel.preferredTime}
                   <br />
@@ -1126,5 +1132,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-
