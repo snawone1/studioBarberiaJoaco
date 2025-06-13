@@ -48,15 +48,18 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+      <div className="container flex h-20 items-center justify-between"> {/* Changed to justify-between */}
+        <Link href="/" className="flex items-center space-x-2"> {/* Removed mr-6 */}
           <Scissors className="h-7 w-7 text-primary" />
           <span className="font-bold text-2xl font-headline text-primary">{dynamicSiteName}</span>
         </Link>
-        <MobileNav items={siteConfig.mainNav} /> {/* Pass auth state and functions to MobileNav */}
-        <div className="flex flex-1 items-center justify-end space-x-2">
-          <MainNav items={siteConfig.mainNav} />
-          {/* Auth buttons for desktop, hidden on small screens */}
+        
+        {/* Wrapper for all right-aligned items */}
+        <div className="flex items-center space-x-2">
+          {/* Desktop Navigation - hidden on mobile */}
+          <MainNav items={siteConfig.mainNav} /> 
+          
+          {/* Desktop Auth Buttons - hidden on mobile */}
           <div className="hidden md:flex items-center space-x-2">
             {loading ? (
               <Button variant="outline" className="border-primary text-primary" disabled>
@@ -84,6 +87,9 @@ export function Header() {
               </>
             )}
           </div>
+          
+          {/* Mobile Navigation Trigger (Hamburger) - visible only on mobile via its own internal classes */}
+          <MobileNav items={siteConfig.mainNav} />
         </div>
       </div>
     </header>
