@@ -64,9 +64,10 @@ export default function HomePage() {
       setError(null);
       try {
         const fetchedServices = await getHomePageServices();
+        console.log("Fetched home page services in page.tsx:", JSON.stringify(fetchedServices, null, 2));
         setServices(fetchedServices);
       } catch (e) {
-        console.error("Failed to load home page services:", e);
+        console.error("Failed to load home page services in page.tsx:", e);
         setError("No se pudieron cargar los servicios. Inténtalo de nuevo más tarde.");
       } finally {
         setIsLoading(false);
@@ -121,7 +122,7 @@ export default function HomePage() {
           <div className="text-center py-10 text-muted-foreground">
             <Scissors className="h-12 w-12 mx-auto mb-3 opacity-50"/>
             <p className="text-lg">Actualmente no hay servicios destacados para mostrar.</p>
-            <p className="text-sm">Por favor, añádelos desde el panel de administración.</p>
+            <p className="text-sm">Por favor, añádelos desde el panel de administración o revisa los logs del servidor por errores de índice de Firestore.</p>
           </div>
         )}
         {!isLoading && !error && services.length > 0 && (
