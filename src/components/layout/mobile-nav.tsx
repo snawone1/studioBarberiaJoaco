@@ -8,7 +8,7 @@ import { Menu, Scissors, Home, ShoppingBag, CalendarDays, LayoutDashboard, LogIn
 import { siteConfig, type NavItem } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added SheetHeader and SheetTitle
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -61,9 +61,12 @@ export function MobileNav({ items }: { items?: NavItem[] }) {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0 bg-background text-foreground flex flex-col">
+        <SheetHeader>
+          <SheetTitle className="sr-only">Navegación Principal</SheetTitle> {/* Visually hidden title for accessibility */}
+        </SheetHeader>
         <MobileLink
           href="/"
-          className="flex items-center mb-4 pl-6" 
+          className="flex items-center mb-4 pl-6 pt-2"  /* Added pt-2 to give space if SheetHeader takes any */
           onOpenChange={setOpen}
         >
           <Scissors className="mr-2 h-6 w-6 text-primary" />
