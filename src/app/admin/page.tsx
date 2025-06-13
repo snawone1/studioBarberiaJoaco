@@ -547,9 +547,9 @@ export default function AdminPage() {
             </DialogHeader>
 
             <Tabs value={activeAppointmentTab} onValueChange={(value) => setActiveAppointmentTab(value as AppointmentStatus | 'all')} className="w-full mt-4">
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-5">
+              <TabsList className="flex w-full overflow-x-auto pb-2 justify-start md:justify-center">
                 {appointmentTabs.map(tab => (
-                  <TabsTrigger key={tab.value} value={tab.value}>{tab.label}</TabsTrigger>
+                  <TabsTrigger key={tab.value} value={tab.value} className="whitespace-nowrap">{tab.label}</TabsTrigger>
                 ))}
               </TabsList>
             

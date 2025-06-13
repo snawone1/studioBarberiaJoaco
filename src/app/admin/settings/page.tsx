@@ -65,8 +65,9 @@ import {
 import { ALL_TIME_SLOTS } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { siteConfig } from '@/config/site';
-import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon, HomeIcon, Image as ImageIcon, ShoppingBag } from 'lucide-react';
+import { Loader2, SettingsIcon, PlusCircle, Edit3, Trash2, PackageSearch, ClockIcon, Check, X, MessageSquareIcon, InfoIcon, PhoneIcon, HomeIcon, Image as ImageIcon, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Label as UiLabel } from '@/components/ui/label'; 
@@ -459,22 +460,31 @@ export default function AdminSettingsPage() {
         titleClassName="font-sans"
       />
 
+      <div className="mb-8">
+        <Button asChild variant="outline">
+          <Link href="/admin">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Volver al Panel Principal
+          </Link>
+        </Button>
+      </div>
+
       <div className="max-w-3xl mx-auto">
-       <Accordion type="single" collapsible className="w-full space-y-4">
+       <Accordion type="single" collapsible className="w-full space-y-0">
           {/* General Site Info Accordion Item */}
-          <AccordionItem value="site-info">
-            <AccordionTrigger className="hover:no-underline">
-              <div className="flex items-center text-xl font-semibold w-full">
-                <SettingsIcon className="h-6 w-6 mr-3 text-primary" />
+          <AccordionItem value="site-info" className="border-x border-t rounded-t-lg overflow-hidden">
+            <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+              <div className="flex items-center text-lg font-semibold w-full">
+                <SettingsIcon className="h-5 w-5 mr-3 text-primary" />
                 Información General del Sitio
               </div>
             </AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm text-muted-foreground mb-6 px-1">
+            <AccordionContent className="pt-4 pb-6 px-4 border-b">
+              <p className="text-sm text-muted-foreground mb-6">
                 Modifica el nombre y la descripción de tu sitio web. Estos cambios se reflejarán globalmente.
               </p>
               <Form {...settingsForm}>
-                <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-6 p-1">
+                <form onSubmit={settingsForm.handleSubmit(onSiteSettingsSubmit)} className="space-y-6">
                   <FormField
                     control={settingsForm.control}
                     name="siteName"
@@ -509,15 +519,15 @@ export default function AdminSettingsPage() {
           </AccordionItem>
 
           {/* Home Page Services Accordion Item */}
-          <AccordionItem value="home-page-services">
-            <AccordionTrigger className="hover:no-underline">
-               <div className="flex items-center text-xl font-semibold w-full">
-                <HomeIcon className="h-6 w-6 mr-3 text-primary" />
+          <AccordionItem value="home-page-services" className="border-x">
+            <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+               <div className="flex items-center text-lg font-semibold w-full">
+                <HomeIcon className="h-5 w-5 mr-3 text-primary" />
                 Servicios Destacados (Página de Inicio)
               </div>
             </AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm text-muted-foreground mb-4 px-1">Gestiona las tarjetas de servicios que aparecen en la página principal.</p>
+            <AccordionContent className="pt-4 pb-6 px-4 border-b">
+              <p className="text-sm text-muted-foreground mb-4">Gestiona las tarjetas de servicios que aparecen en la página principal.</p>
               {!showAddEditHomePageServiceForm && (
                 <Button onClick={handleAddNewHomePageServiceClick} className="mb-6 w-full sm:w-auto">
                   <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio Destacado
@@ -525,9 +535,9 @@ export default function AdminSettingsPage() {
               )}
 
               {showAddEditHomePageServiceForm && (
-                <Card className="mb-6 bg-secondary/30 p-0">
+                <Card className="mb-6 bg-card/50 p-0 border shadow-sm">
                   <CardHeader className="p-4 py-3">
-                    <CardTitle className="font-sans text-lg">
+                    <CardTitle className="font-sans text-base">
                       {editingHomePageService ? 'Editar Servicio Destacado' : 'Nuevo Servicio Destacado'}
                     </CardTitle>
                   </CardHeader>
@@ -586,19 +596,19 @@ export default function AdminSettingsPage() {
                 </Card>
               )}
               
-              <h3 className="text-md font-semibold mb-3 mt-4 text-foreground/90 px-1">Actuales Servicios Destacados</h3>
+              <h3 className="text-sm font-semibold mb-3 mt-4 text-foreground/80">Actuales Servicios Destacados</h3>
               {isLoadingHomePageServices ? (
                 <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : homePageServices.length === 0 ? (
-                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8 bg-muted/20">
                   <ImageIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
                   <p className="font-medium">No hay servicios destacados.</p>
                 </div>
               ) : (
-                <ScrollArea className={showAddEditHomePageServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1" : "max-h-[350px] overflow-y-auto border rounded-md p-1"}>
+                <ScrollArea className={showAddEditHomePageServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1 bg-card/30" : "max-h-[350px] overflow-y-auto border rounded-md p-1 bg-card/30"}>
                   <div className="space-y-3 p-3">
                     {homePageServices.map(service => (
-                      <Card key={service.id} className="p-3 shadow-sm bg-card hover:bg-muted/20">
+                      <Card key={service.id} className="p-3 shadow-sm bg-background hover:bg-muted/50">
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                               <div className="flex-grow min-w-0 mb-2 sm:mb-0">
                                   <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name} (Orden: {service.order})</p>
@@ -636,21 +646,21 @@ export default function AdminSettingsPage() {
           </AccordionItem>
 
           {/* Admin Contact Accordion Item */}
-          <AccordionItem value="admin-contact">
-            <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center text-xl font-semibold w-full">
-                    <PhoneIcon className="h-6 w-6 mr-3 text-primary" />
+          <AccordionItem value="admin-contact" className="border-x">
+            <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+                <div className="flex items-center text-lg font-semibold w-full">
+                    <PhoneIcon className="h-5 w-5 mr-3 text-primary" />
                     Contacto del Administrador (WhatsApp)
                 </div>
             </AccordionTrigger>
-            <AccordionContent>
-                <p className="text-sm text-muted-foreground mb-4 px-1">
+            <AccordionContent className="pt-4 pb-6 px-4 border-b">
+                <p className="text-sm text-muted-foreground mb-4">
                     Configura el número de teléfono para que los clientes te contacten por WhatsApp.
                 </p>
                 {isLoadingAdminPhone ? (
                     <div className="flex justify-center py-4"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
                 ) : (
-                    <div className="space-y-3 p-1">
+                    <div className="space-y-3">
                         <UiLabel htmlFor="adminPhoneNumber" className="text-base font-medium">Número de WhatsApp del Administrador</UiLabel>
                         <Input
                             id="adminPhoneNumber"
@@ -676,15 +686,15 @@ export default function AdminSettingsPage() {
           </AccordionItem>
 
           {/* Booking Services Accordion Item */}
-          <AccordionItem value="booking-services">
-             <AccordionTrigger className="hover:no-underline">
-               <div className="flex items-center text-xl font-semibold w-full">
-                  <ShoppingBag className="h-6 w-6 mr-3 text-primary" /> {/* Changed icon */}
+          <AccordionItem value="booking-services" className="border-x">
+             <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+               <div className="flex items-center text-lg font-semibold w-full">
+                  <ShoppingBag className="h-5 w-5 mr-3 text-primary" />
                   Gestión de Servicios (Página de Reservas)
                 </div>
             </AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm text-muted-foreground mb-4 px-1">Añade, edita o elimina los servicios ofrecidos en la página de reservas.</p>
+            <AccordionContent className="pt-4 pb-6 px-4 border-b">
+              <p className="text-sm text-muted-foreground mb-4">Añade, edita o elimina los servicios ofrecidos en la página de reservas.</p>
                {!showAddEditServiceForm && (
                 <Button onClick={handleAddNewServiceClick} className="mb-6 w-full sm:w-auto">
                   <PlusCircle className="mr-2 h-4 w-4" /> Añadir Servicio de Reserva
@@ -692,9 +702,9 @@ export default function AdminSettingsPage() {
               )}
 
               {showAddEditServiceForm && (
-                <Card className="mb-6 bg-secondary/30 p-0">
+                <Card className="mb-6 bg-card/50 p-0 border shadow-sm">
                   <CardHeader className="p-4 py-3">
-                    <CardTitle className="font-sans text-lg">
+                    <CardTitle className="font-sans text-base">
                       {editingService ? 'Editar Servicio de Reserva' : 'Nuevo Servicio de Reserva'}
                     </CardTitle>
                   </CardHeader>
@@ -729,19 +739,19 @@ export default function AdminSettingsPage() {
                 </Card>
               )}
               
-              <h3 className="text-md font-semibold mb-3 mt-4 text-foreground/90 px-1">Servicios de Reserva Actuales</h3>
+              <h3 className="text-sm font-semibold mb-3 mt-4 text-foreground/80">Servicios de Reserva Actuales</h3>
               {isLoadingServices ? (
                 <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : services.length === 0 ? (
-                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8 bg-muted/20">
                   <PackageSearch className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
                   <p className="font-medium">No hay servicios de reserva.</p>
                 </div>
               ) : (
-                <ScrollArea className={showAddEditServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1" : "max-h-[350px] overflow-y-auto border rounded-md p-1"}>
+                <ScrollArea className={showAddEditServiceForm ? "max-h-[200px] overflow-y-auto border rounded-md p-1 bg-card/30" : "max-h-[350px] overflow-y-auto border rounded-md p-1 bg-card/30"}>
                   <div className="space-y-3 p-3">
                     {services.map(service => (
-                      <Card key={service.id} className="p-3 shadow-sm bg-card hover:bg-muted/20">
+                      <Card key={service.id} className="p-3 shadow-sm bg-background hover:bg-muted/50">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                               <div className="flex-grow min-w-0 mb-2 sm:mb-0">
                                   <p className="font-semibold text-card-foreground truncate" title={service.name}>{service.name}</p>
@@ -779,27 +789,27 @@ export default function AdminSettingsPage() {
           </AccordionItem>
 
           {/* Business Hours Accordion Item */}
-          <AccordionItem value="business-hours">
-            <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center text-xl font-semibold w-full">
-                    <ClockIcon className="h-6 w-6 mr-3 text-primary" />
+          <AccordionItem value="business-hours" className="border-x">
+            <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+                <div className="flex items-center text-lg font-semibold w-full">
+                    <ClockIcon className="h-5 w-5 mr-3 text-primary" />
                     Horarios de Atención
                 </div>
             </AccordionTrigger>
-            <AccordionContent>
-              <p className="text-sm text-muted-foreground mb-4 px-1">Define los horarios disponibles para agendar citas.</p>
+            <AccordionContent className="pt-4 pb-6 px-4 border-b">
+              <p className="text-sm text-muted-foreground mb-4">Define los horarios disponibles para agendar citas.</p>
               {isLoadingTimeSlots ? (
                 <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length === 0 ? ( 
-                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8">
+                <div className="text-center py-10 text-muted-foreground rounded-md border border-dashed p-8 bg-muted/20">
                   <ClockIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground/70" />
                   <p className="font-medium">No hay horarios configurados.</p>
                 </div>
               ) : timeSlotSettingsList.length === 0 && ALL_TIME_SLOTS.length > 0 ? ( 
-                  <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1">
+                  <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1 bg-card/30">
                       <div className="space-y-1 p-3">
                         {ALL_TIME_SLOTS.map((slotTime) => (
-                          <div key={slotTime} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                          <div key={slotTime} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/50 transition-colors bg-background">
                             <UiLabel htmlFor={`ts-${slotTime.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">{slotTime}</UiLabel>
                             <div className="flex items-center space-x-2">
                               {isUpdatingTimeSlot === slotTime ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : 
@@ -811,10 +821,10 @@ export default function AdminSettingsPage() {
                       </div>
                   </ScrollArea>
               ) : (
-                <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1">
+                <ScrollArea className="max-h-[350px] overflow-y-auto border rounded-md p-1 bg-card/30">
                   <div className="space-y-1 p-3">
                     {timeSlotSettingsList.map((slot) => (
-                      <div key={slot.time} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-colors">
+                      <div key={slot.time} className="flex items-center justify-between p-3 rounded-md hover:bg-muted/50 transition-colors bg-background">
                         <UiLabel htmlFor={`ts-${slot.time.replace(/\s|:/g, '-')}`} className="text-base font-medium text-foreground cursor-pointer">{slot.time}</UiLabel>
                         <div className="flex items-center space-x-2">
                           {isUpdatingTimeSlot === slot.time ? <Loader2 className="h-5 w-5 animate-spin text-primary" /> : 
@@ -830,19 +840,19 @@ export default function AdminSettingsPage() {
           </AccordionItem>
 
           {/* WhatsApp Messages Accordion Item */}
-          <AccordionItem value="whatsapp-templates">
-             <AccordionTrigger className="hover:no-underline">
-                <div className="flex items-center text-xl font-semibold w-full">
-                    <MessageSquareIcon className="h-6 w-6 mr-3 text-primary" />
+          <AccordionItem value="whatsapp-templates" className="border-x border-b rounded-b-lg overflow-hidden">
+             <AccordionTrigger className="hover:no-underline py-3 px-4 bg-muted/30 data-[state=open]:border-b-0 border-b">
+                <div className="flex items-center text-lg font-semibold w-full">
+                    <MessageSquareIcon className="h-5 w-5 mr-3 text-primary" />
                     Plantillas de Mensajes de WhatsApp
                 </div>
             </AccordionTrigger>
-            <AccordionContent>
-                <p className="text-sm text-muted-foreground mb-4 px-1">Personaliza los mensajes para diferentes interacciones.</p>
+            <AccordionContent className="pt-4 pb-6 px-4">
+                <p className="text-sm text-muted-foreground mb-4">Personaliza los mensajes para diferentes interacciones.</p>
                 {isLoadingTemplates ? (
                      <div className="flex justify-center py-6"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
                 ) : (
-                    <div className="space-y-6 p-1">
+                    <div className="space-y-6">
                         <div className="space-y-2">
                             <UiLabel htmlFor="confTemplate" className="text-base font-medium">Confirmación de Cita (Admin a Cliente)</UiLabel>
                             <Textarea id="confTemplate" value={confirmationTemplate} onChange={(e) => setConfirmationTemplate(e.target.value)} rows={5} className="text-sm"/>
@@ -873,7 +883,7 @@ export default function AdminSettingsPage() {
                         </div>
                     </div>
                 )}
-                 <Card className="mt-6 bg-secondary/30 mx-1">
+                 <Card className="mt-6 bg-card/50 mx-1 border shadow-sm">
                     <CardHeader className="pb-2 pt-3">
                         <CardTitle className="text-sm font-medium flex items-center">
                             <InfoIcon className="h-4 w-4 mr-2 text-primary" /> Marcadores de Posición
