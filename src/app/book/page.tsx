@@ -746,7 +746,7 @@ export default function BookAppointmentPage() {
                         {popoverProducts.length > 0 && (
                           <Popover open={isProductPopoverOpen} onOpenChange={setIsProductPopoverOpen}>
                             <PopoverTrigger asChild>
-                              <Button variant="outline" className="mt-3 w-full sm:w-auto justify-between">
+                              <Button variant="outline" className="mt-3 w-full justify-between">
                                 <span>{`Ver ${popoverProducts.length} producto(s) más`}</span>
                                 <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isProductPopoverOpen ? 'rotate-180' : ''}`} />
                               </Button>
