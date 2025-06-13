@@ -34,7 +34,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  DialogDescription as DialogPrimitiveDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -44,10 +44,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from '@/components/ui/badge';
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle, MessageSquare, HelpCircle, Phone, ShoppingBag, PackageSearch } from "lucide-react"
+import { CalendarIcon, Loader2, Clock, ListChecks, UserCircle, Briefcase, Trash2, AlertCircle, MessageSquare, HelpCircle, Phone, ShoppingBag, PackageSearch, ChevronDown } from "lucide-react"
 import { format } from "date-fns"
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 import { PageHeader } from '@/components/page-header';
 import {
@@ -63,9 +64,9 @@ import {
   getAdminPhoneNumber,
   getMessageTemplate,
   type MessageTemplateId,
-  getProducts, // Import getProducts
+  getProducts, 
 } from '@/app/actions';
-import type { Product } from '@/app/products/page'; // Import Product type
+import type { Product } from '@/app/products/page'; 
 import { type ClientAppointmentFormValues, clientAppointmentSchema, type AppointmentFormValues } from '@/lib/schemas';
 import { useToast } from '@/hooks/use-toast';
 import React, { useEffect, useState, useMemo } from 'react';
@@ -76,6 +77,7 @@ import { siteConfig } from '@/config/site';
 
 const MIN_ADVANCE_BOOKING_MINUTES = 15;
 const now = new Date();
+const PRODUCTS_TO_SHOW_INLINE = 2;
 
 export default function BookAppointmentPage() {
   const { toast } = useToast();
@@ -85,11 +87,12 @@ export default function BookAppointmentPage() {
   const [bookedSlots, setBookedSlots] = React.useState<string[]>([]);
   const [isLoadingBookedSlots, setIsLoadingBookedSlots] = React.useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isProductPopoverOpen, setIsProductPopoverOpen] = useState(false);
 
   const [allServices, setAllServices] = useState<Service[]>([]);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
-  const [allProducts, setAllProducts] = useState<Product[]>([]); // State for products
-  const [isLoadingProducts, setIsLoadingProducts] = useState(true); // Loading state for products
+  const [allProducts, setAllProducts] = useState<Product[]>([]); 
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true); 
 
 
   const [activeTimeSlotSettings, setActiveTimeSlotSettings] = useState<TimeSlotSetting[]>([]);
@@ -111,7 +114,7 @@ export default function BookAppointmentPage() {
     resolver: zodResolver(clientAppointmentSchema),
     defaultValues: {
       services: [],
-      selectedProducts: [], // Initialize selectedProducts
+      selectedProducts: [], 
       preferredDate: undefined,
       preferredTime: '',
       message: '',
@@ -133,11 +136,11 @@ export default function BookAppointmentPage() {
     try {
       const [fetchedServices, fetchedProducts, fetchedSlotSettings] = await Promise.all([
         getServices(),
-        getProducts(), // Fetch products
+        getProducts(), 
         getTimeSlotSettings()
       ]);
       setAllServices(fetchedServices);
-      setAllProducts(fetchedProducts.filter(p => (p.stock ?? 0) > 0)); // Only show products with stock
+      setAllProducts(fetchedProducts.filter(p => (p.stock ?? 0) > 0)); 
       setActiveTimeSlotSettings(fetchedSlotSettings);
     } catch (error) {
       console.error("Error fetching page data:", error);
@@ -157,7 +160,7 @@ export default function BookAppointmentPage() {
         const userAppointments = await getUserAppointments(currentUser.uid);
         console.log("BookPage: Fetched user appointments from server action:", JSON.stringify(userAppointments, null, 2));
         setMyAppointments(userAppointments);
-        // Ensure products are loaded for mapping in "Mis Citas" if not already loaded
+        
         if (allProducts.length === 0 && !isLoadingProducts) {
           const fetchedProducts = await getProducts();
           setAllProducts(fetchedProducts);
@@ -196,6 +199,8 @@ export default function BookAppointmentPage() {
   const formattedSelectedDate = watchedDate
     ? format(watchedDate, "'Para el' EEEE, d 'de' MMMM 'de' yyyy", { locale: es })
     : "Selecciona una fecha primero";
+  
+  const watchedSelectedProducts = form.watch('selectedProducts');
 
   useEffect(() => {
     let isActive = true;
@@ -261,7 +266,7 @@ export default function BookAppointmentPage() {
       const payloadForServer: AppointmentFormValues = {
         ...data,
         userId: currentUser.uid,
-        selectedProducts: data.selectedProducts || [], // Ensure it's an array
+        selectedProducts: data.selectedProducts || [], 
       };
       result = await submitAppointmentRequest(payloadForServer);
     } catch (error) {
@@ -435,6 +440,9 @@ export default function BookAppointmentPage() {
     const slotSetting = activeTimeSlotSettings.find(s => s.time === slot);
     return slotSetting ? slotSetting.isActive : true; 
   });
+
+  const inlineProducts = allProducts.slice(0, PRODUCTS_TO_SHOW_INLINE);
+  const popoverProducts = allProducts.slice(PRODUCTS_TO_SHOW_INLINE);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -669,11 +677,10 @@ export default function BookAppointmentPage() {
                 )}
               />
 
-              {/* Products Selection Field */}
               <FormField
                 control={form.control}
                 name="selectedProducts"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <div className="mb-4">
                       <FormLabel className="text-lg font-semibold flex items-center">
@@ -684,62 +691,123 @@ export default function BookAppointmentPage() {
                         Añade productos a tu cita. Solo se muestran productos con stock.
                       </FormDescription>
                     </div>
+
                     {isLoadingProducts ? (
                       <div className="flex justify-center items-center py-4">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         <span className="ml-2">Cargando productos...</span>
                       </div>
                     ) : allProducts.length === 0 ? (
-                       <p className="text-sm text-muted-foreground text-center py-4">
-                          No hay productos disponibles para encargar en este momento.
-                       </p>
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No hay productos disponibles para encargar en este momento.
+                      </p>
                     ) : (
-                      <div className="space-y-2">
-                        {allProducts.map((product) => (
-                          <FormField
-                            key={product.id}
-                            control={form.control}
-                            name="selectedProducts"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
+                      <>
+                        <div className="space-y-2">
+                          {inlineProducts.map((product) => (
+                            <FormItem
+                              key={product.id}
+                              className="flex flex-row items-start space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(product.id)}
+                                  onCheckedChange={(checked) => {
+                                    const currentValue = field.value || [];
+                                    return checked
+                                      ? field.onChange([...currentValue, product.id])
+                                      : field.onChange(
+                                          currentValue.filter((value) => value !== product.id)
+                                        );
+                                  }}
+                                  className="h-5 w-5 mt-1"
+                                  disabled={(product.stock ?? 0) === 0}
+                                />
+                              </FormControl>
+                              <div className="flex-grow">
+                                <FormLabel
+                                  className={cn(
+                                    "font-normal text-base cursor-pointer flex justify-between items-center w-full",
+                                    (product.stock ?? 0) === 0 && "text-muted-foreground line-through"
+                                  )}
                                 >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(product.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...(field.value || []), product.id])
-                                          : field.onChange(
-                                              (field.value || []).filter(
-                                                (value) => value !== product.id
-                                              )
-                                            )
-                                      }}
-                                      className="h-5 w-5"
-                                      disabled={(product.stock ?? 0) === 0}
-                                    />
-                                  </FormControl>
-                                  <div className="flex-grow">
-                                    <FormLabel className={cn("font-normal text-base cursor-pointer flex justify-between items-center w-full", (product.stock ?? 0) === 0 && "text-muted-foreground line-through")}>
-                                      <span>{product.name}</span>
-                                      <span className="text-sm text-primary font-medium">{product.price}</span>
-                                    </FormLabel>
-                                    {(product.stock ?? 0) === 0 && <p className="text-xs text-destructive">Agotado</p>}
-                                    <p className={cn("text-xs text-muted-foreground mt-0.5", (product.stock ?? 0) === 0 && "line-through")}>{product.description}</p>
-                                  </div>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                      </div>
+                                  <span>{product.name}</span>
+                                  <span className="text-sm text-primary font-medium">{product.price}</span>
+                                </FormLabel>
+                                {(product.stock ?? 0) === 0 && <p className="text-xs text-destructive">Agotado</p>}
+                                <p className={cn("text-xs text-muted-foreground mt-0.5", (product.stock ?? 0) === 0 && "line-through")}>
+                                  {product.description}
+                                </p>
+                              </div>
+                            </FormItem>
+                          ))}
+                        </div>
+
+                        {popoverProducts.length > 0 && (
+                          <Popover open={isProductPopoverOpen} onOpenChange={setIsProductPopoverOpen}>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="mt-3 w-full sm:w-auto justify-between">
+                                <span>{`Ver ${popoverProducts.length} producto(s) más`}</span>
+                                <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isProductPopoverOpen ? 'rotate-180' : ''}`} />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                              <ScrollArea className="max-h-72">
+                                <div className="p-4 space-y-2">
+                                  {popoverProducts.map((product) => (
+                                    <FormItem
+                                      key={product.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0 p-3 rounded-md hover:bg-muted transition-colors border"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(product.id)}
+                                          onCheckedChange={(checked) => {
+                                            const currentValue = field.value || [];
+                                            return checked
+                                              ? field.onChange([...currentValue, product.id])
+                                              : field.onChange(
+                                                  currentValue.filter((value) => value !== product.id)
+                                                );
+                                          }}
+                                          className="h-5 w-5 mt-1"
+                                          disabled={(product.stock ?? 0) === 0}
+                                        />
+                                      </FormControl>
+                                      <div className="flex-grow">
+                                        <FormLabel
+                                          className={cn(
+                                            "font-normal text-base cursor-pointer flex justify-between items-center w-full",
+                                            (product.stock ?? 0) === 0 && "text-muted-foreground line-through"
+                                          )}
+                                        >
+                                          <span>{product.name}</span>
+                                          <span className="text-sm text-primary font-medium">{product.price}</span>
+                                        </FormLabel>
+                                        {(product.stock ?? 0) === 0 && <p className="text-xs text-destructive">Agotado</p>}
+                                        <p className={cn("text-xs text-muted-foreground mt-0.5", (product.stock ?? 0) === 0 && "line-through")}>
+                                          {product.description}
+                                        </p>
+                                      </div>
+                                    </FormItem>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </>
                     )}
+                     <FormDescription className="text-sm mt-3 pt-2 border-t border-dashed">
+                      {watchedSelectedProducts && watchedSelectedProducts.length > 0
+                        ? `${watchedSelectedProducts.length} producto(s) seleccionado(s).`
+                        : 'Ningún producto seleccionado.'}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
 
               <FormField
                 control={form.control}
@@ -938,9 +1006,9 @@ export default function BookAppointmentPage() {
                 <MessageSquare className="h-5 w-5 mr-2 text-primary" />
                 Contactar al Barbero
               </DialogTitle>
-              <DialogDescription>
+              <DialogPrimitiveDescription>
                 Selecciona una opción para comunicarte por WhatsApp sobre tu cita del <strong className="text-foreground">{format(new Date(selectedAppointmentForContact.preferredDate), "PPP", { locale: es })} a las {selectedAppointmentForContact.preferredTime}</strong>.
-              </DialogDescription>
+              </DialogPrimitiveDescription>
             </DialogHeader>
             <div className="grid grid-cols-1 gap-4 py-4">
               <Button
